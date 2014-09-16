@@ -13,19 +13,22 @@ import java.util.*; // necessary due to the use of lists.
 import search.AbstractSearchProblem;
 import search.State;
 
-public class BoundedDepthFirstSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> extends AbstractSearchEngine<S,Problem> {
+public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> extends AbstractSearchEngine<S,Problem> {
 
 	private int visited;
 	private int bound = 3; 
+	
+	private Stack<State> opened;
 
 	/** 
 	 * Constructor for class DepthFirstEngine.  
 	 * @pre. true.
 	 * @post. Lists visited and path are initialised as empty.
 	 */	
-	public BoundedDepthFirstSearchEngine() {
+	public BoundedIterativeDepthFirstSearchEngine() {
 		super();
 		visited = 0;
+		opened = new Stack<State>();
 	}
 
 	/** 
@@ -36,10 +39,11 @@ public class BoundedDepthFirstSearchEngine<S extends State, Problem extends Abst
 	 * @post. A reference to p is stored in field problem. Lists visited and
 	 * path are initialised as empty.
 	 */	
-	public BoundedDepthFirstSearchEngine(Problem p) {
+	public BoundedIterativeDepthFirstSearchEngine(Problem p) {
 		super(p);
 		if (p==null) throw new IllegalArgumentException("creating engine on a null problem");
 		visited = 0;
+		opened = new Stack<State>();
 	}
 
 
@@ -59,8 +63,10 @@ public class BoundedDepthFirstSearchEngine<S extends State, Problem extends Abst
 
 		// now we call a recursive method implementing depth-first
 		int depth = bound;
-		boolean resultSearch = recursiveDepthFirst(initialState,depth);
-		return resultSearch;
+		opened.clear();
+		opened.push(initialState);
+		
+		return false;
 
 	} 
 
@@ -75,28 +81,8 @@ public class BoundedDepthFirstSearchEngine<S extends State, Problem extends Abst
 	 * list visited, the path in list path, and true is returned iff a       
 	 * successful state is found.	 
 	 */	
-	private boolean recursiveDepthFirst(S s, int depth) {
-		if (s==null || depth<0) throw new IllegalArgumentException("calling dfs on null state or with negative depth");
-		visited++;
-		if (depth==0 || problem.success(s)) {
-
-			return (problem.success(s));
-
-
-		} // end then branch
-		else {
-			List<S> succ_s = problem.getSuccessors(s);
-			boolean found = false;
-			while ( (!succ_s.isEmpty()) && (!found) )  {
-
-				S child = succ_s.get(0);
-				succ_s.remove(0);
-				found = recursiveDepthFirst(child,depth-1);
-
-			} // end while
-			return found;
-
-		} // end else branch
+	private boolean iterativeDepthFirst(S s, int depth) {
+		return false;
 	} // end of recursiveDepthFirst
 
 

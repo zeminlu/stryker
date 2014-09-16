@@ -9,7 +9,7 @@ package repairer;
  */
 public class TACOVerifier {
 
-	public boolean verify(Program p) {
+	public boolean verify(JmlProgram p) {
 		//TODO Implement this method
 		return false;
 	}

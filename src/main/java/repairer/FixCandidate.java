@@ -11,7 +11,7 @@ import search.State;
 public class FixCandidate implements State {
 
 	
-	public FixCandidate(Program program) {
+	public FixCandidate(JmlProgram program) {
 		// TODO Method to be implemented
 	}
 	

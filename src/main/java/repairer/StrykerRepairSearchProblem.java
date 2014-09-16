@@ -6,9 +6,9 @@ import search.AbstractSearchProblem;
 
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
-	Program programToFix;
+	JmlProgram programToFix;
 	
-	public StrykerRepairSearchProblem(Program programToFix) {
+	public StrykerRepairSearchProblem(JmlProgram programToFix) {
 		this.programToFix = programToFix;
 	}
 	
