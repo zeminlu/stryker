@@ -9,6 +9,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	JmlProgram programToFix;
 	
 	public StrykerRepairSearchProblem(JmlProgram programToFix) {
+		if (programToFix==null) throw new IllegalArgumentException("null program");
 		this.programToFix = programToFix;
 	}
 	
@@ -18,12 +19,12 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	}
 
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
-		// TODO Auto-generated method stub
+		// TODO Must call mujava to generate mutants of fix candidate.
 		return null;
 	}
 
 	public boolean success(FixCandidate s) {
-		// TODO Auto-generated method stub
+		// TODO Must call TACO to check if current fix candidate is successful.
 		return false;
 	}
 

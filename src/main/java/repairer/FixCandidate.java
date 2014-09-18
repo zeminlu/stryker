@@ -10,15 +10,22 @@ import search.State;
 
 public class FixCandidate implements State {
 
+	JmlProgram program;
 	
 	public FixCandidate(JmlProgram program) {
-		// TODO Method to be implemented
+		this.program = program;
 	}
 	
-	
+	/**
+	 * Checks whether two fix candidates are equivalent. So far, this just compares
+	 * the programs within fix candidates.
+	 * FIXME This method should implement a more efficient comparison that does not take into
+	 * account the comments. It may be a comparison through md5 hashes. 
+	 */
 	public boolean equals(State other) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!(other instanceof FixCandidate)) return false;
+		FixCandidate otherFix = (FixCandidate) other;
+		return (this.program.equals(otherFix.program));
 	}
 
 	
