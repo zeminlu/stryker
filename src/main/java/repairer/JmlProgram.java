@@ -18,30 +18,30 @@ import ar.edu.taco.jml.parser.JmlParser;
 public class JmlProgram implements Program {
 
 	private String parentPath; // stores the parent path of the file corresponding to the program.
-	private String fileName; // stores the name of the file corresponding to the program.
+	private String className; // stores the qualified name of the class corresponding to the program.
 	private File program; // stores the file corresponding to the program.
 
 	/**
 	 * Constructor for class Program. It creates a Program instance from a given file name. File does not need to be
 	 * a valid Java program. 
 	 * @param parentPath is the parent path of the file to be used to create the program
-	 * @param fileName is the name of the file, to be used to create the program.
+	 * @param className is the qualified name of the class corresponding to the program. Class is assumed to be in a .java file 
 	 */
-	public JmlProgram(String parentPath, String fileName) {
-		if (!isReadable(parentPath, fileName)) throw new IllegalArgumentException("creating program with non existent file");
+	public JmlProgram(String parentPath, String className) {
+		if (!isReadable(parentPath, className)) throw new IllegalArgumentException("creating program with non existent file");
 		this.parentPath = parentPath;
-		this.fileName = fileName;
-		this.program = new File(fileName);
+		this.className = className;
+		this.program = new File(className);
 	}
 
 	/**
-	 * Checks whether a given file name corresponds to an actual file in the file system.
-	 * @param parentPath is the parent path of the file 
-	 * @param fileName is the name of the file
-	 * @return true iff the file is an actual file (it exists and is not a directory) and can be read.
+	 * Checks whether a given class name corresponds to an actual file in the file system.
+	 * @param parentPath is the parent path of the class 
+	 * @param className is the qualified name of the class
+	 * @return true iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
-	public static boolean isReadable(String parentPath, String fileName) {
-		File file = new File(parentPath, fileName);
+	public static boolean isReadable(String parentPath, String className) {
+		File file = new File(parentPath, className+".java");
 		return (file.exists() && file.canRead() && !file.isDirectory());
 	}
 
@@ -89,18 +89,8 @@ public class JmlProgram implements Program {
 
 		Main parser = new Main();
 
-		String[] names = {absPathName+this.fileName};
+		String[] names = {absPathName+this.className+".java"};
 		return parser.run(names, options, null);			
 	}
 
-	/**
-	 * Removes the extension of a file name.
-	 * @param fileName is the file name to remove the extension from
-	 * @return the file name without the extension.
-	 */
-	private String removeExtension(String fileName) {
-		if (fileName==null) throw new IllegalArgumentException("null program name");
-		if (fileName.lastIndexOf('.')==-1) throw new IllegalArgumentException("program name does not have extension");
-		return (fileName.substring(0, fileName.lastIndexOf('.')));
-	}
 }
