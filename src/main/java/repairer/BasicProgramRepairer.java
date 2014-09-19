@@ -1,6 +1,6 @@
 package repairer;
 
-import search.engines.BoundedDepthFirstSearchEngine;
+import search.engines.BoundedIterativeDepthFirstSearchEngine;
 
 /**
  * BasicProgramRepairer is a command line application that calls Stryker on a given class and method, and performs the
@@ -44,8 +44,9 @@ public class BasicProgramRepairer {
 		if (subjectClass==null || subjectMethod==null) throw new IllegalStateException("program or method is null");
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod);
-		BoundedDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = new BoundedDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
+		BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = new BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
 		engine.setProblem(problem);
+		engine.setMaxDepth(2);
 		return engine.performSearch();		
 	}
 	

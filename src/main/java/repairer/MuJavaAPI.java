@@ -217,7 +217,7 @@ public class MuJavaAPI {
 				Mutant.OMR,
 				Mutant.PCC,
 				Mutant.PCD,
-				Mutant.PCI,
+				// Mutant.PCI,
 				Mutant.PMD,
 				Mutant.PNC,
 				Mutant.PPD,

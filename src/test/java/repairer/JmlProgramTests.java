@@ -34,7 +34,7 @@ public class JmlProgramTests {
 	@Test
 	public void programCreationWithSimpleJavaFile() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "simpleClass");
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");
 		assertTrue("program does compile", subject.isValid());
 	}
 
