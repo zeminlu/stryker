@@ -5,10 +5,11 @@ public class SimpleClass {
         public SimpleClass() {
                 x = 10;
         }
+
         /*@
           @ ensures \result >= 0;
           @*/
         public int getX() {
-                return x;
+                return (x+1); //mutGenLimit 10
         }
 }

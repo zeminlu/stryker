@@ -23,6 +23,7 @@ public class BasicProgramRepairer {
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (!subjectClass.isValid()) throw new IllegalArgumentException("program does not compile");
 		this.subjectClass = subjectClass;
+		this.subjectMethod = subjectMethod;
 	}
 
 	/**
