@@ -6,8 +6,8 @@ import search.AbstractSearchProblem;
 
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
-	JmlProgram classToFix; // class to fix using Stryker.
-	String methodToFix; // name of method in class classToFix, that is going to be repaired using Stryker.
+	protected JmlProgram classToFix; // class to fix using Stryker.
+	protected String methodToFix; // name of method in class classToFix, that is going to be repaired using Stryker.
 	
 	
 	public StrykerRepairSearchProblem(JmlProgram programToFix, String methodToFix) {
@@ -23,8 +23,8 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	}
 
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
-		// TODO Must call mujava to generate mutants of fix candidate.
-		return null;
+		MuJavaAPI mjAPI = new MuJavaAPI();
+		return mjAPI.generateMutants(s, methodToFix);
 	}
 
 	public boolean success(FixCandidate s) {
