@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;
+import mujava.util.JustCodeDigest;
 
 public class JmlProgram implements Program {
 
@@ -83,4 +84,12 @@ public class JmlProgram implements Program {
 		return parser.run(names, options, null);			
 	}
 
+	/**
+	 * Returns the md5 digest of the program, without considering comments and blank spaces.
+	 * @return the md5 digest of the file where the program is stored.
+	 */
+	public byte[] getMd5Digest() {
+		return JustCodeDigest.digest(this.program);
+	}
+	
 }
