@@ -92,4 +92,14 @@ public class JmlProgram implements Program {
 		return JustCodeDigest.digest(this.program);
 	}
 	
+	/**
+	 * TODO implement this method, that checks whether a method belongs to a class.
+	 * @param methodName
+	 * @return
+	 */
+	public boolean hasMethod(String methodName) {
+		if (methodName==null) throw new IllegalArgumentException("method name is null");
+		return true;
+	}
+
 }
