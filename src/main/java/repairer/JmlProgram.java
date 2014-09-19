@@ -1,9 +1,15 @@
 package repairer;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;
+
 import mujava.util.JustCodeDigest;
 
 public class JmlProgram implements Program {
@@ -99,7 +105,43 @@ public class JmlProgram implements Program {
 	 */
 	public boolean hasMethod(String methodName) {
 		if (methodName==null) throw new IllegalArgumentException("method name is null");
-		return true;
+		String preRegExp = "(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]]+\\s+";
+		String postRegExp =" *\\([^\\)]*\\) *(\\{?|[^;])";
+		String methodDecl = preRegExp + methodName + postRegExp;
+		Pattern pattern = Pattern.compile(methodDecl);
+		return pattern.matcher(readFile(this.program)).find();
 	}
-
+	
+	/**
+	 * 
+	 * @param f
+	 * @return
+	 */
+	private static String readFile(File f) {
+        String result = null;
+        FileReader fr = null;
+        try {
+                fr = new FileReader(f);
+        } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        BufferedReader br = new BufferedReader(fr);
+        String line = "";
+        try {
+                while ((line = br.readLine()) != null) {
+                        result += line;
+                }
+        } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        try {
+                br.close();
+        } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        return result;
+}
 }
