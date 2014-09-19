@@ -68,10 +68,10 @@ public class MuJavaAPI {
 		
 		Mutator mutator = new Mutator();
 		
-		String clazz = "";
+		String clazz = fixCandidate.program.className;
 		String[] methods = {methodToMutate};
 		Mutant[] ops = operators;
-		String inputDir = "";
+		String inputDir = fixCandidate.program.sourceFolder;
 		String outputDir = this.outputDirectory;
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
 		

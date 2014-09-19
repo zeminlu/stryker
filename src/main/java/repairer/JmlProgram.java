@@ -14,9 +14,9 @@ import mujava.util.JustCodeDigest;
 
 public class JmlProgram implements Program {
 
-	private String sourceFolder; // stores the source folder of the file corresponding to the program.
-	private String className; // stores the qualified name of the class corresponding to the program.
-	private File program; // stores the file corresponding to the program.
+	protected String sourceFolder; // stores the source folder of the file corresponding to the program.
+	protected String className; // stores the qualified name of the class corresponding to the program.
+	protected File program; // stores the file corresponding to the program.
 
 	/**
 	 * Constructor for class Program. It creates a Program instance from a given file name. File does not need to be
