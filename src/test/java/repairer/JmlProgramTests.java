@@ -13,7 +13,7 @@ public class JmlProgramTests {
 	@Test(expected=IllegalArgumentException.class)
 	public void programCreationWithNonExistentFile() {
 		// The following must break if file does not exist!
-		new JmlProgram("src/test/resources/java", "noProgram");
+		new JmlProgram("src/test/resources/java/", "noProgram");
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class JmlProgramTests {
 	@Test
 	public void programCreationWithNonJavaFile() {
 		// extension .java is assumed for programs!
-		JmlProgram subject = new JmlProgram("src/test/resources/java", "whatever");
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "whatever");
 		assertFalse("program does not compile", subject.isValid());
 	}
 
@@ -34,7 +34,7 @@ public class JmlProgramTests {
 	@Test
 	public void programCreationWithSimpleJavaFile() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java", "simpleClass");
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "simpleClass");
 		assertTrue("program does compile", subject.isValid());
 	}
 
