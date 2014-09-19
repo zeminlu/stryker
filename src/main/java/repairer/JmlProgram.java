@@ -7,31 +7,31 @@ import org.jmlspecs.checker.Main;
 
 public class JmlProgram implements Program {
 
-	private String parentPath; // stores the parent path of the file corresponding to the program.
+	private String sourceFolder; // stores the source folder of the file corresponding to the program.
 	private String className; // stores the qualified name of the class corresponding to the program.
 	private File program; // stores the file corresponding to the program.
 
 	/**
 	 * Constructor for class Program. It creates a Program instance from a given file name. File does not need to be
 	 * a valid Java program. 
-	 * @param parentPath is the parent path of the file to be used to create the program
+	 * @param sourceFolder is the source folder of the file to be used to create the program
 	 * @param className is the qualified name of the class corresponding to the program. Class is assumed to be in a .java file 
 	 */
-	public JmlProgram(String parentPath, String className) {
-		if (!isReadable(parentPath, className)) throw new IllegalArgumentException("creating program with non existent file");
-		this.parentPath = parentPath;
+	public JmlProgram(String sourceFolder, String className) {
+		if (!isReadable(sourceFolder, className)) throw new IllegalArgumentException("creating program with non existent file");
+		this.sourceFolder = sourceFolder;
 		this.className = className;
 		this.program = new File(className);
 	}
 
 	/**
 	 * Checks whether a given class name corresponds to an actual file in the file system.
-	 * @param parentPath is the parent path of the class 
+	 * @param sourceFolder is the source folder where the class is located. 
 	 * @param className is the qualified name of the class
 	 * @return true iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
-	public static boolean isReadable(String parentPath, String className) {
-		File file = new File(parentPath, className+".java");
+	public static boolean isReadable(String sourceFolder, String className) {
+		File file = new File(sourceFolder, className+".java");
 		return (file.exists() && file.canRead() && !file.isDirectory());
 	}
 
@@ -45,7 +45,7 @@ public class JmlProgram implements Program {
 		JmlOptions options = new JmlOptions("jml");
 
 		// Paths
-		File parPath = new File(this.parentPath);
+		File parPath = new File(this.sourceFolder);
 		String absPathName = parPath.getAbsolutePath()+"/";
 
 
