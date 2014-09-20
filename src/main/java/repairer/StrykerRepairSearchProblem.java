@@ -1,8 +1,11 @@
 package repairer;
 
 import java.util.List;
+import java.util.Properties;
 
 import search.AbstractSearchProblem;
+import ar.edu.taco.TacoAnalysisResult;
+import ar.edu.taco.TacoMain;
 
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
@@ -27,9 +30,22 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		return mjAPI.generateMutants(s, methodToFix);
 	}
 
+	/**
+	 * Decides whether a given fix candidate is a successful repair or not. To decide it,
+	 * TACO is called for bounded verification of the method to repair against its JML specification.
+	 * FIXME This code may not be the best way of calling TACO. It must be improved. So far, only
+	 * paths are passed, no other verification parameters are checked.
+	 * @param s is the fix candidate to analyze	
+	 */
 	public boolean success(FixCandidate s) {
-		// TODO Must call TACO to check if current fix candidate is successful.
-		return false;
+		TacoMain taco = new TacoMain(null);
+		Properties overridingProperties = new Properties();
+		overridingProperties.put("classToCheck",this.classToFix.className);
+		overridingProperties.put("relevantClasses",this.classToFix.className);
+		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
+		overridingProperties.put("jmlParser.sourcePathStr", this.classToFix.absPath);
+		TacoAnalysisResult result = taco.run("src/test/resources/genericTest.properties", overridingProperties);
+		return result.get_alloy_analysis_result().isUNSAT();
 	}
 
 }

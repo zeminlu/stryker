@@ -7,15 +7,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import mujava.util.JustCodeDigest;
+
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;
-
-import mujava.util.JustCodeDigest;
 
 public class JmlProgram implements Program {
 
 	protected String sourceFolder; // stores the source folder of the file corresponding to the program.
 	protected String className; // stores the qualified name of the class corresponding to the program.
+	protected String absPath; // stores the absolute path name of the file containing the class.
 	protected File program; // stores the file corresponding to the program.
 
 	/**
@@ -29,6 +30,7 @@ public class JmlProgram implements Program {
 		this.sourceFolder = sourceFolder;
 		this.className = className;
 		this.program = new File(sourceFolder+className+".java");
+		this.absPath = (new File(sourceFolder)).getAbsolutePath()+"/";		
 	}
 
 	/**
@@ -51,15 +53,11 @@ public class JmlProgram implements Program {
 
 		JmlOptions options = new JmlOptions("jml");
 
-		// Paths
-		File parPath = new File(this.sourceFolder);
-		String absPathName = parPath.getAbsolutePath()+"/";
 
-
-		String classPath = System.getProperty("java.class.path")+":"+absPathName;
+		String classPath = System.getProperty("java.class.path")+":"+this.absPath;
 
 		options.set_classpath(classPath);
-		options.set_sourcepath(absPathName);
+		options.set_sourcepath(this.absPath);
 
 		// Allow generic source code (experimental)
 		options.set_generic(true);
@@ -86,7 +84,7 @@ public class JmlProgram implements Program {
 
 		Main parser = new Main();
 
-		String[] names = {absPathName+this.className+".java"};
+		String[] names = {this.absPath+this.className+".java"};
 		return parser.run(names, options, null);			
 	}
 

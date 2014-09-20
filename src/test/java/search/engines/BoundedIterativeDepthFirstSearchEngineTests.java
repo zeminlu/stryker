@@ -1,13 +1,15 @@
 package search.engines;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
 
-import search.*;
+import search.AbstractSearchProblem;
+import search.State;
 /**
  * Unit tests for search engine BoundedIterativeDepthFirstSearchEngine.
  * @author aguirre

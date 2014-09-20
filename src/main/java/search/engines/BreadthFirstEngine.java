@@ -1,6 +1,8 @@
 package search.engines;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import search.AbstractSearchProblem;
 import search.State;

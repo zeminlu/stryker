@@ -8,7 +8,7 @@ package search.engines;
  */
 
 
-import java.util.*; // necessary due to the use of lists.
+import java.util.Stack; // necessary due to the use of lists.
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

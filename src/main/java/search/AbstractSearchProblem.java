@@ -1,6 +1,6 @@
 package search;
 
-import java.util.*; // necessary due to the use of lists.
+import java.util.List; // necessary due to the use of lists.
 
 /**
  * Title:        AbstractSearchProblem<p>
