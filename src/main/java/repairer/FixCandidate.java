@@ -12,7 +12,7 @@ public class FixCandidate implements State {
 
 	JmlProgram program;
 	
-	private MutantIdentifier mutation; // it holds the mutant identifier that led to current candidate
+	protected MutantIdentifier mutation; // it holds the mutant identifier that led to current candidate
 									   // null for initial fix candidate.
  	
 	/**

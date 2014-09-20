@@ -73,6 +73,9 @@ public class MuJavaAPI {
 		Mutant[] ops = operators;
 		String inputDir = fixCandidate.program.sourceFolder;
 		String outputDir = this.outputDirectory;
+		if (fixCandidate.mutation != null) {
+			outputDir += md5HashToString(fixCandidate.program.getMd5Digest());
+		}
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
 		
 		mutator.setRequest(request);
@@ -119,6 +122,14 @@ public class MuJavaAPI {
 	}
 	
 	
+	private String md5HashToString(byte[] md5Digest) {
+		String result = "";
+		for (byte b : md5Digest) {
+			result += Byte.toString(b);
+		}
+		return result;
+	}
+
 	/**
 	 * Generates mutants from a java file using hardcoded mutation operators
 	 * 
@@ -217,7 +228,7 @@ public class MuJavaAPI {
 				Mutant.OMR,
 				Mutant.PCC,
 				Mutant.PCD,
-				Mutant.PCI,
+				//Mutant.PCI,
 				Mutant.PMD,
 				Mutant.PNC,
 				Mutant.PPD,
