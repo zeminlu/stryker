@@ -43,7 +43,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		overridingProperties.put("classToCheck",this.classToFix.className);
 		overridingProperties.put("relevantClasses",this.classToFix.className);
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", this.classToFix.absPath);
+		overridingProperties.put("jmlParser.sourcePathStr", s.program.absPath);
 		TacoAnalysisResult result = taco.run("src/test/resources/genericTest.properties", overridingProperties);
 		return result.get_alloy_analysis_result().isUNSAT();
 	}
