@@ -28,7 +28,7 @@ public class JmlProgram implements Program {
 		if (!isReadable(sourceFolder, className)) throw new IllegalArgumentException("creating program with non existent file");
 		this.sourceFolder = sourceFolder;
 		this.className = className;
-		this.program = new File(className);
+		this.program = new File(sourceFolder+className+".java");
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class JmlProgram implements Program {
 	 * @return true iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
 	public static boolean isReadable(String sourceFolder, String className) {
-		File file = new File(sourceFolder, className+".java");
+		File file = new File(sourceFolder+className+".java");
 		return (file.exists() && file.canRead() && !file.isDirectory());
 	}
 
