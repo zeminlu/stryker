@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import openjava.ptree.ParseTreeException;
@@ -22,7 +23,7 @@ import mujava.util.JustCodeDigest;
  * This class allows the use of {@code muJava++} to generate mutants ({@code FixCandidate})
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.1u
+ * @version 0.3
  * @see FixCandidate
  * @see JmlProgram
  */
@@ -41,7 +42,7 @@ public class MuJavaAPI {
 	 * mutants will be written to {@code /tmp/} folder
 	 */
 	public MuJavaAPI() {
-		this("/tmp/");
+		this("/tmp/mutants/");
 	}
 	
 	/**
@@ -73,9 +74,21 @@ public class MuJavaAPI {
 		Mutant[] ops = operators;
 		String inputDir = fixCandidate.program.sourceFolder;
 		String outputDir = this.outputDirectory;
-		if (fixCandidate.mutation != null) {
-			outputDir += md5HashToString(fixCandidate.program.getMd5Digest());
+		
+		outputDir += randomString(10);
+		
+		if (!outputDir.endsWith(Core.SEPARATOR)) {
+			outputDir += Core.SEPARATOR;
 		}
+		
+		if (fixCandidate.mutation != null) {
+			outputDir += "_from_" + md5HashToString(fixCandidate.program.getMd5Digest());
+		}
+		
+		if (!outputDir.endsWith(Core.SEPARATOR)) {
+			outputDir += Core.SEPARATOR;
+		}
+		
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
 		
 		mutator.setRequest(request);
@@ -293,6 +306,15 @@ public class MuJavaAPI {
 		if (f.exists()) {
 			f.delete();
 		}
+	}
+	
+	private String randomString(int len) {
+		String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		Random rnd = new Random();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
+			sb.append(AB.charAt(rnd.nextInt(AB.length())));
+		return sb.toString();
 	}
 	
 	
