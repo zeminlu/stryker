@@ -8,7 +8,7 @@ package search.engines;
  */
 
 
-import java.util.*; // necessary due to the use of lists.
+import java.util.List; // necessary due to the use of lists.
 
 import search.AbstractSearchProblem;
 import search.State;

@@ -1,6 +1,7 @@
 package repairer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class JmlProgramTests {
 	@Test
 	public void programCreationWithSimpleJavaFile() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "simpleClass");
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");
 		assertTrue("program does compile", subject.isValid());
 	}
 

@@ -1,18 +1,54 @@
 package repairer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 public class BasicProgramRepairerTests {
 
+	/**
+	 * Tests that attempts to repair a very simple correct program
+	 * Running repair only up to depth 0 (only the initial candidate considered).  
+	 * Repair must return true, indicating the program is (trivially) repaired.
+	 */
 	@Test
-	public void programRepairWithSimpleJavaFile() {
+	public void programRepairWithSimpleCorrectMethod() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "simpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getX");
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", 0);
+		boolean isRepaired = repairer.repair();
+		assertTrue("method cannot be repaired", isRepaired);
+	}
+
+	/**
+	 * Tests that attempts to repair a very simple incorrect program
+	 * Running repair only up to depth 0 (only the initial candidate considered).  
+	 * Repair must return false, indicating the program cannot be repair (up to depth 0).
+	 */
+	@Test
+	public void programRepairWithSimpleIncorrectMethod() {
+		// extension .java is assumed for programs
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 0);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
 	}
+
+	/**
+	 * Tests that attempts to repair a very simple incorrect program
+	 * Running repair only up to depth 1.  
+	 * Repair must return true, indicating the program can be repaired with a single mutation.
+	 */
+	@Test
+	public void programRepairWithSimpleIncorrectMethodDepthOne() {
+		// extension .java is assumed for programs
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
+		boolean isRepaired = repairer.repair();
+		assertTrue("method cannot be repaired", isRepaired);
+	}
+
+
 
 }

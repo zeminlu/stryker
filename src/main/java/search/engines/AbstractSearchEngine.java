@@ -8,9 +8,9 @@ package search.engines;
  * @version 0.3
  */
 
-import java.util.*; // necessary for the use of lists
 import search.AbstractSearchProblem;
 import search.State;
+// necessary for the use of lists
 
 abstract public class AbstractSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> {
 	
