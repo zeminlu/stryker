@@ -42,7 +42,7 @@ public class MuJavaAPI {
 	 * mutants will be written to {@code /tmp/} folder
 	 */
 	public MuJavaAPI() {
-		this("/tmp/");
+		this("/tmp/mutants/");
 	}
 	
 	/**
@@ -77,8 +77,16 @@ public class MuJavaAPI {
 		
 		outputDir += randomString(10);
 		
+		if (!outputDir.endsWith(Core.SEPARATOR)) {
+			outputDir += Core.SEPARATOR;
+		}
+		
 		if (fixCandidate.mutation != null) {
 			outputDir += "_from_" + md5HashToString(fixCandidate.program.getMd5Digest());
+		}
+		
+		if (!outputDir.endsWith(Core.SEPARATOR)) {
+			outputDir += Core.SEPARATOR;
 		}
 		
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
