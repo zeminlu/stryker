@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class BasicProgramRepairerTests {
+public class BasicProgramRepairerTest {
 
 	/**
 	 * Tests that attempts to repair a very simple correct program
@@ -46,9 +46,22 @@ public class BasicProgramRepairerTests {
 		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
 		boolean isRepaired = repairer.repair();
-		assertTrue("method cannot be repaired", isRepaired);
+		assertTrue("method can be repaired", isRepaired);
 	}
 
+	/**
+	 * Tests that attempts to repair a very simple incorrect program
+	 * Running repair only up to depth 2.  
+	 * Repair must return true, indicating the program can be repaired with two mutations.
+	 */
+	@Test
+	public void programRepairWithSimpleIncorrectMethodDepthTwo() {
+		// extension .java is assumed for programs
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decXTwice", 2);
+		boolean isRepaired = repairer.repair();
+		assertTrue("method can be repaired", isRepaired);
+	}
 
 
 }

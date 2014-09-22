@@ -32,5 +32,14 @@ public class SimpleClass {
             return (newX-1); //mutGenLimit 1
     }
 
-      
+    /*@ requires newX >= 0;
+    @ ensures \result >= 0;
+    @*/
+  public static int decXTwice(int newX) {
+          return ((newX-1)-1); //mutGenLimit 2
+  }
+
+    
+    
+    
 }

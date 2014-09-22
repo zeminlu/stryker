@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class JmlProgramTests {
+public class JmlProgramTest {
 
 	/**
 	 * Tests the creation of a program object with a non existent file. Constructor must throw an 
