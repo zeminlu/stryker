@@ -20,6 +20,7 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 
 	private int visited;
 	private int bound = 3; 
+	private S solutionFound;
 	
 	private Stack<Pair<S, Integer>> opened; // stores opened states and their corresponding depth.
 
@@ -31,6 +32,7 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 	public BoundedIterativeDepthFirstSearchEngine() {
 		super();
 		visited = 0;
+		solutionFound = null;
 		opened = new Stack<Pair<S, Integer>>();
 	}
 
@@ -46,6 +48,7 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 		super(p);
 		if (p==null) throw new IllegalArgumentException("creating engine on a null problem");
 		visited = 0;
+		solutionFound = null;
 		opened = new Stack<Pair<S,Integer>>();
 	}
 
@@ -64,6 +67,7 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 		if (maxDepth<0) throw new IllegalArgumentException("invalid max depth");
 		visited = 0;
 		bound = maxDepth;
+		solutionFound = null;
 		opened = new Stack<Pair<S,Integer>>();
 	}
 
@@ -85,6 +89,7 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 	 * @post. the bounded dfs search is performed, and the result of the search is returned. 	 
 	 */
 	public boolean performSearch() {
+		this.solutionFound = null;
 		if (this.problem==null) throw new IllegalStateException("initiating search on a null problem");
 		// we get the initial state
 		S initialState = problem.initialState();
@@ -114,9 +119,10 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 				visited++;
 				if (problem.success(currState)) {
 					found = true;
+					this.solutionFound = currState;
 				}
 				else {
-					// we only push childreno of curr if curr is not at the
+					// we only push children of curr if curr is not at the
 					// last level to treat
 					if (currDepth<this.bound) {
 						for (S s: problem.getSuccessors(currState)) {
@@ -130,6 +136,17 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 		return found;
 	} 
 
+	/**
+	 * Returns the solution found in the last performed search. If search was unsuccessful, then this
+	 * method should not be called.
+	 * @return the solution found in the last performed search.
+	 */
+	public S getSolution() {
+		if (this.solutionFound==null) throw new IllegalStateException("getSolution() can only be called if search was successful.");
+		return this.solutionFound;
+	}
+	
+	
 	/** 
 	 * Reports information regarding a previously executed search.   
 	 * @pre. performSearch() has been executed and finished.
@@ -141,5 +158,6 @@ public class BoundedIterativeDepthFirstSearchEngine<S extends State, Problem ext
 
 	}
 
+	
 
 } 

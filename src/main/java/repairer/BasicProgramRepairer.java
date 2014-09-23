@@ -77,7 +77,18 @@ public class BasicProgramRepairer {
 		BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = new BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(this.maxDepth);
-		return engine.performSearch();		
+		boolean outcome = engine.performSearch();
+		if (outcome) {
+			FixCandidate solution = engine.getSolution();
+			String solutionLocation = solution.program.absPath + solution.program.className + ".java";
+			System.out.println("*** FOUND SOLUTION! Get it from: " + solutionLocation);
+			System.out.println("*** Stats: " + engine.report());
+		}
+		else {
+			System.out.println("*** COULD NOT REPAIR PROGRAM. Try increasing depth in the search for solutions");
+			System.out.println("*** Stats: " + engine.report());
+		}
+		return outcome;
 	}
 	
 }
