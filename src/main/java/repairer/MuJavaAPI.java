@@ -245,10 +245,10 @@ public class MuJavaAPI {
 				Mutant.PMD,
 				Mutant.PNC,
 				Mutant.PPD,
-				Mutant.PRVOL_SMART,
-				Mutant.PRVOR_REFINED,
-				Mutant.PRVOU_REFINED,
-				Mutant.PRVOL,
+				// Mutant.PRVOL_SMART,
+				// Mutant.PRVOR_REFINED,
+				// Mutant.PRVOU_REFINED,
+				// Mutant.PRVOL,
 		};
 		return generateMutants(fixCandidate, methodToMutate, operators);
 	}
