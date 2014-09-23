@@ -33,10 +33,10 @@ public class SimpleClass {
     }
 
     /*@ requires newX >= 0;
-    @ ensures \result >= 0;
+    @ ensures \result == newX*2 + 1;
     @*/
-  public static int decXTwice(int newX) {
-          return ((newX-1)-1); //mutGenLimit 2
+  public static int twicePlusOne(int newX) {
+	  	return (newX - 2)/1; //mutGenLimit 2 
   }
 
     
