@@ -9,7 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class StrykeRepairSearchProblemTests {
+public class StrykerRepairSearchProblemTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	

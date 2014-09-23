@@ -23,7 +23,7 @@ import mujava.util.JustCodeDigest;
  * This class allows the use of {@code muJava++} to generate mutants ({@code FixCandidate})
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.3
+ * @version 0.3.1
  * @see FixCandidate
  * @see JmlProgram
  */
@@ -191,11 +191,9 @@ public class MuJavaAPI {
 	 *		<li> OMR
 	 *		<li> PCC
 	 *		<li> PCD
-	 *		<li> PCI
 	 *		<li> PMD
 	 *		<li> PNC
 	 *		<li> PPD
-	 *		<li> PRVOL_SMART
 	 *		<li> PRVOR_REFINED
 	 *		<li> PRVOU_REFINED
 	 * </b>
@@ -241,7 +239,6 @@ public class MuJavaAPI {
 				Mutant.OMR,
 				Mutant.PCC,
 				Mutant.PCD,
-				//Mutant.PCI,
 				Mutant.PMD,
 				Mutant.PNC,
 				Mutant.PPD,
@@ -249,6 +246,8 @@ public class MuJavaAPI {
 				// Mutant.PRVOR_REFINED,
 				// Mutant.PRVOU_REFINED,
 				// Mutant.PRVOL,
+				// Mutant.PRVOR_REFINED,
+				// Mutant.PRVOU_REFINED,
 		};
 		return generateMutants(fixCandidate, methodToMutate, operators);
 	}
