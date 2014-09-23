@@ -26,5 +26,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/comitaco"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dynalloy4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jdynalloy"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/muJava"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenJava_1.1"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
