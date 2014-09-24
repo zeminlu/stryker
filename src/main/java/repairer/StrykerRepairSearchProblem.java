@@ -53,13 +53,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		overridingProperties.put("jmlParser.sourcePathStr", s.program.absPath);
 		TacoAnalysisResult result = null;
 		try {
-			result = taco.run("src/test/resources/genericTest.properties", overridingProperties);
+	
+			result = taco.run("genericTest.properties", overridingProperties);
 		}
 		catch (TacoNotImplementedYetException e) {
 			// candidate is well formed JML but taco does not support syntax.
 			// considering candidate invalid, for the moment.
 			return false;
-		}
+		} 
 		return result.get_alloy_analysis_result().isUNSAT();
 	}
 
