@@ -12,7 +12,7 @@ import mujava.util.JustCodeDigest;
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;
 
-public class JmlProgram implements Program {
+public class JmlProgram {
 
 	protected String sourceFolder; // stores the source folder of the file corresponding to the program.
 	protected String className; // stores the qualified name of the class corresponding to the program.

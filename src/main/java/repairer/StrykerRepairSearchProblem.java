@@ -8,12 +8,30 @@ import ar.edu.taco.TacoAnalysisResult;
 import ar.edu.taco.TacoMain;
 import ar.edu.taco.TacoNotImplementedYetException;
 
+/**
+ * StrykerRepairSearchProblem is a class that contains all concrete elements necessary for implementing the
+ * program repair process associated with Stryker, as a search problem. This includes:
+ * - the construction of an initial fix candidate to start the search for a fix.
+ * - a routine that, given a fix candidate, computes its successors for the search (mutations obtainable from
+ * a given fix candidate).
+ * - a routine that, given a fix candidate, decides whether it constitutes an actual fix or not.
+ * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
+ * defined as implementations of search.engines.AbstractSearchEngine.
+ * @author aguirre
+ *
+ */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
 	protected JmlProgram classToFix; // class to fix using Stryker.
 	protected String methodToFix; // name of method in class classToFix, that is going to be repaired using Stryker.
 	
 	
+	/**
+	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
+	 * method to fix in the program/class.
+	 * @param programToFix is the JML program containing the method to fix
+	 * @param methodToFix is the name of the method to fix.
+	 */
 	public StrykerRepairSearchProblem(JmlProgram programToFix, String methodToFix) {
 		if (programToFix==null) throw new IllegalArgumentException("no program to fix");
 		if (methodToFix==null) throw new IllegalArgumentException("no method to fix");
@@ -21,12 +39,25 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.methodToFix = methodToFix;
 	}
 	
+	/**
+	 * Returns the initial fix candidate, to start a search for a program fix.
+	 * @return the received JML program, as a fix candidate (coming from no mutation).
+	 */
 	public FixCandidate initialState() {
 		if (classToFix==null) throw new IllegalStateException("program to fix not set in stryker search problem");
 		return (new FixCandidate(this.classToFix));
 	}
 
+	/**
+	 * Computes the successors of a given fix candidate. Successors are all mutants that can be obtained from
+	 * a given fix candidate. These mutations are restricted by: the mutation operators considered (so far, 
+	 * a fixed set of all mutators, excluding those that apply to the left-hand side of assignments), and
+	 * the mutGenLimits provided in the fix candidate's program text.
+	 * @param s is the fix candidate to compute the successors to.
+	 * @return the list of all mutations, as fix candidates, obtainable from the fix candidate s.
+	 */
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
+		if (s==null) throw new IllegalArgumentException("null candidate passed for computing successors");
 		MuJavaAPI mjAPI = new MuJavaAPI();
 		return mjAPI.generateMutants(s, methodToFix);
 	}

@@ -4,16 +4,17 @@ import mujava.api.MutantIdentifier;
 import search.State;
 
 /**
- * Class that represents a fix candidate. It is, basically, an annotated program
+ * Class that represents a fix candidate. It consists of a JML program (JML annotated class) and a mutation that
+ * led to the candidate.
  * @author aguirre
  *
  */
 public class FixCandidate implements State {
 
-	JmlProgram program;
+	protected JmlProgram program; // JML program constituting the fix candidate.
 	
 	protected MutantIdentifier mutation; // it holds the mutant identifier that led to current candidate
-									   // null for initial fix candidate.
+						   			   // null for initial fix candidate.
  	
 	/**
 	 * Constructor of class FixCandidate. It receives the jml program corresponding to the candidate.
@@ -51,7 +52,5 @@ public class FixCandidate implements State {
 		if (!(other instanceof FixCandidate)) return false;
 		return (this.program.getMd5Digest().equals(((FixCandidate) other).program.getMd5Digest()));
 	}
-
-	
 
 }
