@@ -76,6 +76,21 @@ public class BasicProgramRepairerTest {
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
 	}
+	
+	/**
+	 * Tests that attempts to repair a very simple incorrect program
+	 * Running repair only up to depth 3.  
+	 * Repair must return true, indicating the program can be repaired with three mutations.
+	 */
+	@Test
+	public void programRepairWithSimpleIncorrectMethodDepthThree() {
+		// extension .java is assumed for programs
+		mujava.op.util.MutantCodeWriter.writeMutation = true;
+		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
+		boolean isRepaired = repairer.repair();
+		assertTrue("method can be repaired", isRepaired);
+	}
 
 
 }

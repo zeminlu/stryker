@@ -82,7 +82,7 @@ public class MuJavaAPI {
 		}
 		
 		if (fixCandidate.mutation != null) {
-			outputDir += "_from_" + md5HashToString(fixCandidate.program.getMd5Digest());
+			outputDir += "from_" + md5HashToString(fixCandidate.program.getMd5Digest());
 		}
 		
 		if (!outputDir.endsWith(Core.SEPARATOR)) {
@@ -242,12 +242,10 @@ public class MuJavaAPI {
 				Mutant.PMD,
 				Mutant.PNC,
 				Mutant.PPD,
-				// Mutant.PRVOL_SMART,
-				// Mutant.PRVOR_REFINED,
-				// Mutant.PRVOU_REFINED,
-				// Mutant.PRVOL,
-				// Mutant.PRVOR_REFINED,
-				// Mutant.PRVOU_REFINED,
+				Mutant.PRVOR_REFINED,
+				Mutant.PRVOU_REFINED,
+				Mutant.PRVOR_REFINED,
+				Mutant.PRVOU_REFINED,
 		};
 		return generateMutants(fixCandidate, methodToMutate, operators);
 	}

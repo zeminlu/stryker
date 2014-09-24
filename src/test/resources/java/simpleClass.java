@@ -38,6 +38,13 @@ public class SimpleClass {
   public static int twicePlusOne(int newX) {
 	  	return (newX - 2)/1; //mutGenLimit 2 
   }
+  
+  /*@ requires newX >= 0;
+  @ ensures \result == newX*2 + 1;
+  @*/
+	public static int altTwicePlusOne(int newX) {
+		  	return (newX - 0)/1; //mutGenLimit 3 
+	}
 
     
     
