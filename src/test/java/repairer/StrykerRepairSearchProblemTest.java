@@ -32,7 +32,7 @@ public class StrykerRepairSearchProblemTest {
 	}
 	
 	@SuppressWarnings("unused")
-	// @Test
+	@Test
 	public void testGetSuccessors_emptyMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no method to fix");

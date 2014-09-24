@@ -34,7 +34,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public StrykerRepairSearchProblem(JmlProgram programToFix, String methodToFix) {
 		if (programToFix==null) throw new IllegalArgumentException("no program to fix");
-		if (methodToFix==null) throw new IllegalArgumentException("no method to fix");
+		if (methodToFix==null || methodToFix.isEmpty()) throw new IllegalArgumentException("no method to fix");
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
 	}
