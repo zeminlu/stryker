@@ -6,10 +6,24 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * RepairCLI is a command line interface for Stryker. It is a very simple interface, that receives only minimal
+ * input: class name, method to fix, qualified path to class, and max depth for search.
+ * @author aguirre
+ *
+ */
 public class RepairCLI {
 
+	/**
+	 * Main method of CLI interface to Stryker. It uses Apache CLI to parse command line options:
+	 * -p for qualified path to class
+	 * -c for class name
+	 * -m for method to fix
+	 * -d for max depth for the search for fixes.
+	 * All arguments are mandatory, except for max depth. Default max depth: 3.
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Options options = new Options();
 
 		options.addOption("p", true, "qualified path");
@@ -18,13 +32,12 @@ public class RepairCLI {
 		options.addOption("d", false, "max depth for search");
 
 		CommandLineParser parser = new BasicParser();
-		CommandLine cmd = null;
 		try {
-			cmd = parser.parse(options, args);
+			CommandLine cmd = parser.parse(options, args);
 			String qualifiedPath = cmd.getOptionValue("p");
 			String className = cmd.getOptionValue("c");
 			String methodToFix = cmd.getOptionValue("m");
-			int maxDepth = 3;
+			int maxDepth = 3; // max depth is 3 by default.
 
 			if (cmd.hasOption("d")) { 
 				maxDepth = Integer.parseInt(cmd.getOptionValue("d"));
