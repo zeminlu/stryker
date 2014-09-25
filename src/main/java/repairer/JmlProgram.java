@@ -142,6 +142,7 @@ public class JmlProgram {
 	 */
 	public boolean hasMethod(String methodName) {
 		if (methodName==null) throw new IllegalArgumentException("method name is null");
+		if (methodName.isEmpty()) throw new IllegalArgumentException("empty method name");
 		String preRegExp = "(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]]+\\s+";
 		String postRegExp =" *\\([^\\)]*\\) *(\\{?|[^;])";
 		String methodDecl = preRegExp + methodName + postRegExp;
