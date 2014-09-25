@@ -23,9 +23,14 @@ import org.jmlspecs.checker.Main;
  * <li> a file									:	the file which contains the java program </li>
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.1
+ * @version 0.2
  */
 public class JmlProgram {
+	
+	/**
+	 * System path separator
+	 */
+	protected static final String SEPARATOR = "/"; //FIXME: improve this 
 	
 	/**
 	 * stores the source folder of the file corresponding to the program.
@@ -60,7 +65,7 @@ public class JmlProgram {
 		this.sourceFolder = sourceFolder;
 		this.className = className;
 		this.program = new File(sourceFolder+className+".java");
-		this.absPath = (new File(sourceFolder)).getAbsolutePath()+"/";		
+		this.absPath = (new File(sourceFolder)).getAbsolutePath()+SEPARATOR;		
 	}
 
 	/**
@@ -70,6 +75,10 @@ public class JmlProgram {
 	 * @return {@code true} iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
 	public static boolean isReadable(String sourceFolder, String className) {
+		if (!sourceFolder.endsWith(SEPARATOR)) {
+			sourceFolder += SEPARATOR;
+		}
+		className = className.replace("\\.", SEPARATOR);
 		File file = new File(sourceFolder+className+".java");
 		return (file.exists() && file.canRead() && !file.isDirectory());
 	}
