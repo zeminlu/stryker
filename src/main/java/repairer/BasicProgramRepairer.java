@@ -1,12 +1,13 @@
 package repairer;
 
+import mujava.api.MutantIdentifier;
 import search.engines.BoundedIterativeDepthFirstSearchEngine;
 
 /**
  * BasicProgramRepairer is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
  * @author Nazareno Aguirre
- *
+ * @version 0.3
  */
 public class BasicProgramRepairer {
 	
@@ -82,6 +83,10 @@ public class BasicProgramRepairer {
 			FixCandidate solution = engine.getSolution();
 			String solutionLocation = solution.program.absPath + solution.program.className + ".java";
 			System.out.println("*** FOUND SOLUTION! Get it from: " + solutionLocation);
+			System.out.println("*** Mutations that produced the fix: ");
+			for (MutantIdentifier mutation : solution.getMutations()) {
+				System.out.println(mutation.toString() + " in method " + (mutation.isOneLineInMethodOp()?(this.subjectMethod + " in line " + mutation.getAffectedLine()):"not a method mutation"));
+			}
 			System.out.println("*** Stats: " + engine.report());
 		}
 		else {

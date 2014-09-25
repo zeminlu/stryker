@@ -12,6 +12,7 @@ import openjava.ptree.ParseTreeException;
 
 import mujava.OpenJavaException;
 import mujava.api.Mutant;
+import mujava.api.MutantIdentifier;
 import mujava.api.MutantsInformationHolder;
 import mujava.app.Core;
 import mujava.app.MutantInfo;
@@ -23,7 +24,7 @@ import mujava.util.JustCodeDigest;
  * This class allows the use of {@code muJava++} to generate mutants ({@code FixCandidate})
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.3.1
+ * @version 0.3.2
  * @see FixCandidate
  * @see JmlProgram
  */
@@ -81,7 +82,7 @@ public class MuJavaAPI {
 			outputDir += Core.SEPARATOR;
 		}
 		
-		if (fixCandidate.mutation != null) {
+		if (!fixCandidate.mutations.isEmpty()) {
 			outputDir += "from_" + md5HashToString(fixCandidate.program.getMd5Digest());
 		}
 		
@@ -127,7 +128,7 @@ public class MuJavaAPI {
 		
 		if (couldGenerate) {
 			for (MutantInfo mi : mutantsInfo) {
-				mutants.add(wrapMutant(mi));
+				mutants.add(wrapMutant(mi, fixCandidate.getMutations()));
 			}
 		}
 		
@@ -257,11 +258,14 @@ public class MuJavaAPI {
 	 * @param mi	:	the mutant	:	{@code MutantInfo}
 	 * @return	a {@code FixCandidate} object instanciated from the data of {@code mi}	:	{@code FixCandidate}
 	 */
-	private FixCandidate wrapMutant(MutantInfo mi) {
+	private FixCandidate wrapMutant(MutantInfo mi, List<MutantIdentifier> parentMutations) {
 		String baseDir = removeLastPartOfPath(mi.getPath(), mi.getName());
 		String clazzName = mi.getName();
 		JmlProgram program = new JmlProgram(baseDir, clazzName);
-		FixCandidate wrap = new FixCandidate(program, mi.getMutantIdentifier());
+		List<MutantIdentifier> mutations = new LinkedList<MutantIdentifier>();
+		mutations.addAll(parentMutations);
+		mutations.add(mi.getMutantIdentifier());
+		FixCandidate wrap = new FixCandidate(program, mutations);
 		return wrap;
 	}
 	

@@ -1,20 +1,23 @@
 package repairer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import mujava.api.MutantIdentifier;
 import search.State;
 
 /**
  * Class that represents a fix candidate. It consists of a JML program (JML annotated class) and a mutation that
  * led to the candidate.
- * @author aguirre
- *
+ * @author Nazareno Matías Aguirre
+ * @version 0.2
  */
 public class FixCandidate implements State {
 
 	protected JmlProgram program; // JML program constituting the fix candidate.
 	
-	protected MutantIdentifier mutation; // it holds the mutant identifier that led to current candidate
-						   			   // null for initial fix candidate.
+	protected List<MutantIdentifier> mutations; // it holds the mutant identifiers that led to current candidate
+						   			   			// empty for initial fix candidate.
  	
 	/**
 	 * Constructor of class FixCandidate. It receives the jml program corresponding to the candidate.
@@ -24,7 +27,7 @@ public class FixCandidate implements State {
 	public FixCandidate(JmlProgram program) {
 		if (program==null) throw new IllegalArgumentException("creating candidate with null program");
 		this.program = program;
-		this.mutation = null; // initial candidate does not come from a mutation.
+		this.mutations = new LinkedList<MutantIdentifier>(); // initial candidate does not come from a mutation.
 	}
 
 	/**
@@ -34,10 +37,28 @@ public class FixCandidate implements State {
 	 * @param mutation is the mutation that led to the candidate.
 	 */
 	public FixCandidate(JmlProgram program, MutantIdentifier mutation) {
-		if (program==null) throw new IllegalArgumentException("creating candidate with null program");
+		this(program);
 		if (mutation==null) throw new IllegalArgumentException("creating candidate with null mutation");
-		this.program = program;
-		this.mutation = mutation; 
+		this.mutations.add(mutation);
+	}
+	
+	/**
+	 * Constructor of class FixCandidate. It receives the jml program corresponding to the candidate, and
+	 * the mutant identifier that led to the candidate. 
+	 * @param program is the jml program corresponding to the candidate.
+	 * @param mutation is the mutation that led to the candidate.
+	 */
+	public FixCandidate(JmlProgram program, List<MutantIdentifier> mutations) {
+		this(program);
+		if (mutations==null) throw new IllegalArgumentException("creating candidate with null mutations");
+		this.mutations.addAll(mutations);
+	}
+	
+	/**
+	 * @return the mutations applied to this {@code FixCandidate}, the result will never be {@code null}
+	 */
+	public List<MutantIdentifier> getMutations() {
+		return this.mutations;
 	}
 
 	

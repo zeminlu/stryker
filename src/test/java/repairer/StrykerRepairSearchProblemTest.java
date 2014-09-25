@@ -91,5 +91,25 @@ public class StrykerRepairSearchProblemTest {
 			assertTrue("second gen successors is empty", secondGenSuccessors.isEmpty());
 		}
 	}
+	
+	@Test
+	public void testGetSuccessors_mutationsList() {
+		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne");
+		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
+		assertTrue("successors generated", !successors.isEmpty());
+		for (FixCandidate fc : successors) {
+			assertTrue("first candidates have only one mutation", fc.getMutations().size() == 1);
+			List<FixCandidate> secondGenSuccessors = problem.getSuccessors(fc);
+			for (FixCandidate sfc : secondGenSuccessors) {
+				assertTrue("second candidates have two mutations", sfc.getMutations().size() == 2);
+				int fcFirstMutOrigID = fc.getMutations().get(0).getOriginal().getObjectID();
+				int fcFirstMutMutID = fc.getMutations().get(0).getMutant().getObjectID();
+				int scFirstMutOrigID = sfc.getMutations().get(0).getOriginal().getObjectID();
+				int scFirstMutMutID = sfc.getMutations().get(0).getMutant().getObjectID();
+				assertTrue("second candidates first mutation is first mutation of first candidate", fcFirstMutOrigID == scFirstMutOrigID && fcFirstMutMutID == scFirstMutMutID);
+			}
+		}
+	}
 
 }

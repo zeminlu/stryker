@@ -85,7 +85,6 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthThree() {
 		// extension .java is assumed for programs
-		mujava.op.util.MutantCodeWriter.writeMutation = true;
 		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
 		boolean isRepaired = repairer.repair();
