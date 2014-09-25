@@ -12,18 +12,48 @@ import mujava.util.JustCodeDigest;
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;
 
+/**
+ * This class represents a Java program with JML specifications
+ * 
+ * A program is defined by
+ * 
+ * <li> a source folder 						:	where the class should be found, e.g.: {@code src/} </li>
+ * <li> a class name 							:	the full class name (including package), e.g.: {@code main.util.Pair} </li>
+ * <li> the absolute path						:	the full path to the program's file, e.g.: {@code /Users/rupert/project1/src/main/util/Pair.java} </li>
+ * <li> a file									:	the file which contains the java program </li>
+ * 
+ * @author Nazareno Matías Aguirre
+ * @version 0.1
+ */
 public class JmlProgram {
-
-	protected String sourceFolder; // stores the source folder of the file corresponding to the program.
-	protected String className; // stores the qualified name of the class corresponding to the program.
-	protected String absPath; // stores the absolute path name of the file containing the class.
-	protected File program; // stores the file corresponding to the program.
+	
+	/**
+	 * stores the source folder of the file corresponding to the program.
+	 */
+	protected String sourceFolder;
+	
+	/**
+	 * stores the qualified name of the class corresponding to the program.
+	 */
+	protected String className;
+	
+	/**
+	 * stores the absolute path name of the file containing the class.
+	 */
+	protected String absPath;
+	
+	/**
+	 * stores the file corresponding to the program.
+	 */
+	protected File program;
 
 	/**
-	 * Constructor for class Program. It creates a Program instance from a given file name. File does not need to be
-	 * a valid Java program. 
-	 * @param sourceFolder is the source folder of the file to be used to create the program
-	 * @param className is the qualified name of the class corresponding to the program. Class is assumed to be in a .java file 
+	 * Constructor for class {@code JmlProgram}. It creates a {@code JmlProgram} instance from a given file name.
+	 * the file will not be validated in this constructor. 
+	 * @param sourceFolder	:	where the class should be found, e.g.: {@code src/}				: {@code String}
+	 * @param className 	:	the qualified name of the class corresponding to the program	: {@code String}
+	 * <hr>
+	 * <b> note:  the class is assumed to be in a .java file </b>
 	 */
 	public JmlProgram(String sourceFolder, String className) {
 		if (!isReadable(sourceFolder, className)) throw new IllegalArgumentException("creating program with non existent file");
@@ -35,9 +65,9 @@ public class JmlProgram {
 
 	/**
 	 * Checks whether a given class name corresponds to an actual file in the file system.
-	 * @param sourceFolder is the source folder where the class is located. 
-	 * @param className is the qualified name of the class
-	 * @return true iff the class is an actual file (it exists and is not a directory) and can be read.
+	 * @param sourceFolder	:	the source folder where the class is located e.g.: {@code src/}	:	{@code String} 
+	 * @param className 	:	the qualified name of the class	e.g.: {main.util.Pair}			:	{@code String}
+	 * @return {@code true} iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
 	public static boolean isReadable(String sourceFolder, String className) {
 		File file = new File(sourceFolder+className+".java");
@@ -45,8 +75,8 @@ public class JmlProgram {
 	}
 
 	/** 
-	 * Checks whether the program instance is a valid JML-annotated Java program.
-	 * @return true iff program compiles correctly (including JML parsing).
+	 * Checks whether this instance represents a valid JML-annotated Java program.
+	 * @return {@code true} iff program compiles correctly (including JML parsing).
 	 * FIXME the way we are calling the compiler here is "borrowed" from JmlParser. It must be improved.
 	 */
 	public boolean isValid() {
@@ -97,9 +127,9 @@ public class JmlProgram {
 	}
 	
 	/**
-	 * TODO implement this method, that checks whether a method belongs to a class.
-	 * @param methodName
-	 * @return
+	 * this method checks whether a method belongs to the class represented by this instance.
+	 * @param methodName	:	the name of a method to check	: {@code String}
+	 * @return {@code true} iff the class represented by this instance contains a method with the name represented by {@code methodName}
 	 */
 	public boolean hasMethod(String methodName) {
 		if (methodName==null) throw new IllegalArgumentException("method name is null");
@@ -110,10 +140,8 @@ public class JmlProgram {
 		return pattern.matcher(readFile(this.program)).find();
 	}
 	
-	/**
-	 * 
-	 * @param f
-	 * @return
+	/*
+	 * This method is used to read a file and returns the content of the file as a String
 	 */
 	private static String readFile(File f) {
         String result = null;
