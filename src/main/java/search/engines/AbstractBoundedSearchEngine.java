@@ -12,7 +12,7 @@ import search.AbstractSearchProblem;
 import search.State;
 // necessary for the use of lists
 
-abstract public class AbstractSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> {
+abstract public class AbstractBoundedSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> extends AbstractSearchEngine<S, Problem>{
 	
     // a reference to the problem to apply search to
     protected Problem problem;
@@ -22,7 +22,7 @@ abstract public class AbstractSearchEngine<S extends State, Problem extends Abst
 	 * @pre. true.
 	 * @post. This constructor does nothing (skip).
 	 */
-	public AbstractSearchEngine() {};
+	public AbstractBoundedSearchEngine() {};
     
 	/** 
 	 * Constructor for abstract class AbstractSearchEngine.
@@ -31,7 +31,7 @@ abstract public class AbstractSearchEngine<S extends State, Problem extends Abst
 	 * @pre. p!=null.
 	 * @post. A reference to p is stored in field problem.
 	 */	
-    public AbstractSearchEngine(Problem p) {
+    public AbstractBoundedSearchEngine(Problem p) {
         problem = p;
     }
     
@@ -64,4 +64,10 @@ abstract public class AbstractSearchEngine<S extends State, Problem extends Abst
     }
 	
     abstract public S getSolution();
+    
+	/**
+	 * Sets the maximum depth, or bound, for the bounded search
+	 * @param depth is new depth to be used for bounded search strategy.
+	 */
+    abstract public void setMaxDepth(int maxDepth);
 } 

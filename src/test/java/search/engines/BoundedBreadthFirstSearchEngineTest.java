@@ -11,11 +11,11 @@ import org.junit.Test;
 import search.AbstractSearchProblem;
 import search.State;
 /**
- * Unit tests for search engine BoundedIterativeDepthFirstSearchEngine.
+ * Unit tests for search engine BoundedBreadthFirstSearchEngine.
  * @author aguirre
  *
  */
-public class BoundedIterativeDepthFirstSearchEngineTests {
+public class BoundedBreadthFirstSearchEngineTest {
 
 	/**
 	 * IntState is a simple search state represented simply as an integer number.
@@ -115,10 +115,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 0 up to depth 0, starting from 0. Should succeed!
 	 */
 	@Test
-	public void testBoundedDfsWithNilBoundsSuccess() {
+	public void testBoundedBfsWithNilBoundsSuccess() {
 		FindIntProblem problem = new FindIntProblem(0);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(0);
 		assertTrue("number 0 should be found in depth 0", engine.performSearch());
@@ -128,10 +128,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 1 up to depth 0, starting from 0. Should fail!
 	 */
 	@Test
-	public void testBoundedDfsWithNilBoundsFail() {
+	public void testBoundedBfsWithNilBoundsFail() {
 		FindIntProblem problem = new FindIntProblem(1);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(0);
 		assertFalse("number 1 should not be found in depth 0", engine.performSearch());
@@ -141,10 +141,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 2 up to depth 1, starting from 0. Should succeed!
 	 */
 	@Test
-	public void testBoundedDfsSuccessWithinBounds() {
+	public void testBoundedBfsSuccessWithinBounds() {
 		FindIntProblem problem = new FindIntProblem(2);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(1);
 		assertTrue("number 2 should be found in depth 1", engine.performSearch());
@@ -154,10 +154,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 2 up to depth 0, starting from 0. Should fail!
 	 */
 	@Test
-	public void testBoundedDfsSuccessOutsideBounds() {
+	public void testBoundedBfsSuccessOutsideBounds() {
 		FindIntProblem problem = new FindIntProblem(2);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(0);
 		assertFalse("number 2 should be not be found up to depth 0", engine.performSearch());
@@ -167,10 +167,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 20 up to depth 10, starting from 0. Should succeed!
 	 */
 	@Test
-	public void testBoundedDfsSuccessInsideBiggerBounds() {
+	public void testBoundedBfsSuccessInsideBiggerBounds() {
 		FindIntProblem problem = new FindIntProblem(20);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(10);
 		assertTrue("number 20 should be found (search up to depth 10)", engine.performSearch());
@@ -180,10 +180,10 @@ public class BoundedIterativeDepthFirstSearchEngineTests {
 	 * Search for 21 up to depth 10, starting from 0. Should fail!
 	 */
 	@Test
-	public void testBoundedDfsSuccessOutsideBiggerBounds() {
+	public void testBoundedBfsSuccessOutsideBiggerBounds() {
 		FindIntProblem problem = new FindIntProblem(21);
-		BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem> engine = 
-				new BoundedIterativeDepthFirstSearchEngine<IntState, FindIntProblem>();
+		BoundedBreadthFirstSearchEngine<IntState, FindIntProblem> engine = 
+				new BoundedBreadthFirstSearchEngine<IntState, FindIntProblem>();
 		engine.setProblem(problem);
 		engine.setMaxDepth(10);
 		assertFalse("number 21 should not be found (search up to depth 10)", engine.performSearch());

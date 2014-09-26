@@ -1,7 +1,9 @@
 package repairer;
 
 import mujava.api.MutantIdentifier;
-import search.engines.BoundedIterativeDepthFirstSearchEngine;
+import search.engines.AbstractBoundedSearchEngine;
+import search.engines.BoundedBreadthFirstSearchEngine;
+import search.engines.BoundedDepthFirstSearchEngine;
 
 /**
  * BasicProgramRepairer is a command line application that calls Stryker on a given class and method, and performs the
@@ -13,6 +15,13 @@ public class BasicProgramRepairer {
 	
 	private JmlProgram subjectClass; // class containing method to repair
 	private String subjectMethod; // method to repair within subjectClass
+	
+	
+	/**
+	 * Indicates which search strategy is used for searching for a program repair.
+	 * By default, the strategy is (bounded) DFS.
+	 */
+	private boolean dfsStrategy = true;
 	
 	private int maxDepth = 3; // max depth to be considered in the search of program repairs
 	
@@ -59,6 +68,20 @@ public class BasicProgramRepairer {
 	}
 	
 	/**
+	 * Sets Bounded Depth First Search as the strategy to use in the search for program repairs.
+	 */
+	public void setDfsStrategy() {
+		this.dfsStrategy = true;
+	}
+
+	/**
+	 * Sets Bounded Breadth First Search as the strategy to use in the search for program repairs.
+	 */
+	public void setBfsStrategy() {
+		this.dfsStrategy = false;
+	}
+	
+	/**
 	 * Sets the maximum depth to be considered in the search of program repairs.
 	 * @param maxDepth is the value to be set as maximum depth for the search.
 	 */
@@ -75,7 +98,13 @@ public class BasicProgramRepairer {
 		if (subjectClass==null || subjectMethod==null) throw new IllegalStateException("program or method is null");
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod);
-		BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = new BoundedIterativeDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
+		AbstractBoundedSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = null;
+		if (this.dfsStrategy) {
+			engine = new BoundedDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
+		}
+		else {
+			engine = new BoundedBreadthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
+		}
 		engine.setProblem(problem);
 		engine.setMaxDepth(this.maxDepth);
 		boolean outcome = engine.performSearch();
