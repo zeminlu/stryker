@@ -26,7 +26,7 @@ import mujava.util.JustCodeDigest;
  * @author Simón Emmanuel Gutiérrez Brida
  * @version 0.3.2
  * @see FixCandidate
- * @see JmlProgram
+ * @see JMLAnnotatedClass
  */
 public class MuJavaAPI {
 	/**
@@ -261,7 +261,7 @@ public class MuJavaAPI {
 	private FixCandidate wrapMutant(MutantInfo mi, List<MutantIdentifier> parentMutations) {
 		String baseDir = removeLastPartOfPath(mi.getPath(), mi.getName());
 		String clazzName = mi.getName();
-		JmlProgram program = new JmlProgram(baseDir, clazzName);
+		JMLAnnotatedClass program = new JMLAnnotatedClass(baseDir, clazzName);
 		List<MutantIdentifier> mutations = new LinkedList<MutantIdentifier>();
 		mutations.addAll(parentMutations);
 		mutations.add(mi.getMutantIdentifier());

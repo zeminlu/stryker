@@ -13,8 +13,15 @@ import search.engines.BoundedDepthFirstSearchEngine;
  */
 public class BasicProgramRepairer {
 	
-	private JmlProgram subjectClass; // class containing method to repair
-	private String subjectMethod; // method to repair within subjectClass
+	/**
+	 * jml annotated class to repair
+	 */
+	private JMLAnnotatedClass subjectClass;
+	
+	/**
+	 * method to repair within {@code subjectClass}
+	 */
+	private String subjectMethod;
 	
 	
 	/**
@@ -23,7 +30,10 @@ public class BasicProgramRepairer {
 	 */
 	private boolean dfsStrategy = true;
 	
-	private int maxDepth = 3; // max depth to be considered in the search of program repairs
+	/**
+	 * max depth to be considered in the search of program repairs
+	 */
+	private int maxDepth = 3;
 	
 	/**
 	 * Constructor of class ProgramRepair. It sets the subject of the repair process
@@ -31,7 +41,7 @@ public class BasicProgramRepairer {
 	 * @param subjectClass is the class containing the method to be repaired.
 	 * @param subjectMethod is the method to be repaired.
 	 */
-	public BasicProgramRepairer(JmlProgram subjectClass, String subjectMethod) {
+	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod) {
 		if (subjectClass==null) throw new IllegalArgumentException("program is null");
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (!subjectClass.isValid()) throw new IllegalArgumentException("program does not compile");
@@ -46,7 +56,7 @@ public class BasicProgramRepairer {
 	 * @param subjectMethod is the method to be repaired.
 	 * @param maxDepth is the maximum depth to be considered for the search of repairs.
 	 */
-	public BasicProgramRepairer(JmlProgram subjectClass, String subjectMethod, int maxDepth) {
+	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod, int maxDepth) {
 		if (subjectClass==null) throw new IllegalArgumentException("program is null");
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (maxDepth<0) throw new IllegalArgumentException("max depth must be >=0");
@@ -61,7 +71,7 @@ public class BasicProgramRepairer {
 	 * setProgram: it sets the subject of the repair process with the provided parameter.
 	 * @param subject is the program that the repair process will be applied to.
 	 */
-	public void setProgram(JmlProgram subject) {
+	public void setProgram(JMLAnnotatedClass subject) {
 		if (subject==null) throw new IllegalArgumentException("program is null");
 		if (!subject.isValid()) throw new IllegalArgumentException("program does not compile");
 		this.subjectClass = subject;		

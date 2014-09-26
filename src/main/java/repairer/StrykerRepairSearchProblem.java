@@ -22,7 +22,7 @@ import ar.edu.taco.TacoNotImplementedYetException;
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
-	protected JmlProgram classToFix; // class to fix using Stryker.
+	protected JMLAnnotatedClass classToFix; // class to fix using Stryker.
 	protected String methodToFix; // name of method in class classToFix, that is going to be repaired using Stryker.
 	
 	
@@ -32,9 +32,10 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 * @param programToFix is the JML program containing the method to fix
 	 * @param methodToFix is the name of the method to fix.
 	 */
-	public StrykerRepairSearchProblem(JmlProgram programToFix, String methodToFix) {
+	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix) {
 		if (programToFix==null) throw new IllegalArgumentException("no program to fix");
 		if (methodToFix==null || methodToFix.isEmpty()) throw new IllegalArgumentException("no method to fix");
+		if (!programToFix.hasMethod(methodToFix)) throw new IllegalArgumentException("class " + programToFix.className + " doesn't have method " + methodToFix);
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
 	}

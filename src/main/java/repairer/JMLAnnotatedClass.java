@@ -25,7 +25,7 @@ import org.jmlspecs.checker.Main;
  * @author Nazareno Matías Aguirre
  * @version 0.2
  */
-public class JmlProgram {
+public class JMLAnnotatedClass {
 	
 	/**
 	 * System path separator
@@ -53,14 +53,14 @@ public class JmlProgram {
 	protected File program;
 
 	/**
-	 * Constructor for class {@code JmlProgram}. It creates a {@code JmlProgram} instance from a given file name.
+	 * Constructor for class {@code JMLAnnotatedClass}. It creates a {@code JMLAnnotatedClass} instance from a given file name.
 	 * the file will not be validated in this constructor. 
 	 * @param sourceFolder	:	where the class should be found, e.g.: {@code src/}				: {@code String}
 	 * @param className 	:	the qualified name of the class corresponding to the program	: {@code String}
 	 * <hr>
 	 * <b> note:  the class is assumed to be in a .java file </b>
 	 */
-	public JmlProgram(String sourceFolder, String className) {
+	public JMLAnnotatedClass(String sourceFolder, String className) {
 		if (!isReadable(sourceFolder, className)) throw new IllegalArgumentException("creating program with non existent file");
 		this.sourceFolder = sourceFolder;
 		this.className = className;

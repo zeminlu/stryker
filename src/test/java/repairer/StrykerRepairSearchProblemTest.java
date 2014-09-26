@@ -16,7 +16,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@SuppressWarnings("unused")
 	@Test
-	public void testGetSuccessors_nullJmlProgram() {
+	public void testGetSuccessors_nullJMLAnnotatedClass() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no program to fix");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(null, "method");
@@ -27,7 +27,7 @@ public class StrykerRepairSearchProblemTest {
 	public void testGetSuccessors_nullMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no method to fix");
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, null);
 	}
 	
@@ -36,13 +36,13 @@ public class StrykerRepairSearchProblemTest {
 	public void testGetSuccessors_emptyMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no method to fix");
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "");
 	}
 	
 	@Test
 	public void testGetSuccessors_initialStateIsOriginal() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "nonExistenceMethod");
 		FixCandidate initialState = problem.initialState();
 		assertTrue("initial state is the original program", Arrays.equals(program.getMd5Digest(), initialState.program.getMd5Digest()));
@@ -50,7 +50,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_inexistentMethodToMutate() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "nonExistenceMethod");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("no successors generated", successors.isEmpty());
@@ -58,7 +58,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_noMutGenLimitSet() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "TestClass_1");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "TestClass_1");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "method");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("no successors generated", successors.isEmpty());
@@ -66,7 +66,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_mutGenLimitSetWith0() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "TestClass_3");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "TestClass_3");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "method");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("no successors generated", successors.isEmpty());
@@ -74,7 +74,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_mutGenLimitSet_onlyOneGeneration() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "TestClass_2");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "TestClass_2");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "method");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("successors generated", !successors.isEmpty());
@@ -82,7 +82,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_mutGenLimitSet_onlyOneGeneration_secondGenerationIsEmpty() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "TestClass_2");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "TestClass_2");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "method");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("successors generated", !successors.isEmpty());
@@ -94,7 +94,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_mutationsList() {
-		JmlProgram program = new JmlProgram("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("successors generated", !successors.isEmpty());

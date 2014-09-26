@@ -14,7 +14,7 @@ import search.State;
  */
 public class FixCandidate implements State {
 
-	protected JmlProgram program; // JML program constituting the fix candidate.
+	protected JMLAnnotatedClass program; // JML program constituting the fix candidate.
 	
 	protected List<MutantIdentifier> mutations; // it holds the mutant identifiers that led to current candidate
 						   			   			// empty for initial fix candidate.
@@ -24,7 +24,7 @@ public class FixCandidate implements State {
 	 * Use this constructor to create the initial fix candidate, that does not come from a mutation.
 	 * @param program is the program corresponding to the fix candidate.
 	 */
-	public FixCandidate(JmlProgram program) {
+	public FixCandidate(JMLAnnotatedClass program) {
 		if (program==null) throw new IllegalArgumentException("creating candidate with null program");
 		this.program = program;
 		this.mutations = new LinkedList<MutantIdentifier>(); // initial candidate does not come from a mutation.
@@ -36,7 +36,7 @@ public class FixCandidate implements State {
 	 * @param program is the jml program corresponding to the candidate.
 	 * @param mutation is the mutation that led to the candidate.
 	 */
-	public FixCandidate(JmlProgram program, MutantIdentifier mutation) {
+	public FixCandidate(JMLAnnotatedClass program, MutantIdentifier mutation) {
 		this(program);
 		if (mutation==null) throw new IllegalArgumentException("creating candidate with null mutation");
 		this.mutations.add(mutation);
@@ -48,7 +48,7 @@ public class FixCandidate implements State {
 	 * @param program is the jml program corresponding to the candidate.
 	 * @param mutation is the mutation that led to the candidate.
 	 */
-	public FixCandidate(JmlProgram program, List<MutantIdentifier> mutations) {
+	public FixCandidate(JMLAnnotatedClass program, List<MutantIdentifier> mutations) {
 		this(program);
 		if (mutations==null) throw new IllegalArgumentException("creating candidate with null mutations");
 		this.mutations.addAll(mutations);

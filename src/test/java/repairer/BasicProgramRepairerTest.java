@@ -15,7 +15,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleCorrectMethod() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", 0);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method cannot be repaired", isRepaired);
@@ -29,7 +29,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleCorrectMethodInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", 0);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
@@ -45,7 +45,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethod() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 0);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
@@ -59,7 +59,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 0);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
@@ -75,7 +75,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -89,7 +89,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
@@ -105,7 +105,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthTwo() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 2);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -120,7 +120,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthTwoInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 2);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
@@ -136,7 +136,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 1);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
@@ -150,7 +150,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 1);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
@@ -166,7 +166,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthThree() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -180,7 +180,7 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthThreeInBfs() {
 		// extension .java is assumed for programs
-		JmlProgram subject = new JmlProgram("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
