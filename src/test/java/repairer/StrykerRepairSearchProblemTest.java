@@ -43,17 +43,18 @@ public class StrykerRepairSearchProblemTest {
 	@Test
 	public void testGetSuccessors_initialStateIsOriginal() {
 		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
-		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "nonExistenceMethod");
+		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "getX");
 		FixCandidate initialState = problem.initialState();
 		assertTrue("initial state is the original program", Arrays.equals(program.getMd5Digest(), initialState.program.getMd5Digest()));
 	}
 	
 	@Test
 	public void testGetSuccessors_inexistentMethodToMutate() {
+		exception.expect(IllegalArgumentException.class);
+		exception.expectMessage("class " + "SimpleClass" + " doesn't have method " + "nonExistenceMethod");
 		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		@SuppressWarnings("unused")
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "nonExistenceMethod");
-		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
-		assertTrue("no successors generated", successors.isEmpty());
 	}
 	
 	@Test
@@ -110,6 +111,22 @@ public class StrykerRepairSearchProblemTest {
 				assertTrue("second candidates first mutation is first mutation of first candidate", fcFirstMutOrigID == scFirstMutOrigID && fcFirstMutMutID == scFirstMutMutID);
 			}
 		}
+	}
+	
+	@Test
+	public void testMergedRelevantClasses_emptyDependencies() {
+		String[] dependencies = new String[]{};
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne", dependencies);
+		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo(program.getClassName())==0);
+	}
+	
+	@Test
+	public void testMergedRelevantClasses_nonEmptyDependencies() {
+		String[] dependencies = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne", dependencies);
+		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo(program.getClassName()+",a.b.Clase1,a.Main,a.b.util.Pair")==0);
 	}
 
 }

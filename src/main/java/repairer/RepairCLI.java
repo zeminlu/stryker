@@ -47,7 +47,7 @@ public class RepairCLI {
 		Option classes = new Option("n", "needed-classes", true, "class dependencies of the class defined with c/class-name argument");
 		classes.setRequired(false);
 		classes.setArgs(Option.UNLIMITED_VALUES);
-		classes.setValueSeparator(':');
+		classes.setValueSeparator(',');
 		
 		options.addOption(help);
 		options.addOption(path);
@@ -74,13 +74,14 @@ public class RepairCLI {
 				if (maxDepth <= 0) throw new NumberFormatException("Incorrect options.  Max depth must be a non-negative integer.");
 			}
 			
+			String[] dependenciesArgs = new String[]{};
+			
 			if (cmd.hasOption("n")) {
-				String[] dependenciesArgs = cmd.getOptionValues('n');
-				//FIXME: do something with dependenciesArgs
+				dependenciesArgs = cmd.getOptionValues('n');
 			}
 
 			JMLAnnotatedClass subject = new JMLAnnotatedClass(qualifiedPath, clazz);		
-			BasicProgramRepairer repairer = new BasicProgramRepairer(subject, methodToFix, maxDepth);
+			BasicProgramRepairer repairer = new BasicProgramRepairer(subject, methodToFix, dependenciesArgs, maxDepth);
 			repairer.repair();
 		}
 		catch (ParseException e) {

@@ -17,13 +17,26 @@ import ar.edu.taco.TacoNotImplementedYetException;
  * - a routine that, given a fix candidate, decides whether it constitutes an actual fix or not.
  * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
  * defined as implementations of search.engines.AbstractSearchEngine.
- * @author aguirre
- *
+ * @author Nazareno Matías Aguirre
+ * @version 0.1
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
-	protected JMLAnnotatedClass classToFix; // class to fix using Stryker.
-	protected String methodToFix; // name of method in class classToFix, that is going to be repaired using Stryker.
+	/**
+	 * class to fix using Stryker.
+	 */
+	protected JMLAnnotatedClass classToFix;
+	
+	/**
+	 * name of method in class classToFix, that is going to be repaired using Stryker.
+	 */
+	protected String methodToFix;
+	
+	
+	/**
+	 * stores the class to repair and all its dependencies (only java classes)
+	 */
+	private String[] relevantClasses;
 	
 	
 	/**
@@ -35,9 +48,23 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix) {
 		if (programToFix==null) throw new IllegalArgumentException("no program to fix");
 		if (methodToFix==null || methodToFix.isEmpty()) throw new IllegalArgumentException("no method to fix");
-		if (!programToFix.hasMethod(methodToFix)) throw new IllegalArgumentException("class " + programToFix.className + " doesn't have method " + methodToFix);
+		if (!programToFix.hasMethod(methodToFix)) throw new IllegalArgumentException("class " + programToFix.getClassName() + " doesn't have method " + methodToFix);
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
+		this.relevantClasses = new String[]{programToFix.getClassName()};
+	}
+	
+	/**
+	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
+	 * method to fix in the program/class.
+	 * @param programToFix is the JML program containing the method to fix
+	 * @param methodToFix is the name of the method to fix.
+	 */
+	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies) {
+		this(programToFix, methodToFix);
+		this.relevantClasses = new String[dependencies.length + 1];
+		this.relevantClasses[0] = programToFix.getClassName();
+		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
 	}
 	
 	/**
@@ -79,10 +106,10 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		if (!s.program.isValid()) return false;
 		TacoMain taco = new TacoMain(null);
 		Properties overridingProperties = new Properties();
-		overridingProperties.put("classToCheck",s.program.className);
-		overridingProperties.put("relevantClasses",s.program.className);
+		overridingProperties.put("classToCheck",s.program.getClassName());
+		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", s.program.absPath);
+		overridingProperties.put("jmlParser.sourcePathStr", s.program.getSourceFolder());
 		TacoAnalysisResult result = null;
 		try {
 	
@@ -94,6 +121,21 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			return false;
 		} 
 		return result.get_alloy_analysis_result().isUNSAT();
+	}
+	
+	
+	/**
+	 * @return a {@code String} representation of the relevant classes : {@code String}
+	 */
+	public String mergedRelevantClasses() {
+		String mrc = "";
+		for (int d = 0; d < this.relevantClasses.length; d++) {
+			mrc += this.relevantClasses[d];
+			if (d + 1 < this.relevantClasses.length) {
+				mrc += ",";
+			}
+		}
+		return mrc;
 	}
 
 }

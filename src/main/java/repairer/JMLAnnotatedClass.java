@@ -23,34 +23,34 @@ import org.jmlspecs.checker.Main;
  * <li> a file									:	the file which contains the java program </li>
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.2
+ * @version 0.3
  */
 public class JMLAnnotatedClass {
 	
 	/**
 	 * System path separator
 	 */
-	protected static final String SEPARATOR = "/"; //FIXME: improve this 
+	private static final String SEPARATOR = "/"; //FIXME: improve this 
 	
 	/**
 	 * stores the source folder of the file corresponding to the program.
 	 */
-	protected String sourceFolder;
+	private String sourceFolder;
 	
 	/**
 	 * stores the qualified name of the class corresponding to the program.
 	 */
-	protected String className;
+	private String className;
 	
 	/**
 	 * stores the absolute path name of the file containing the class.
 	 */
-	protected String absPath;
+	private String absPath;
 	
 	/**
 	 * stores the file corresponding to the program.
 	 */
-	protected File program;
+	private File program;
 
 	/**
 	 * Constructor for class {@code JMLAnnotatedClass}. It creates a {@code JMLAnnotatedClass} instance from a given file name.
@@ -62,10 +62,47 @@ public class JMLAnnotatedClass {
 	 */
 	public JMLAnnotatedClass(String sourceFolder, String className) {
 		if (!isReadable(sourceFolder, className)) throw new IllegalArgumentException("creating program with non existent file");
-		this.sourceFolder = sourceFolder;
+		this.sourceFolder = toPath(sourceFolder, "");
 		this.className = className;
-		this.program = new File(sourceFolder+className+".java");
-		this.absPath = (new File(sourceFolder)).getAbsolutePath()+SEPARATOR;		
+		this.program = new File(toPath(sourceFolder, className)+".java");
+		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
+	}
+	
+	private static String toPath(String sourceFolder, String className) {
+		String path = sourceFolder;
+		if (!path.endsWith(SEPARATOR)) {
+			path += SEPARATOR;
+		}
+		path += className.replaceAll("\\.", SEPARATOR);
+		return path;
+	}
+	
+	/**
+	 * @return the source folder of the file corresponding to the program : {@code String}
+	 */
+	public String getSourceFolder() {
+		return this.sourceFolder;
+	}
+	
+	/**
+	 * @return the qualified name of the class corresponding to the program : {@code String}
+	 */
+	public String getClassName() {
+		return this.className;
+	}
+	
+	/**
+	 * @return the absolute path name of the file containing the class : {@code String}
+	 */
+	public String getAbsolutePath() {
+		return this.absPath;
+	}
+	
+	/**
+	 * @return the file corresponding to the program : {@code String}
+	 */
+	public File getProgramFile() {
+		return this.program;
 	}
 
 	/**
@@ -75,11 +112,7 @@ public class JMLAnnotatedClass {
 	 * @return {@code true} iff the class is an actual file (it exists and is not a directory) and can be read.
 	 */
 	public static boolean isReadable(String sourceFolder, String className) {
-		if (!sourceFolder.endsWith(SEPARATOR)) {
-			sourceFolder += SEPARATOR;
-		}
-		className = className.replace("\\.", SEPARATOR);
-		File file = new File(sourceFolder+className+".java");
+		File file = new File(toPath(sourceFolder, className)+".java");
 		return (file.exists() && file.canRead() && !file.isDirectory());
 	}
 
@@ -123,7 +156,7 @@ public class JMLAnnotatedClass {
 
 		Main parser = new Main();
 
-		String[] names = {this.absPath+this.className+".java"};
+		String[] names = {this.program.getAbsolutePath()};
 		return parser.run(names, options, null);			
 	}
 

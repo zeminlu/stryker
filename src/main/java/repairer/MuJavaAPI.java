@@ -70,10 +70,10 @@ public class MuJavaAPI {
 		
 		Mutator mutator = new Mutator();
 		
-		String clazz = fixCandidate.program.className;
+		String clazz = fixCandidate.program.getClassName();
 		String[] methods = {methodToMutate};
 		Mutant[] ops = operators;
-		String inputDir = fixCandidate.program.sourceFolder;
+		String inputDir = fixCandidate.program.getSourceFolder();
 		String outputDir = this.outputDirectory;
 		
 		outputDir += randomString(10);

@@ -7,6 +7,39 @@ import org.junit.Test;
 
 public class BasicProgramRepairerTest {
 
+	
+	@Test
+	public void emptyRelevantClasses() {
+		String[] relevantClasses = new String[]{};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", relevantClasses, 0);
+		assertTrue("BasicProgramRepairer only have the class to repair in relevant classes", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("SimpleClass")==0);
+	}
+	
+	@Test
+	public void nonEmptyRelevantClasses() {
+		String[] relevantClasses = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", relevantClasses, 0);
+		boolean relevantClassesSizeIsCorrect = repairer.getClassesDependencies().length == 4;
+		boolean relevantClassesContentIsCorrect = true;
+		String[] classesToSearch = new String[]{subject.getClassName(), "a.b.Clase1", "a.Main", "a.b.util.Pair"};
+		for (String cts : classesToSearch) {
+			boolean found = false;
+			for (String c : repairer.getClassesDependencies()) {
+				if (c.compareTo(cts)==0) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				relevantClassesContentIsCorrect = false;
+				break;
+			}
+		}
+		assertTrue("BasicProgramRepairer relevant classes size and content is correct", relevantClassesSizeIsCorrect && relevantClassesContentIsCorrect);
+	}
+	
 	/**
 	 * Tests that attempts to repair a very simple correct program
 	 * Running repair only up to depth 0 (only the initial candidate considered).  
@@ -183,6 +216,16 @@ public class BasicProgramRepairerTest {
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
 		repairer.setBfsStrategy();
+		boolean isRepaired = repairer.repair();
+		assertTrue("method can be repaired", isRepaired);
+	}
+	
+	@Test
+	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_multikeymap() {
+		String sourceFolder = "src/test/resources/java/";
+		String[] dependencies = new String[]{"examples.stryker.multikeymap.HashEntry", "examples.stryker.multikeymap.MultiKey"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples.stryker.multikeymap.MultiKeyMap");
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "isEqualKey", dependencies, 1);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
