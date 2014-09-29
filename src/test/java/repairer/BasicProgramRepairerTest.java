@@ -223,8 +223,8 @@ public class BasicProgramRepairerTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_multikeymap() {
 		String sourceFolder = "src/test/resources/java/";
-		String[] dependencies = new String[]{"examples.stryker.multikeymap.HashEntry", "examples.stryker.multikeymap.MultiKey"};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples.stryker.multikeymap.MultiKeyMap");
+		String[] dependencies = new String[]{"examples.stryker.multikeymap.MultiKeyMap", "examples.stryker.multikeymap.MultiKey", "examples.stryker.multikeymap.HashEntry"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples/stryker/multikeymap/MultiKeyMap");
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "isEqualKey", dependencies, 1);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);

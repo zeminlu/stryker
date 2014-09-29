@@ -4,14 +4,14 @@ package examples.stryker.multikeymap;
 public class HashEntry {
 
 	/** An object for masking null */
-	protected static final Object NULL = new Object();
+	public static final Object NULL = new Object();
 
 	/** The next entry in the hash chain */
 	protected HashEntry next;
 	/** The hash code of the key */
 	protected int hashCode;
 	/** The key */
-	protected MultiKey key;
+	public MultiKey key;
 	/** The value */
 	protected Object value;
 
@@ -48,7 +48,4 @@ public class HashEntry {
 	}
 
 	
-	public String toString() {
-		return new StringBuilder().append(getKey()).append('=').append(getValue()).toString();
-	}
 }

@@ -30,7 +30,7 @@ public class MultiKey {
     // This class could implement List, but that would confuse it's purpose
 
     /** The individual keys */
-    private /*final*/ Object[] keys;
+    public /*final*/ Object[] keys;
     /** The cached hashCode */
     private transient int hashCode;
 
@@ -218,15 +218,7 @@ public class MultiKey {
         return hashCode;
     }
 
-    /**
-     * Gets a debugging string version of the key.
-     *
-     * @return a debugging string
-     */
-    public String toString() {
-        return "MultiKey" + Arrays.toString(keys);
-    }
-
+  
     /**
      * Calculate the hash code of the instance using the provided keys.
      * @param keys the keys to calculate the hash code for
