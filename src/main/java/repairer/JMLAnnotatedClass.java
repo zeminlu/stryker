@@ -23,7 +23,7 @@ import org.jmlspecs.checker.Main;
  * <li> a file									:	the file which contains the java program </li>
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.3
+ * @version 0.4
  */
 public class JMLAnnotatedClass {
 	
@@ -51,6 +51,11 @@ public class JMLAnnotatedClass {
 	 * stores the file corresponding to the program.
 	 */
 	private File program;
+	
+	/**
+	 * stores the package of the class 
+	 */
+	private String classPackage;
 
 	/**
 	 * Constructor for class {@code JMLAnnotatedClass}. It creates a {@code JMLAnnotatedClass} instance from a given file name.
@@ -66,6 +71,20 @@ public class JMLAnnotatedClass {
 		this.className = className;
 		this.program = new File(toPath(sourceFolder, className)+".java");
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
+		String fullClassName = className;
+		int lastPathSeparatorIndex = fullClassName.lastIndexOf("");
+		if (lastPathSeparatorIndex == -1) {
+			this.classPackage = "";
+		} else {
+			this.classPackage = toPath(fullClassName.substring(0, lastPathSeparatorIndex), "");
+		}
+	}
+	
+	public void moveLocation(String sourceFolder) {
+		if (!isReadable(sourceFolder, this.className)) throw new IllegalArgumentException("creating program with non existent file");
+		this.sourceFolder = toPath(sourceFolder, "");
+		this.program = new File(toPath(sourceFolder, className)+".java");
+		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");	
 	}
 	
 	private static String toPath(String sourceFolder, String className) {
@@ -73,8 +92,16 @@ public class JMLAnnotatedClass {
 		if (!path.endsWith(SEPARATOR)) {
 			path += SEPARATOR;
 		}
-		path += className.replaceAll("\\.", SEPARATOR);
+		path += className;
+		path = path.replaceAll("\\.", SEPARATOR);
 		return path;
+	}
+	
+	/**
+	 * @return the package of the class
+	 */
+	public String getClassPackage() {
+		return this.classPackage;
 	}
 	
 	/**
@@ -89,6 +116,13 @@ public class JMLAnnotatedClass {
 	 */
 	public String getClassName() {
 		return this.className;
+	}
+	
+	/**
+	 * @return the qualified name of the class but with each dot replaced by /
+	 */
+	public String getClassNameAsPath() {
+		return this.className.replaceAll("\\.", SEPARATOR);
 	}
 	
 	/**
@@ -166,6 +200,13 @@ public class JMLAnnotatedClass {
 	 */
 	public byte[] getMd5Digest() {
 		return JustCodeDigest.digest(this.program);
+	}
+	
+	/**
+	 * @return the path to the program asociated with this instance
+	 */
+	public String getFilePath() {
+		return this.program.getAbsolutePath();
 	}
 	
 	/**

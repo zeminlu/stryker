@@ -7,15 +7,15 @@ public class HashEntry {
 	public static final Object NULL = new Object();
 
 	/** The next entry in the hash chain */
-	protected HashEntry next;
+	public HashEntry next;
 	/** The hash code of the key */
-	protected int hashCode;
+	public int hashCode;
 	/** The key */
 	public MultiKey key;
 	/** The value */
-	protected Object value;
+	public Object value;
 
-	protected HashEntry(final HashEntry next, final int hashCode, final MultiKey key, final Object value) {
+	public HashEntry(final HashEntry next, final int hashCode, final MultiKey key, final Object value) {
 		super();
 		this.next = next;
 		this.hashCode = hashCode;

@@ -1,5 +1,10 @@
 package repairer;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Properties;
 
@@ -103,13 +108,22 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public boolean success(FixCandidate s) {
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
+		
+		if (!copy(s.program.getFilePath(), FixCandidate.getSandboxDir() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
+			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + FixCandidate.getSandboxDir());
+			return false;
+		}
+		
+		String sourceFolderBackup = s.program.getSourceFolder();
+		s.program.moveLocation(FixCandidate.getSandboxDir());
+		
 		if (!s.program.isValid()) return false;
 		TacoMain taco = new TacoMain(null);
 		Properties overridingProperties = new Properties();
-		overridingProperties.put("classToCheck",s.program.getClassName());
+		overridingProperties.put("classToCheck",s.program.getClassNameAsPath());//s.program.getClassName());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", s.program.getSourceFolder());
+		overridingProperties.put("jmlParser.sourcePathStr", FixCandidate.getSandboxDir());//s.program.getSourceFolder());
 		TacoAnalysisResult result = null;
 		try {
 	
@@ -118,8 +132,10 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		catch (TacoNotImplementedYetException e) {
 			// candidate is well formed JML but taco does not support syntax.
 			// considering candidate invalid, for the moment.
+			s.program.moveLocation(sourceFolderBackup);
 			return false;
-		} 
+		}
+		s.program.moveLocation(sourceFolderBackup);
 		return result.get_alloy_analysis_result().isUNSAT();
 	}
 	
@@ -136,6 +152,19 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			}
 		}
 		return mrc;
+	}
+	
+	private boolean copy(String srcPath, String destPath) {
+		Path source = FileSystems.getDefault().getPath(srcPath);
+		Path target = FileSystems.getDefault().getPath(destPath);
+		try {
+			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 }

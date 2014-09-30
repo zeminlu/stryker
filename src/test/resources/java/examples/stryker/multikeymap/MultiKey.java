@@ -32,7 +32,7 @@ public class MultiKey {
     /** The individual keys */
     public /*final*/ Object[] keys;
     /** The cached hashCode */
-    private transient int hashCode;
+    public int hashCode;
 
     /**
      * Constructor taking two keys.
@@ -223,7 +223,7 @@ public class MultiKey {
      * Calculate the hash code of the instance using the provided keys.
      * @param keys the keys to calculate the hash code for
      */
-    private void calculateHashCode(final Object[] keys)
+    public void calculateHashCode(final Object[] keys)
     {
         int total = 0;
         for (int i=0; i<keys.length; i++) {
@@ -240,7 +240,7 @@ public class MultiKey {
      * only stable for the same process).
      * @return the instance with recalculated hash code
      */
-    private Object readResolve() {
+    public Object readResolve() {
         calculateHashCode(keys);
         return this;
     }

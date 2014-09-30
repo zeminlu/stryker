@@ -70,7 +70,7 @@ public class MuJavaAPI {
 		
 		Mutator mutator = new Mutator();
 		
-		String clazz = fixCandidate.program.getClassName();
+		String clazz = fixCandidate.program.getClassNameAsPath();
 		String[] methods = {methodToMutate};
 		Mutant[] ops = operators;
 		String inputDir = fixCandidate.program.getSourceFolder();
@@ -236,7 +236,7 @@ public class MuJavaAPI {
 				Mutant.LOD,
 				Mutant.LOI,
 				Mutant.LOR,
-				Mutant.OAN_RELAXED,
+				//Mutant.OAN_RELAXED,
 				Mutant.OMR,
 				Mutant.PCC,
 				Mutant.PCD,
@@ -244,9 +244,7 @@ public class MuJavaAPI {
 				Mutant.PNC,
 				Mutant.PPD,
 				Mutant.PRVOR_REFINED,
-				Mutant.PRVOU_REFINED,
-				Mutant.PRVOR_REFINED,
-				Mutant.PRVOU_REFINED,
+				//Mutant.PRVOU_REFINED,
 		};
 		return generateMutants(fixCandidate, methodToMutate, operators);
 	}
@@ -270,7 +268,7 @@ public class MuJavaAPI {
 	}
 	
 	private String removeLastPartOfPath(String originalPath, String className) {
-		String classNameToPath = className.replace("\\.", Core.SEPARATOR) + ".java";
+		String classNameToPath = className.replaceAll("\\.", Core.SEPARATOR) + ".java";
 		int indexToCut = originalPath.indexOf(classNameToPath);
 		String result = originalPath.substring(0, indexToCut-1);
 		if (!result.endsWith(Core.SEPARATOR)) {

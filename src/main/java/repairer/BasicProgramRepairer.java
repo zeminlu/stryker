@@ -1,5 +1,23 @@
 package repairer;
 
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
+import java.util.Random;
+import java.util.Set;
+
 import mujava.api.MutantIdentifier;
 import search.engines.AbstractBoundedSearchEngine;
 import search.engines.BoundedBreadthFirstSearchEngine;
@@ -9,7 +27,7 @@ import search.engines.BoundedDepthFirstSearchEngine;
  * BasicProgramRepairer is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
  * @author Nazareno Aguirre
- * @version 0.3
+ * @version 0.4
  */
 public class BasicProgramRepairer {
 	
@@ -144,6 +162,19 @@ public class BasicProgramRepairer {
 		if (subjectClass==null || subjectMethod==null) throw new IllegalStateException("program or method is null");
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod, this.relevantClasses);
+		// +++++++++++++++++++++++++++++++++++++++++++++++
+		// create compilation sandbox
+		String sandboxDir = generateSandboxDirOnTmp();
+		if (!createSandboxDir(sandboxDir)) {
+			System.err.println("couldn't create compilation sandbox directory: " + sandboxDir);
+			return false;
+		}
+		if (!move(problem.initialState().program.getSourceFolder(), sandboxDir, problem.initialState().program.getFilePath())) {
+			System.err.println("couldn't move compilation ambient to compilation sandbox directory");
+			return false;
+		}
+		FixCandidate.setSandboxDir(sandboxDir);
+		// ------------------------------------------------
 		AbstractBoundedSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = null;
 		if (this.dfsStrategy) {
 			engine = new BoundedDepthFirstSearchEngine<FixCandidate,StrykerRepairSearchProblem>();
@@ -168,7 +199,116 @@ public class BasicProgramRepairer {
 			System.out.println("*** COULD NOT REPAIR PROGRAM. Try increasing depth in the search for solutions");
 			System.out.println("*** Stats: " + engine.report());
 		}
+		deleteDir(FixCandidate.getSandboxDir());
 		return outcome;
+	}
+	
+	private boolean move(String sourceFolder, String sandboxDir, String ignoreFile) {
+		final Path source = FileSystems.getDefault().getPath(sourceFolder);
+		final Path target = FileSystems.getDefault().getPath(sandboxDir);
+		final Path ignore = FileSystems.getDefault().getPath(ignoreFile);
+		try {
+			Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS),
+					Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir,
+						BasicFileAttributes attrs) throws IOException {
+					Path targetdir = target.resolve(source.relativize(dir));
+					try {
+						Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrwxrwx");
+					    FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(perms);
+						Files.createDirectory(targetdir, fileAttributes);
+						//Files.copy(dir, targetdir);
+					} catch (FileAlreadyExistsException e) {
+						if (!Files.isDirectory(targetdir))
+							throw e;
+					} catch (AccessDeniedException e) {
+						System.err.println("AccessDeniedException: " + e.getMessage());
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(Path file,BasicFileAttributes attrs) throws IOException {
+					try {
+						if (!file.toAbsolutePath().equals(ignore)) {
+							Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-rw-rw-");
+						    FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(perms);
+							Path resolvedPath = target.resolve(source.relativize(file));
+						    Files.createFile(resolvedPath, fileAttributes);
+							Files.copy(file,target.resolve(source.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+						}
+								
+					} catch (AccessDeniedException e) {
+						System.err.println("AccessDeniedException: " + e.getMessage());
+					}
+					return FileVisitResult.CONTINUE;
+				}
+				
+				
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean deleteDir(String dir) {
+		Path start = FileSystems.getDefault().getPath(dir);
+		try {
+			Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file,
+						BasicFileAttributes attrs) throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir,
+						IOException e) throws IOException {
+					if (e == null) {
+						Files.delete(dir);
+						return FileVisitResult.CONTINUE;
+					} else {
+						// directory iteration failed
+						throw e;
+					}
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	private boolean createSandboxDir(String sandboxDir) {
+		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrwxrwx");
+	    FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(perms);
+		Path sandboxPath = FileSystems.getDefault().getPath(sandboxDir);
+	    try {
+			Files.createDirectory(sandboxPath, fileAttributes);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private String generateSandboxDirOnTmp() {
+		return "/tmp/" + "compilationSandbox-" + randomString(10) + "/";
+	}
+	
+	private String randomString(int len) {
+		String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		Random rnd = new Random();
+		StringBuilder sb = new StringBuilder(len);
+		for (int i = 0; i < len; i++)
+			sb.append(AB.charAt(rnd.nextInt(AB.length())));
+		return sb.toString();
 	}
 	
 }

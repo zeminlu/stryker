@@ -10,7 +10,7 @@ import search.State;
  * Class that represents a fix candidate. It consists of a JML program (JML annotated class) and a mutation that
  * led to the candidate.
  * @author Nazareno Matías Aguirre
- * @version 0.2
+ * @version 0.3
  */
 public class FixCandidate implements State {
 
@@ -19,6 +19,20 @@ public class FixCandidate implements State {
 	protected List<MutantIdentifier> mutations; // it holds the mutant identifiers that led to current candidate
 						   			   			// empty for initial fix candidate.
  	
+	/**
+	 * The path to the compilation sandbox directory
+	 */
+	private static String sandboxDir;
+	
+	public static void setSandboxDir(String sd) {
+		FixCandidate.sandboxDir = sd;
+	}
+	
+	public static String getSandboxDir() {
+		//TODO: add exception when this method is called before calling setSandboxDir
+		return FixCandidate.sandboxDir;
+	}
+	
 	/**
 	 * Constructor of class FixCandidate. It receives the jml program corresponding to the candidate.
 	 * Use this constructor to create the initial fix candidate, that does not come from a mutation.
