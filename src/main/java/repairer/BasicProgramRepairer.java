@@ -162,6 +162,9 @@ public class BasicProgramRepairer {
 		if (subjectClass==null || subjectMethod==null) throw new IllegalStateException("program or method is null");
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod, this.relevantClasses);
+		if (this.typeScope!=null) {
+			problem.setScope(this.typeScope);
+		}
 		// +++++++++++++++++++++++++++++++++++++++++++++++
 		// create compilation sandbox
 		String sandboxDir = generateSandboxDirOnTmp();
@@ -310,5 +313,11 @@ public class BasicProgramRepairer {
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
 	}
+	
+	public void setScope(String typeScope) {
+		this.typeScope = typeScope;
+	}
+	
+	private String typeScope = null;
 	
 }

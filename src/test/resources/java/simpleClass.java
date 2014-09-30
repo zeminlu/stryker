@@ -15,7 +15,7 @@ public class SimpleClass {
           @ ensures \result >= 0;
           @*/
         public int getX() {
-                return (x-1); //mutGenLimit 1
+                return (x); 
         }
         
         /*@ requires newX >= 0;

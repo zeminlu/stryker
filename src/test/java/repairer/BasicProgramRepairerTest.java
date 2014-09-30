@@ -7,15 +7,21 @@ import org.junit.Test;
 
 public class BasicProgramRepairerTest {
 
-	
+	/**
+	 * When an empty set of relevant classes is provided, only the class containing the method to repair 
+	 * is considered.
+	 */
 	@Test
 	public void emptyRelevantClasses() {
 		String[] relevantClasses = new String[]{};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", relevantClasses, 0);
-		assertTrue("BasicProgramRepairer only have the class to repair in relevant classes", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("SimpleClass")==0);
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getX", relevantClasses, 0);
+		assertTrue("Only the class to repair is relevant", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("SimpleClass")==0);
 	}
 	
+	/**
+	 * When relevant classes are passed, these are correctly taken into account.
+	 */
 	@Test
 	public void nonEmptyRelevantClasses() {
 		String[] relevantClasses = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
@@ -37,7 +43,7 @@ public class BasicProgramRepairerTest {
 				break;
 			}
 		}
-		assertTrue("BasicProgramRepairer relevant classes size and content is correct", relevantClassesSizeIsCorrect && relevantClassesContentIsCorrect);
+		assertTrue("number and contents of relevant classes is correct", relevantClassesSizeIsCorrect && relevantClassesContentIsCorrect);
 	}
 	
 	/**
@@ -49,7 +55,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleCorrectMethod() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", 0);
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getX", 0);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method cannot be repaired", isRepaired);
 	}
@@ -135,7 +141,7 @@ public class BasicProgramRepairerTest {
 	 * Running repair only up to depth 2.  
 	 * Repair must return true, indicating the program can be repaired with two mutations.
 	 */
-	@Test
+	//@Test
 	public void programRepairWithSimpleIncorrectMethodDepthTwo() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
@@ -196,7 +202,7 @@ public class BasicProgramRepairerTest {
 	 * Running repair only up to depth 3.  
 	 * Repair must return true, indicating the program can be repaired with three mutations.
 	 */
-	@Test
+	// @Test
 	public void programRepairWithSimpleIncorrectMethodDepthThree() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
@@ -210,7 +216,7 @@ public class BasicProgramRepairerTest {
 	 * Running repair only up to depth 3, using BFS.  
 	 * Repair must return true, indicating the program can be repaired with three mutations.
 	 */
-	@Test
+	// @Test
 	public void programRepairWithSimpleIncorrectMethodDepthThreeInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
@@ -220,12 +226,24 @@ public class BasicProgramRepairerTest {
 		assertTrue("method can be repaired", isRepaired);
 	}
 	
+	
 	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_multikeymap() {
-		String sourceFolder = "src/test/resources/java/";
-		String[] dependencies = new String[]{"examples.stryker.multikeymap.MultiKeyMap", "examples.stryker.multikeymap.MultiKey", "examples.stryker.multikeymap.HashEntry"};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples.stryker.multikeymap.MultiKeyMap");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "isEqualKey", dependencies, 1);
+		String sourceFolder = "src/test/resources/java/examples/stryker/multikeymap";
+		String[] dependencies = new String[]{"MultiKey", "HashEntry"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "MultiKeyMap");
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "equalKey", dependencies, 0);
+		boolean isRepaired = repairer.repair();
+		assertTrue("method can be repaired", isRepaired);
+	}
+
+	@Test
+	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_singlylinkedlist() {
+		String sourceFolder = "src/test/resources/java/roops/core/objects";
+		String[] dependencies = new String[]{"SinglyLinkedList", "SinglyLinkedListNode"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "SinglyLinkedList");
+		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getNode", dependencies, 1);
+		repairer.setScope("roops.core.objects.SinglyLinkedList:3,roops.core.objects.SinglyLinkedListNode:3");
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}

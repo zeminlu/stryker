@@ -1,4 +1,3 @@
-package examples.stryker.multikeymap;
 
 
 public class HashEntry {
@@ -15,7 +14,7 @@ public class HashEntry {
 	/** The value */
 	public Object value;
 
-	public HashEntry(final HashEntry next, final int hashCode, final MultiKey key, final Object value) {
+	public HashEntry(HashEntry next, int hashCode, MultiKey key, Object value) {
 		super();
 		this.next = next;
 		this.hashCode = hashCode;
@@ -34,7 +33,7 @@ public class HashEntry {
 		return (Object) value;
 	}
 
-	public Object setValue(final Object value) {
+	public Object setValue(Object value) {
 		final Object old = this.value;
 		this.value = value;
 		return (Object) old;
@@ -43,8 +42,7 @@ public class HashEntry {
 
 	
 	public int hashCode() {
-		return (getKey() == null ? 0 : getKey().hashCode()) ^
-				(getValue() == null ? 0 : getValue().hashCode());
+		return 0;
 	}
 
 	

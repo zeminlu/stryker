@@ -236,15 +236,15 @@ public class MuJavaAPI {
 				Mutant.LOD,
 				Mutant.LOI,
 				Mutant.LOR,
-				//Mutant.OAN_RELAXED,
+				Mutant.OAN_RELAXED,
 				Mutant.OMR,
 				Mutant.PCC,
 				Mutant.PCD,
 				Mutant.PMD,
 				Mutant.PNC,
-				Mutant.PPD,
+				Mutant.PPD, 
 				Mutant.PRVOR_REFINED,
-				//Mutant.PRVOU_REFINED,
+				Mutant.PRVOU_REFINED,
 		};
 		return generateMutants(fixCandidate, methodToMutate, operators);
 	}

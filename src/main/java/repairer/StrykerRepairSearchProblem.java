@@ -43,6 +43,11 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	private String[] relevantClasses;
 	
+	/**
+	 * Type scopes, provided as a string
+	 * FIXME improve the representation
+	 */
+	private String typeScopes = null;
 	
 	/**
 	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
@@ -124,6 +129,26 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
 		overridingProperties.put("jmlParser.sourcePathStr", FixCandidate.getSandboxDir());//s.program.getSourceFolder());
+		
+		overridingProperties.put("relevancyAnalysis", true);
+		overridingProperties.put("checkNullDereference", true);
+		overridingProperties.put("useJavaArithmetic", false);
+		overridingProperties.put("checkArithmeticException", false);
+		overridingProperties.put("inferScope", true);
+		overridingProperties.put("objectScope", 3);
+		overridingProperties.put("loopUnroll", 3);
+		overridingProperties.put("skolemizeInstanceInvariant", true);
+		overridingProperties.put("skolemizeInstanceAbstraction", true);
+		overridingProperties.put("generateUnitTestCase", false);
+		overridingProperties.put("attemptToCorrectBug", false);
+		overridingProperties.put("maxStrykerMethodsPerFile", 1);
+		overridingProperties.put("removeQuantifiers", true);
+		overridingProperties.put("useJavaSBP", false);
+		overridingProperties.put("useTightUpperBounds", false);
+		if (this.typeScopes!=null) {
+			overridingProperties.put("typeScopes", this.typeScopes);
+		}
+		
 		TacoAnalysisResult result = null;
 		try {
 	
@@ -139,6 +164,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		return result.get_alloy_analysis_result().isUNSAT();
 	}
 	
+	/**
+	 * Sets the type scopes for the search
+	 * @param typeScopes is the type scopes, represented as a string
+	 */
+	public void setScope(String typeScopes) {
+		if (typeScopes==null) throw new IllegalArgumentException("setting null type scope");
+		this.typeScopes = typeScopes;
+	}
 	
 	/**
 	 * @return a {@code String} representation of the relevant classes : {@code String}

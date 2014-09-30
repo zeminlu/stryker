@@ -1,150 +1,31 @@
-package examples.stryker.multikeymap;
 
 
-import java.util.Arrays;
-
-/**
- * A <code>MultiKey</code> allows multiple map keys to be merged together.
- * <p>
- * The purpose of this class is to avoid the need to write code to handle
- * maps of maps. An example might be the need to look up a file name by
- * key and locale. The typical solution might be nested maps. This class
- * can be used instead by creating an instance passing in the key and locale.
- * <p>
- * Example usage:
- * <pre>
- * // populate map with data mapping key+locale to localizedText
- * Map map = new HashMap();
- * MultiKey multiKey = new MultiKey(key, locale);
- * map.put(multiKey, localizedText);
- *
- * // later retrieve the localized text
- * MultiKey multiKey = new MultiKey(key, locale);
- * String localizedText = (String) map.get(multiKey);
- * </pre>
- *
- * @since 3.0
- * @version $Id$
- */
 public class MultiKey {
-    // This class could implement List, but that would confuse it's purpose
 
-    /** The individual keys */
     public /*final*/ Object[] keys;
-    /** The cached hashCode */
+
     public int hashCode;
 
-    /**
-     * Constructor taking two keys.
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     *
-     * @param key1  the first key
-     * @param key2  the second key
-     */
     public MultiKey(final Object key1, final Object key2) {
         this((Object[]) new Object[] { key1, key2 }, false);
     }
 
-    /**
-     * Constructor taking three keys.
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     *
-     * @param key1  the first key
-     * @param key2  the second key
-     * @param key3  the third key
-     */
     public MultiKey(final Object key1, final Object key2, final Object key3) {
         this((Object[]) new Object[] {key1, key2, key3}, false);
     }
 
-    /**
-     * Constructor taking four keys.
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     *
-     * @param key1  the first key
-     * @param key2  the second key
-     * @param key3  the third key
-     * @param key4  the fourth key
-     */
     public MultiKey(final Object key1, final Object key2, final Object key3, final Object key4) {
         this((Object[]) new Object[] {key1, key2, key3, key4}, false);
     }
 
-    /**
-     * Constructor taking five keys.
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     *
-     * @param key1  the first key
-     * @param key2  the second key
-     * @param key3  the third key
-     * @param key4  the fourth key
-     * @param key5  the fifth key
-     */
     public MultiKey(final Object key1, final Object key2, final Object key3, final Object key4, final Object key5) {
         this((Object[]) new Object[] {key1, key2, key3, key4, key5}, false);
     }
 
-    /**
-     * Constructor taking an array of keys which is cloned.
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     * <p>
-     * This is equivalent to <code>new MultiKey(keys, true)</code>.
-     *
-     * @param keys  the array of keys, not null
-     * @throws IllegalArgumentException if the key array is null
-     */
-    public MultiKey(final Object[] keys) {
-        this(keys, true);
+    public MultiKey(Object[] keys, boolean clone) {
+    	this.keys = keys;
     }
-
-    /**
-     * Constructor taking an array of keys, optionally choosing whether to clone.
-     * <p>
-     * <b>If the array is not cloned, then it must not be modified.</b>
-     * <p>
-     * This method is public for performance reasons only, to avoid a clone.
-     * The hashcode is calculated once here in this method.
-     * Therefore, changing the array passed in would not change the hashcode but
-     * would change the equals method, which is a bug.
-     * <p>
-     * This is the only fully safe usage of this constructor, as the object array
-     * is never made available in a variable:
-     * <pre>
-     * new MultiKey(new Object[] {...}, false);
-     * </pre>
-     * <p>
-     * The keys should be immutable
-     * If they are not then they must not be changed after adding to the MultiKey.
-     *
-     * @param keys  the array of keys, not null
-     * @param makeClone  true to clone the array, false to assign it
-     * @throws IllegalArgumentException if the key array is null
-     * @since 3.1
-     */
-    public MultiKey(final Object[] keys, final boolean makeClone) {
-        super();
-        if (keys == null) {
-            throw new IllegalArgumentException("The array of keys must not be null");
-        }
-        if (makeClone) {
-            this.keys = (Object[]) keys.clone();
-        } else {
-            this.keys = keys;
-        }
-
-        calculateHashCode(keys);
-    }
-
+    
     //-----------------------------------------------------------------------
     /**
      * Gets a clone of the array of keys.
@@ -155,7 +36,7 @@ public class MultiKey {
      * @return the individual keys
      */
     public Object[] getKeys() {
-        return (Object[]) keys.clone();
+        return keys;
     }
 
     /**
@@ -180,29 +61,9 @@ public class MultiKey {
      * @since 3.1
      */
     /*@ pure @*/ public int size() {
-        return keys.length;
+        return ((Object[]) keys).length;
     }
 
-    //-----------------------------------------------------------------------
-    /**
-     * Compares this object to another.
-     * <p>
-     * To be equal, the other object must be a <code>MultiKey</code> with the
-     * same number of keys which are also equal.
-     *
-     * @param other  the other object to compare to
-     * @return true if equal
-     */
-    public boolean equals(final Object other) {
-        if (other == this) {
-            return true;
-        }
-        if (other instanceof MultiKey) {
-            final MultiKey otherMulti = (MultiKey) other;
-            return Arrays.equals(keys, otherMulti.keys);
-        }
-        return false;
-    }
 
     /**
      * Gets the combined hash code that is computed from all the keys.
@@ -225,13 +86,8 @@ public class MultiKey {
      */
     public void calculateHashCode(final Object[] keys)
     {
-        int total = 0;
-        for (int i=0; i<keys.length; i++) {
-            if (keys[i] != null) {
-                total ^= keys[i].hashCode();
-            }
-        }
-        hashCode = total;
+        
+        hashCode = 0;
     }
 
     /**
