@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import search.AbstractSearchProblem;
+import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoAnalysisResult;
 import ar.edu.taco.TacoMain;
 import ar.edu.taco.TacoNotImplementedYetException;
@@ -157,6 +158,12 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		catch (TacoNotImplementedYetException e) {
 			// candidate is well formed JML but taco does not support syntax.
 			// considering candidate invalid, for the moment.
+			s.program.moveLocation(sourceFolderBackup);
+			return false;
+		}
+		catch (JDynAlloySemanticException e) {
+			// candidate is syntactically well formed but JML detects it as 
+			// semantically invalid. Considering candidate invalid.
 			s.program.moveLocation(sourceFolderBackup);
 			return false;
 		}

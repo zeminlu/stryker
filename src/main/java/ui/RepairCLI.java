@@ -61,6 +61,7 @@ public class RepairCLI {
 		options.addOption(method);
 		options.addOption(depth);
 		options.addOption(classes);
+		options.addOption(scope);
 
 		CommandLineParser parser = new BasicParser();
 		try {
