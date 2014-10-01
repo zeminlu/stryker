@@ -1,4 +1,4 @@
-package repairer;
+package ui;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -7,6 +7,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import repairer.BasicProgramRepairer;
+import repairer.JMLAnnotatedClass;
 
 /**
  * RepairCLI is a command line interface for Stryker. It is a very simple interface, that receives only minimal
