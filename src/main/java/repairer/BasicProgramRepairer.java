@@ -314,6 +314,12 @@ public class BasicProgramRepairer {
 		return sb.toString();
 	}
 	
+	/**
+	 * Sets the scope, provided as a string.
+	 * FIXME This is not the best way to pass the scope (we are passing it through too many classes). Let's use
+	 * configuration as a singleton.
+	 * @param typeScope is the scope to be used in the repair process.
+	 */
 	public void setScope(String typeScope) {
 		this.typeScope = typeScope;
 	}

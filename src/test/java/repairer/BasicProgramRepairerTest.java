@@ -212,7 +212,7 @@ public class BasicProgramRepairerTest {
 	}
 
 	/**
-	 * Tests that attempts to repair a very simple incorrect program
+	 * Test that attempts to repair a very simple incorrect program
 	 * Running repair only up to depth 3, using BFS.  
 	 * Repair must return true, indicating the program can be repaired with three mutations.
 	 */
@@ -226,24 +226,31 @@ public class BasicProgramRepairerTest {
 		assertTrue("method can be repaired", isRepaired);
 	}
 	
-	
-	@Test
+	/**
+	 * Attempts to repair a simple program with various dependencies, failing to do so due to the max
+	 * depth in the search.
+	 */
+	// @Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_multikeymap() {
 		String sourceFolder = "src/test/resources/java/examples/stryker/multikeymap";
 		String[] dependencies = new String[]{"MultiKey", "HashEntry"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "MultiKeyMap");
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "equalKey", dependencies, 0);
 		boolean isRepaired = repairer.repair();
-		assertTrue("method can be repaired", isRepaired);
+		assertFalse("method cannot be repaired with this depth", isRepaired);
 	}
 
+	/**
+	 * Attempts to repair a SinglyLinkedList method which depends on other files (node class).
+	 * It repairs the program.
+	 */
 	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_singlylinkedlist() {
-		String sourceFolder = "src/test/resources/java/roops/core/objects";
-		String[] dependencies = new String[]{"SinglyLinkedList", "SinglyLinkedListNode"};
+		String sourceFolder = "src/test/resources/java/roops/core/objects/";
+		String[] dependencies = new String[]{"SinglyLinkedList", "dep.SinglyLinkedListNode"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "SinglyLinkedList");
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getNode", dependencies, 1);
-		repairer.setScope("roops.core.objects.SinglyLinkedList:3,roops.core.objects.SinglyLinkedListNode:3");
+		repairer.setScope("SinglyLinkedList:3,dep.SinglyLinkedListNode:3");
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
