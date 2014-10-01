@@ -38,8 +38,11 @@ public class RepairCLI {
 		method.setRequired(true);
 		
 		Option depth = new Option("d", "depth", true, "max depth for search");
-		depth.setRequired(true);
+		depth.setRequired(false);
 		depth.setType(Integer.class);
+
+		Option scope = new Option("s", "scope", true, "scope");
+		scope.setRequired(false);
 		
 		Option help = new Option("h", "help", false, "print commands");
 		help.setRequired(false);
@@ -82,6 +85,11 @@ public class RepairCLI {
 
 			JMLAnnotatedClass subject = new JMLAnnotatedClass(qualifiedPath, clazz);		
 			BasicProgramRepairer repairer = new BasicProgramRepairer(subject, methodToFix, dependenciesArgs, maxDepth);
+			
+			if (cmd.hasOption("s")) {
+				String typeScope = cmd.getOptionValue('s');
+				repairer.setScope(typeScope);
+			}
 			repairer.repair();
 		}
 		catch (ParseException e) {

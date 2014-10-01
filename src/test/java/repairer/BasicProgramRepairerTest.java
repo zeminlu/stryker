@@ -246,11 +246,11 @@ public class BasicProgramRepairerTest {
 	 */
 	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_singlylinkedlist() {
-		String sourceFolder = "src/test/resources/java/roops/core/objects/";
-		String[] dependencies = new String[]{"SinglyLinkedList", "dep.SinglyLinkedListNode"};
+		String sourceFolder = "src/test/resources/";
+		String[] dependencies = new String[]{"SinglyLinkedList", "SinglyLinkedListNode"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "SinglyLinkedList");
 		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getNode", dependencies, 1);
-		repairer.setScope("SinglyLinkedList:3,dep.SinglyLinkedListNode:3");
+		repairer.setScope("SinglyLinkedList:3,SinglyLinkedListNode:3");
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
