@@ -163,6 +163,7 @@ public class BasicProgramRepairer {
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod, this.relevantClasses);
 		if (this.typeScope!=null) {
+			// if a scope is provided, we pass it to the problem (to be used in success method).
 			problem.setScope(this.typeScope);
 		}
 		// +++++++++++++++++++++++++++++++++++++++++++++++

@@ -1,4 +1,3 @@
-
 /*@nullable_by_default@*/
 public class SinglyLinkedListNode {
 

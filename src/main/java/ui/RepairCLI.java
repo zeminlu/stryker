@@ -1,4 +1,4 @@
-package repairer;
+package ui;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -7,6 +7,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import repairer.BasicProgramRepairer;
+import repairer.JMLAnnotatedClass;
 
 /**
  * RepairCLI is a command line interface for Stryker. It is a very simple interface, that receives only minimal
@@ -38,8 +41,11 @@ public class RepairCLI {
 		method.setRequired(true);
 		
 		Option depth = new Option("d", "depth", true, "max depth for search");
-		depth.setRequired(true);
+		depth.setRequired(false);
 		depth.setType(Integer.class);
+
+		Option scope = new Option("s", "scope", true, "scope");
+		scope.setRequired(false);
 		
 		Option help = new Option("h", "help", false, "print commands");
 		help.setRequired(false);
@@ -55,6 +61,7 @@ public class RepairCLI {
 		options.addOption(method);
 		options.addOption(depth);
 		options.addOption(classes);
+		options.addOption(scope);
 
 		CommandLineParser parser = new BasicParser();
 		try {
@@ -82,6 +89,11 @@ public class RepairCLI {
 
 			JMLAnnotatedClass subject = new JMLAnnotatedClass(qualifiedPath, clazz);		
 			BasicProgramRepairer repairer = new BasicProgramRepairer(subject, methodToFix, dependenciesArgs, maxDepth);
+			
+			if (cmd.hasOption("s")) {
+				String typeScope = cmd.getOptionValue('s');
+				repairer.setScope(typeScope);
+			}
 			repairer.repair();
 		}
 		catch (ParseException e) {
