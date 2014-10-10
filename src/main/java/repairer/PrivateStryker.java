@@ -24,12 +24,12 @@ import search.engines.BoundedBreadthFirstSearchEngine;
 import search.engines.BoundedDepthFirstSearchEngine;
 
 /**
- * BasicProgramRepairer is a command line application that calls Stryker on a given class and method, and performs the
+ * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
  * @author Nazareno Aguirre
  * @version 0.4
  */
-public class BasicProgramRepairer {
+public class PrivateStryker {
 	
 	/**
 	 * jml annotated class to repair
@@ -64,7 +64,7 @@ public class BasicProgramRepairer {
 	 * @param subjectClass is the class containing the method to be repaired.
 	 * @param subjectMethod is the method to be repaired.
 	 */
-	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod) {
+	public PrivateStryker(JMLAnnotatedClass subjectClass, String subjectMethod) {
 		if (subjectClass==null) throw new IllegalArgumentException("program is null");
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (!subjectClass.isValid()) throw new IllegalArgumentException("program does not compile");
@@ -80,7 +80,7 @@ public class BasicProgramRepairer {
 	 * @param subjectMethod :	the method to be repaired.											:	{@code String}
 	 * @param dependencies	:	the class to repair and all its dependencies (only java classes)	:	{@code String[]}
 	 */
-	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod, String[] dependencies) {
+	public PrivateStryker(JMLAnnotatedClass subjectClass, String subjectMethod, String[] dependencies) {
 		this(subjectClass, subjectMethod);
 		String[] mergedDependencies = new String[this.relevantClasses.length + dependencies.length];
 		System.arraycopy(this.relevantClasses, 0, mergedDependencies, 0, this.relevantClasses.length);
@@ -95,7 +95,7 @@ public class BasicProgramRepairer {
 	 * @param subjectMethod is the method to be repaired.
 	 * @param maxDepth is the maximum depth to be considered for the search of repairs.
 	 */
-	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod, int maxDepth) {
+	public PrivateStryker(JMLAnnotatedClass subjectClass, String subjectMethod, int maxDepth) {
 		this(subjectClass, subjectMethod);
 		this.maxDepth = maxDepth;
 	}
@@ -108,7 +108,7 @@ public class BasicProgramRepairer {
 	 * @param dependencies	:	the class to repair and all its dependencies (only java classes)	:	{@code String[]}
 	 * @param maxDepth		:	the maximum depth to be considered for the search of repairs		:	{@code int}
 	 */
-	public BasicProgramRepairer(JMLAnnotatedClass subjectClass, String subjectMethod, String[] dependencies, int maxDepth) {
+	public PrivateStryker(JMLAnnotatedClass subjectClass, String subjectMethod, String[] dependencies, int maxDepth) {
 		this(subjectClass, subjectMethod, dependencies);
 		this.maxDepth = maxDepth;
 	}

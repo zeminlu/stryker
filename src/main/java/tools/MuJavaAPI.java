@@ -1,4 +1,4 @@
-package repairer;
+package tools;
 
 import java.io.File;
 import java.util.HashSet;
@@ -9,7 +9,8 @@ import java.util.Random;
 import java.util.Set;
 
 import openjava.ptree.ParseTreeException;
-
+import repairer.FixCandidate;
+import repairer.JMLAnnotatedClass;
 import mujava.OpenJavaException;
 import mujava.api.Mutant;
 import mujava.api.MutantIdentifier;
@@ -70,10 +71,10 @@ public class MuJavaAPI {
 		
 		Mutator mutator = new Mutator();
 		
-		String clazz = fixCandidate.program.getClassNameAsPath();
+		String clazz = fixCandidate.getProgram().getClassNameAsPath();
 		String[] methods = {methodToMutate};
 		Mutant[] ops = operators;
-		String inputDir = fixCandidate.program.getSourceFolder();
+		String inputDir = fixCandidate.getProgram().getSourceFolder();
 		String outputDir = this.outputDirectory;
 		
 		outputDir += randomString(10);
@@ -82,8 +83,8 @@ public class MuJavaAPI {
 			outputDir += Core.SEPARATOR;
 		}
 		
-		if (!fixCandidate.mutations.isEmpty()) {
-			outputDir += "from_" + md5HashToString(fixCandidate.program.getMd5Digest());
+		if (!fixCandidate.getMutations().isEmpty()) {
+			outputDir += "from_" + md5HashToString(fixCandidate.getProgram().getMd5Digest());
 		}
 		
 		if (!outputDir.endsWith(Core.SEPARATOR)) {

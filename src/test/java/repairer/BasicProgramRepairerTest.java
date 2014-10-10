@@ -15,7 +15,7 @@ public class BasicProgramRepairerTest {
 	public void emptyRelevantClasses() {
 		String[] relevantClasses = new String[]{};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getX", relevantClasses, 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "getX", relevantClasses, 0);
 		assertTrue("Only the class to repair is relevant", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("SimpleClass")==0);
 	}
 	
@@ -26,7 +26,7 @@ public class BasicProgramRepairerTest {
 	public void nonEmptyRelevantClasses() {
 		String[] relevantClasses = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", relevantClasses, 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "setX", relevantClasses, 0);
 		boolean relevantClassesSizeIsCorrect = repairer.getClassesDependencies().length == 4;
 		boolean relevantClassesContentIsCorrect = true;
 		String[] classesToSearch = new String[]{subject.getClassName(), "a.b.Clase1", "a.Main", "a.b.util.Pair"};
@@ -55,7 +55,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleCorrectMethod() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getX", 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "getX", 0);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method cannot be repaired", isRepaired);
 	}
@@ -69,7 +69,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleCorrectMethodInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "setX", 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "setX", 0);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertTrue("method cannot be repaired", isRepaired);
@@ -85,7 +85,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethod() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
 	}
@@ -99,7 +99,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
@@ -115,7 +115,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
+		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
@@ -129,7 +129,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "decX", 1);
+		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -145,7 +145,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthTwo() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 2);
+		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 2);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
@@ -160,7 +160,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthTwoInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 2);
+		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 2);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -176,7 +176,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 1);
+		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 1);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
 	}
@@ -190,7 +190,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "twicePlusOne", 1);
+		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 1);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
@@ -206,7 +206,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthThree() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
+		PrivateStryker repairer = new PrivateStryker(subject, "altTwicePlusOne", 3);
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
 	}
@@ -220,7 +220,7 @@ public class BasicProgramRepairerTest {
 	public void programRepairWithSimpleIncorrectMethodDepthThreeInBfs() {
 		// extension .java is assumed for programs
 		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "altTwicePlusOne", 3);
+		PrivateStryker repairer = new PrivateStryker(subject, "altTwicePlusOne", 3);
 		repairer.setBfsStrategy();
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);
@@ -235,7 +235,7 @@ public class BasicProgramRepairerTest {
 		String sourceFolder = "src/test/resources/java/examples/stryker/multikeymap";
 		String[] dependencies = new String[]{"MultiKey", "HashEntry"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "MultiKeyMap");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "equalKey", dependencies, 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "equalKey", dependencies, 0);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired with this depth", isRepaired);
 	}
@@ -249,7 +249,7 @@ public class BasicProgramRepairerTest {
 		String sourceFolder = "src/test/resources/";
 		String[] dependencies = new String[]{"SinglyLinkedList", "SinglyLinkedListNode"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "SinglyLinkedList");
-		BasicProgramRepairer repairer = new BasicProgramRepairer(subject, "getNode", dependencies, 1);
+		PrivateStryker repairer = new PrivateStryker(subject, "getNode", dependencies, 1);
 		repairer.setScope("SinglyLinkedList:3,SinglyLinkedListNode:3");
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);

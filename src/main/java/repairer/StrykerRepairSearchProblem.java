@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import search.AbstractSearchProblem;
+import tools.MuJavaAPI;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoAnalysisResult;
 import ar.edu.taco.TacoMain;

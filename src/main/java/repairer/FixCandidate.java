@@ -14,10 +14,16 @@ import search.State;
  */
 public class FixCandidate implements State {
 
-	protected JMLAnnotatedClass program; // JML program constituting the fix candidate.
+	/**
+	 * Stores JML program constituting the fix candidate.
+	 */
+	protected JMLAnnotatedClass program; 
 	
-	protected List<MutantIdentifier> mutations; // it holds the mutant identifiers that led to current candidate
-						   			   			// empty for initial fix candidate.
+	/**
+	 *  Holds the mutant identifiers that led to current candidate
+		empty for initial fix candidate.
+	 */
+	protected List<MutantIdentifier> mutations;
  	
 	/**
 	 * The path to the compilation sandbox directory
@@ -67,7 +73,15 @@ public class FixCandidate implements State {
 		if (mutations==null) throw new IllegalArgumentException("creating candidate with null mutations");
 		this.mutations.addAll(mutations);
 	}
-	
+
+	/**
+	 * JML program constituting the fix candidate.
+	 * @return the JML program constituting the fix candidate.
+	 */
+	public JMLAnnotatedClass getProgram() {
+		return program;
+	}
+
 	/**
 	 * @return the mutations applied to this {@code FixCandidate}, the result will never be {@code null}
 	 */

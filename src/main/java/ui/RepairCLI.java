@@ -8,7 +8,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import repairer.BasicProgramRepairer;
+import repairer.PrivateStryker;
 import repairer.JMLAnnotatedClass;
 
 /**
@@ -88,7 +88,7 @@ public class RepairCLI {
 			}
 
 			JMLAnnotatedClass subject = new JMLAnnotatedClass(qualifiedPath, clazz);		
-			BasicProgramRepairer repairer = new BasicProgramRepairer(subject, methodToFix, dependenciesArgs, maxDepth);
+			PrivateStryker repairer = new PrivateStryker(subject, methodToFix, dependenciesArgs, maxDepth);
 			
 			if (cmd.hasOption("s")) {
 				String typeScope = cmd.getOptionValue('s');
