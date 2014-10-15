@@ -9,8 +9,7 @@ import java.util.regex.Pattern;
 
 import mujava.util.JustCodeDigest;
 
-import org.jmlspecs.checker.JmlOptions;
-import org.jmlspecs.checker.Main;
+import tools.JMLSpecsAPI;
 
 /**
  * This class represents a Java program with JML specifications
@@ -156,42 +155,8 @@ public class JMLAnnotatedClass {
 	 * FIXME the way we are calling the compiler here is "borrowed" from JmlParser. It must be improved.
 	 */
 	public boolean isValid() {
-
-		JmlOptions options = new JmlOptions("jml");
-
-
-		String classPath = System.getProperty("java.class.path")+":"+this.absPath;
-
-		options.set_classpath(classPath);
-		options.set_sourcepath(this.absPath);
-
-		// Allow generic source code (experimental)
-		options.set_generic(true);
-
-		// Parse assertions and other Java 1.4 syntax
-		options.set_source("1.4");
-
-		// Deny multi-java code
-		options.set_multijava(false);
-
-		// Type-checking configuration
-		options.set_purity(true);
-		options.set_assignable(true);
-		options.set_Assignable(true);
-		options.set_universesx("no");
-
-		// Verbose
-		options.set_verbose(false);
-		options.set_Quiet(!options.verbose());
-		options.set_quiet(!options.verbose());
-
-		// Experimental options
-		options.set_keepGoing(false);
-
-		Main parser = new Main();
-
-		String[] names = {this.program.getAbsolutePath()};
-		return parser.run(names, options, null);			
+		JMLSpecsAPI jmlSpecsApi = new JMLSpecsAPI();
+		return jmlSpecsApi.validate(this);
 	}
 
 	/**
