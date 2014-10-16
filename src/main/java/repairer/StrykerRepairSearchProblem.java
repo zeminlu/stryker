@@ -51,6 +51,8 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	private String typeScopes = null;
 	
+	private Properties overridingProperties = null;
+	
 	/**
 	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
 	 * method to fix in the program/class.
@@ -67,6 +69,17 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	}
 	
 	/**
+	 * Constructor of StrykerRepairSearchProblem.
+	 * @param programToFix			:	the JML program containing the method to fix	:	{@code JMLAnnotatedClass}
+	 * @param methodToFix			:	the name of the method to fix					:	{@code String}
+	 * @param overridingProperties	:	overriding properties to be used				:	{@code Properties}
+	 */
+	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, Properties overridingProperties) {
+		this(programToFix, methodToFix);
+		this.overridingProperties = overridingProperties;
+	}
+	
+	/**
 	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
 	 * method to fix in the program/class.
 	 * @param programToFix is the JML program containing the method to fix
@@ -77,6 +90,18 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.relevantClasses = new String[dependencies.length + 1];
 		this.relevantClasses[0] = programToFix.getClassName();
 		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
+	}
+	
+	/**
+	 * Constructor of StrykerRepairSearchProblem.
+	 * @param programToFix			:	the JML program containing the method to fix				:	{@code JMLAnnotatedClass}
+	 * @param methodToFix			:	the name of the method to fix								:	{@code String}
+	 * @param dependencies			:	a list of dependencies (class names) of the class to fix	:	{@code String[]}
+	 * @param overridingProperties	:	overriding properties to be used							:	{@code Properties}
+	 */
+	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies, Properties overridingProperties) {
+		this(programToFix, methodToFix, dependencies);
+		this.overridingProperties = overridingProperties;
 	}
 	
 	/**
@@ -126,30 +151,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		
 		if (!s.program.isValid()) return false;
 		TacoMain taco = new TacoMain(null);
-		Properties overridingProperties = new Properties();
+		if (this.overridingProperties == null) {
+			this.overridingProperties = defaultProperties();
+		}
+		Properties overridingProperties = this.overridingProperties;
 		overridingProperties.put("classToCheck",s.program.getClassNameAsPath());//s.program.getClassName());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
 		overridingProperties.put("jmlParser.sourcePathStr", FixCandidate.getSandboxDir());//s.program.getSourceFolder());
-		
-		overridingProperties.put("relevancyAnalysis", true);
-		overridingProperties.put("checkNullDereference", true);
-		overridingProperties.put("useJavaArithmetic", false);
-		overridingProperties.put("checkArithmeticException", false);
-		overridingProperties.put("inferScope", true);
-		overridingProperties.put("objectScope", 3);
-		overridingProperties.put("loopUnroll", 3);
-		overridingProperties.put("skolemizeInstanceInvariant", true);
-		overridingProperties.put("skolemizeInstanceAbstraction", true);
-		overridingProperties.put("generateUnitTestCase", false);
-		overridingProperties.put("attemptToCorrectBug", false);
-		overridingProperties.put("maxStrykerMethodsPerFile", 1);
-		overridingProperties.put("removeQuantifiers", true);
-		overridingProperties.put("useJavaSBP", false);
-		overridingProperties.put("useTightUpperBounds", false);
-		if (this.typeScopes!=null) {
-			overridingProperties.put("typeScopes", this.typeScopes);
-		}
 		
 		TacoAnalysisResult result = null;
 		try {
@@ -206,6 +215,33 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			return false;
 		}
 		return true;
+	}
+	
+	/*
+	 * Return default overriding properties,
+	 * these are used when no overriding properties where provided when instanciating this class
+	 */
+	private Properties defaultProperties() {
+		Properties overridingProperties = new Properties();
+		overridingProperties.put("relevancyAnalysis", true);
+		overridingProperties.put("checkNullDereference", true);
+		overridingProperties.put("useJavaArithmetic", false);
+		overridingProperties.put("checkArithmeticException", false);
+		overridingProperties.put("inferScope", true);
+		overridingProperties.put("objectScope", 3);
+		overridingProperties.put("loopUnroll", 3);
+		overridingProperties.put("skolemizeInstanceInvariant", true);
+		overridingProperties.put("skolemizeInstanceAbstraction", true);
+		overridingProperties.put("generateUnitTestCase", false);
+		overridingProperties.put("attemptToCorrectBug", false);
+		overridingProperties.put("maxStrykerMethodsPerFile", 1);
+		overridingProperties.put("removeQuantifiers", true);
+		overridingProperties.put("useJavaSBP", false);
+		overridingProperties.put("useTightUpperBounds", false);
+		if (this.typeScopes!=null) {
+			overridingProperties.put("typeScopes", this.typeScopes);
+		}
+		return overridingProperties;
 	}
 
 }
