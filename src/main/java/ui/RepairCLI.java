@@ -14,7 +14,9 @@ import repairer.JMLAnnotatedClass;
 /**
  * RepairCLI is a command line interface for Stryker. It is a very simple interface, that receives only minimal
  * input: class name, method to fix, qualified path to class, and max depth for search.
- * @author aguirre
+ * 
+ * @author Nazareno Matías Aguirre
+ * @version 0.2
  *
  */
 public class RepairCLI {

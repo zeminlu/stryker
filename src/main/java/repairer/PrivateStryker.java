@@ -26,7 +26,7 @@ import search.engines.BoundedDepthFirstSearchEngine;
 /**
  * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
- * @author Nazareno Aguirre
+ * @author Nazareno Matías Aguirre
  * @version 0.4
  */
 public class PrivateStryker {

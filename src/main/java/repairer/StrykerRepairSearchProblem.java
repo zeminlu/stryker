@@ -224,20 +224,20 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	private Properties defaultProperties() {
 		Properties overridingProperties = new Properties();
 		overridingProperties.put("relevancyAnalysis", true);
-		overridingProperties.put("checkNullDereference", true);
+//		overridingProperties.put("checkNullDereference", true);
 		overridingProperties.put("useJavaArithmetic", false);
 		overridingProperties.put("checkArithmeticException", false);
-		overridingProperties.put("inferScope", true);
-		overridingProperties.put("objectScope", 3);
-		overridingProperties.put("loopUnroll", 3);
-		overridingProperties.put("skolemizeInstanceInvariant", true);
-		overridingProperties.put("skolemizeInstanceAbstraction", true);
-		overridingProperties.put("generateUnitTestCase", false);
-		overridingProperties.put("attemptToCorrectBug", false);
-		overridingProperties.put("maxStrykerMethodsPerFile", 1);
-		overridingProperties.put("removeQuantifiers", true);
-		overridingProperties.put("useJavaSBP", false);
-		overridingProperties.put("useTightUpperBounds", false);
+//		overridingProperties.put("inferScope", true);
+//		overridingProperties.put("objectScope", 3);
+//		overridingProperties.put("loopUnroll", 3);
+//		overridingProperties.put("skolemizeInstanceInvariant", true);
+//		overridingProperties.put("skolemizeInstanceAbstraction", true);
+//		overridingProperties.put("generateUnitTestCase", false);
+//		overridingProperties.put("attemptToCorrectBug", false);
+//		overridingProperties.put("maxStrykerMethodsPerFile", 1);
+//		overridingProperties.put("removeQuantifiers", true);
+//		overridingProperties.put("useJavaSBP", false);
+//		overridingProperties.put("useTightUpperBounds", false);
 		if (this.typeScopes!=null) {
 			overridingProperties.put("typeScopes", this.typeScopes);
 		}
