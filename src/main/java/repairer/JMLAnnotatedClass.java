@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import config.StrykerConfig;
+
 import mujava.util.JustCodeDigest;
 
 import tools.JMLSpecsAPI;
@@ -22,14 +24,9 @@ import tools.JMLSpecsAPI;
  * <li> a file									:	the file which contains the java program </li>
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.4
+ * @version 0.4.1
  */
 public class JMLAnnotatedClass {
-	
-	/**
-	 * System path separator
-	 */
-	private static final String SEPARATOR = "/"; //FIXME: improve this 
 	
 	/**
 	 * stores the source folder of the file corresponding to the program.
@@ -70,8 +67,9 @@ public class JMLAnnotatedClass {
 		this.className = className;
 		this.program = new File(toPath(sourceFolder, className)+".java");
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
+		if (!StrykerConfig.instanceBuilt()) StrykerConfig.getInstance(StrykerConfig.DEFAULT_PROPERTIES);
 		String fullClassName = className;
-		int lastPathSeparatorIndex = fullClassName.lastIndexOf("");
+		int lastPathSeparatorIndex = fullClassName.lastIndexOf(".");
 		if (lastPathSeparatorIndex == -1) {
 			this.classPackage = "";
 		} else {
@@ -88,11 +86,11 @@ public class JMLAnnotatedClass {
 	
 	private static String toPath(String sourceFolder, String className) {
 		String path = sourceFolder;
-		if (!path.endsWith(SEPARATOR)) {
-			path += SEPARATOR;
+		if (!path.endsWith(StrykerConfig.getLastBuiltInstance().getPathSeparator())) {
+			path += StrykerConfig.getLastBuiltInstance().getPathSeparator();
 		}
 		path += className;
-		path = path.replaceAll("\\.", SEPARATOR);
+		path = path.replaceAll("\\.", StrykerConfig.getLastBuiltInstance().getPathSeparator());
 		return path;
 	}
 	
@@ -121,7 +119,7 @@ public class JMLAnnotatedClass {
 	 * @return the qualified name of the class but with each dot replaced by /
 	 */
 	public String getClassNameAsPath() {
-		return this.className.replaceAll("\\.", SEPARATOR);
+		return this.className.replaceAll("\\.", StrykerConfig.getLastBuiltInstance().getPathSeparator());
 	}
 	
 	/**

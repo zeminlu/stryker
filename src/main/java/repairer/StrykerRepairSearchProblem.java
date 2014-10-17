@@ -8,6 +8,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Properties;
 
+import config.StrykerConfig;
+
 import search.AbstractSearchProblem;
 import tools.MuJavaAPI;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
@@ -141,13 +143,13 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
 		
-		if (!copy(s.program.getFilePath(), FixCandidate.getSandboxDir() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
-			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + FixCandidate.getSandboxDir());
+		if (!copy(s.program.getFilePath(), StrykerConfig.getLastBuiltInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
+			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
 			return false;
 		}
 		
 		String sourceFolderBackup = s.program.getSourceFolder();
-		s.program.moveLocation(FixCandidate.getSandboxDir());
+		s.program.moveLocation(StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
 		
 		if (!s.program.isValid()) return false;
 		TacoMain taco = new TacoMain(null);
@@ -155,10 +157,10 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			this.overridingProperties = defaultProperties();
 		}
 		Properties overridingProperties = this.overridingProperties;
-		overridingProperties.put("classToCheck",s.program.getClassNameAsPath());//s.program.getClassName());
+		overridingProperties.put("classToCheck",s.program.getClassNameAsPath());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", FixCandidate.getSandboxDir());//s.program.getSourceFolder());
+		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
 		
 		TacoAnalysisResult result = null;
 		try {

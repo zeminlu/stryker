@@ -38,6 +38,11 @@ public class StrykerConfig {
 	 * The configuration loaded, especified by {@link StrykerConfig#propertiesFile}
 	 */
 	private Configuration config;
+	
+	/**
+	 * The location of the folder that will be used as compiling environment
+	 */
+	private String compilingSandbox = null;
 
 	/**
 	 * Gets an instance of {@code StrykerConfig}
@@ -83,6 +88,8 @@ public class StrykerConfig {
 	 */
 	private StrykerConfig(String configFile) {
 		this.propertiesFile = configFile;
+		this.compilingSandbox = null;
+		this.config = null;
 		loadConfig();
 	}
 
@@ -127,10 +134,15 @@ public class StrykerConfig {
 	
 	/**
 	 * @return the value of property {@code path.compilingSandbox} replacing the first argument with {@link StrykerConfig#getPathSeparator()} and the second with {@code randomString(10)}
+	 * <hr>
+	 * <b>The value returned by this method will not change until {@link StrykerConfig#getInstance(String)} is called again with a different config file</b>
 	 * @see StrykerConfig#randomString(int)
 	 */
 	public String getCompilingSandbox() {
-		return MessageFormat.format(this.config.getString("path.compilingSandbox"), getPathSeparator(), randomString(10));
+		if (this.compilingSandbox == null) {
+			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getPathSeparator(), randomString(10));
+		}
+		return this.compilingSandbox; 
 	}
 	
 	/**

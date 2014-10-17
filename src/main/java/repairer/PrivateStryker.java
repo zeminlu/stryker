@@ -179,7 +179,6 @@ public class PrivateStryker {
 			System.err.println("couldn't move compilation ambient to compilation sandbox directory");
 			return false;
 		}
-		FixCandidate.setSandboxDir(sandboxDir);
 		// ------------------------------------------------
 		AbstractBoundedSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = null;
 		if (this.dfsStrategy) {
@@ -205,7 +204,7 @@ public class PrivateStryker {
 			System.out.println("*** COULD NOT REPAIR PROGRAM. Try increasing depth in the search for solutions");
 			System.out.println("*** Stats: " + engine.report());
 		}
-		deleteDir(FixCandidate.getSandboxDir());
+		deleteDir(sandboxDir);
 		return outcome;
 	}
 	
