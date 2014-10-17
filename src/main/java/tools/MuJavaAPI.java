@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import config.StrykerConfig;
+
 import openjava.ptree.ParseTreeException;
 import repairer.FixCandidate;
 import repairer.JMLAnnotatedClass;
@@ -15,7 +17,6 @@ import mujava.OpenJavaException;
 import mujava.api.Mutant;
 import mujava.api.MutantIdentifier;
 import mujava.api.MutantsInformationHolder;
-import mujava.app.Core;
 import mujava.app.MutantInfo;
 import mujava.app.MutationRequest;
 import mujava.app.Mutator;
@@ -25,7 +26,7 @@ import mujava.util.JustCodeDigest;
  * This class allows the use of {@code muJava++} to generate mutants ({@code FixCandidate})
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.3.2
+ * @version 0.3.3
  * @see FixCandidate
  * @see JMLAnnotatedClass
  */
@@ -44,7 +45,7 @@ public class MuJavaAPI {
 	 * mutants will be written to {@code /tmp/} folder
 	 */
 	public MuJavaAPI() {
-		this("/tmp/mutants/");
+		this(StrykerConfig.getLastBuiltInstance().getMutantsDir());
 	}
 	
 	/**
@@ -79,16 +80,16 @@ public class MuJavaAPI {
 		
 		outputDir += randomString(10);
 		
-		if (!outputDir.endsWith(Core.SEPARATOR)) {
-			outputDir += Core.SEPARATOR;
+		if (!outputDir.endsWith(StrykerConfig.getLastBuiltInstance().getPathSeparator())) {
+			outputDir += StrykerConfig.getLastBuiltInstance().getPathSeparator();
 		}
 		
 		if (!fixCandidate.getMutations().isEmpty()) {
 			outputDir += "from_" + md5HashToString(fixCandidate.getProgram().getMd5Digest());
 		}
 		
-		if (!outputDir.endsWith(Core.SEPARATOR)) {
-			outputDir += Core.SEPARATOR;
+		if (!outputDir.endsWith(StrykerConfig.getLastBuiltInstance().getPathSeparator())) {
+			outputDir += StrykerConfig.getLastBuiltInstance().getPathSeparator();
 		}
 		
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
@@ -269,11 +270,11 @@ public class MuJavaAPI {
 	}
 	
 	private String removeLastPartOfPath(String originalPath, String className) {
-		String classNameToPath = className.replaceAll("\\.", Core.SEPARATOR) + ".java";
+		String classNameToPath = className.replaceAll("\\.", StrykerConfig.getLastBuiltInstance().getPathSeparator()) + ".java";
 		int indexToCut = originalPath.indexOf(classNameToPath);
 		String result = originalPath.substring(0, indexToCut-1);
-		if (!result.endsWith(Core.SEPARATOR)) {
-			result += Core.SEPARATOR;
+		if (!result.endsWith(StrykerConfig.getLastBuiltInstance().getPathSeparator())) {
+			result += StrykerConfig.getLastBuiltInstance().getPathSeparator();
 		}
 		return result;
 	}

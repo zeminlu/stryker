@@ -15,8 +15,9 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
-import java.util.Random;
 import java.util.Set;
+
+import config.StrykerConfig;
 
 import mujava.api.MutantIdentifier;
 import search.engines.AbstractBoundedSearchEngine;
@@ -27,7 +28,7 @@ import search.engines.BoundedDepthFirstSearchEngine;
  * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
  * @author Nazareno Matías Aguirre
- * @version 0.4
+ * @version 0.4.1
  */
 public class PrivateStryker {
 	
@@ -68,6 +69,7 @@ public class PrivateStryker {
 		if (subjectClass==null) throw new IllegalArgumentException("program is null");
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (!subjectClass.isValid()) throw new IllegalArgumentException("program does not compile");
+		if (!StrykerConfig.instanceBuilt()) StrykerConfig.getInstance(StrykerConfig.DEFAULT_PROPERTIES);
 		this.subjectClass = subjectClass;
 		this.subjectMethod = subjectMethod;
 		this.relevantClasses = new String[] {subjectClass.getClassName()};
@@ -168,7 +170,7 @@ public class PrivateStryker {
 		}
 		// +++++++++++++++++++++++++++++++++++++++++++++++
 		// create compilation sandbox
-		String sandboxDir = generateSandboxDirOnTmp();
+		String sandboxDir = StrykerConfig.getLastBuiltInstance().getCompilingSandbox();
 		if (!createSandboxDir(sandboxDir)) {
 			System.err.println("couldn't create compilation sandbox directory: " + sandboxDir);
 			return false;
@@ -300,19 +302,6 @@ public class PrivateStryker {
 			return false;
 		}
 		return true;
-	}
-	
-	private String generateSandboxDirOnTmp() {
-		return "/tmp/" + "compilationSandbox-" + randomString(10) + "/";
-	}
-	
-	private String randomString(int len) {
-		String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		Random rnd = new Random();
-		StringBuilder sb = new StringBuilder(len);
-		for (int i = 0; i < len; i++)
-			sb.append(AB.charAt(rnd.nextInt(AB.length())));
-		return sb.toString();
 	}
 	
 	/**
