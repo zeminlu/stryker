@@ -1,5 +1,12 @@
 package tools;
 
+import java.util.Properties;
+
+import ar.edu.jdynalloy.JDynAlloySemanticException;
+import ar.edu.taco.TacoAnalysisResult;
+import ar.edu.taco.TacoMain;
+import ar.edu.taco.TacoNotImplementedYetException;
+
 import repairer.FixCandidate;
 
 /**
@@ -13,9 +20,93 @@ import repairer.FixCandidate;
  * @see FixCandidate
  * @see CounterExample
  * 
- * @version 0.1u
+ * @version 0.1.3u
  */
 public class TacoAPI {
+	
+	/**
+	 * An instance of this class, used to implement the Singleton pattern
+	 */
+	private static TacoAPI instance = null;
+	
+	/**
+	 * Access to Taco in comitaco
+	 */
+	private TacoMain wireToTaco = null;
+	
+	/**
+	 * config file used by run method of {@code TacoMain}
+	 */
+	private String configFile = null;
+	
+	/**
+	 * overriding properties used by run method of {@code TacoMain}
+	 */
+	private Properties overridingProperties = null;
+	
+	/**
+	 * used to verify if an instance of this class is already built or not
+	 */
+	private static boolean instanceBuilt = false;
+	
+	/**
+	 * Gets an previously built instance of this class
+	 * if an instance was not built before or if any
+	 * of the parameters of this method is different form the
+	 * ones used in the current instance.
+	 * 
+	 * @param configFile			:	config file used by run method of {@code TacoMain}				:	{@code String}
+	 * @param overridingProperties	:	overriding properties used by run method of {@code TacoMain}	:	{@code Properties}
+	 * @return an instance of this class
+	 */
+	public static TacoAPI getInstance(String configFile, Properties overridingProperties) {
+		if (instance != null) {
+			boolean reBuild = false;
+			if (configFile.compareTo(instance.configFile) != 0) {
+				reBuild = true;
+			}
+			if (!overridingProperties.equals(instance.overridingProperties)) {
+				reBuild = true;
+			}
+			if (reBuild) {
+				instance = new TacoAPI(configFile, overridingProperties);
+			}
+		} else {
+			instance = new TacoAPI(configFile, overridingProperties);
+		}
+		return instance;
+	}
+	
+	/**
+	 * @return the last instance built
+	 * @throws IllegalStateException : if an instance hasn't been built before
+	 */
+	public static TacoAPI getLastBuiltInstance() throws IllegalStateException {
+		if (instance == null) {
+			throw new IllegalStateException("TacoAPI#getLastBuiltInstance() : must make a successful call to TacoAPI#getInstance(String, Properties) before calling this method");
+		}
+		return instance;
+	}
+	
+	/**
+	 * Private constructor
+	 * 
+	 * @param configFile			:	config file used by run method of {@code TacoMain}				:	{@code String}
+	 * @param overridingProperties	:	overriding properties used by run method of {@code TacoMain}	:	{@code Properties}
+	 */
+	private TacoAPI(String configFile, Properties overridingProperties) {
+		this.configFile = configFile;
+		this.overridingProperties = overridingProperties;
+		this.wireToTaco = new TacoMain(null);
+		instanceBuilt = true;
+	}
+	
+	/**
+	 * @return {@code true} if an instance is already built
+	 */
+	public static boolean instanceBuilt() {
+		return instanceBuilt;
+	}
 
 	/**
 	 * Runs SAT on a java source file
@@ -23,9 +114,18 @@ public class TacoAPI {
 	 * @param candidate	:	the java source file	:	{@code FixCandidate}
 	 * @return {@code true} if the SAT solver returns SAT, {@code false} if returns UNSAT	:	{@code boolean}
 	 */
-	public boolean sat(FixCandidate candidate) {
-		//TODO: implement this method
-		throw new UnsupportedOperationException ("TacoAPI#sat(FixCandidate) : not yet implemented");
+	public boolean sat(FixCandidate candidate) throws TacoNotImplementedYetException, JDynAlloySemanticException {
+		TacoAnalysisResult result = null;
+		try {
+			result = this.wireToTaco.run(this.configFile, this.overridingProperties);
+		}
+		catch (TacoNotImplementedYetException e) {
+			throw e;
+		}
+		catch (JDynAlloySemanticException e) {
+			throw e; 
+		}
+		return result.get_alloy_analysis_result().isSAT();
 	}
 	
 	/**

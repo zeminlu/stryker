@@ -69,7 +69,7 @@ public class JMLAnnotatedClass {
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
 		if (!StrykerConfig.instanceBuilt()) StrykerConfig.getInstance(StrykerConfig.DEFAULT_PROPERTIES);
 		String fullClassName = className;
-		int lastPathSeparatorIndex = fullClassName.lastIndexOf(".");
+		int lastPathSeparatorIndex = fullClassName.lastIndexOf("\\.");
 		if (lastPathSeparatorIndex == -1) {
 			this.classPackage = "";
 		} else {
