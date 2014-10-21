@@ -20,7 +20,7 @@ import repairer.FixCandidate;
  * @see FixCandidate
  * @see CounterExample
  * 
- * @version 0.1.3u
+ * @version 0.1.3.1u
  */
 public class TacoAPI {
 	
@@ -106,6 +106,13 @@ public class TacoAPI {
 	 */
 	public static boolean instanceBuilt() {
 		return instanceBuilt;
+	}
+	
+	/**
+	 * @return overriding properties used by run method of {@code TacoMain}
+	 */
+	public Properties getOverridingProperties() {
+		return this.overridingProperties;
 	}
 
 	/**

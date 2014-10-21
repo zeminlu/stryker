@@ -8,14 +8,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Properties;
 
+import ar.edu.jdynalloy.JDynAlloySemanticException;
+import ar.edu.taco.TacoNotImplementedYetException;
+
 import config.StrykerConfig;
 
 import search.AbstractSearchProblem;
 import tools.MuJavaAPI;
-import ar.edu.jdynalloy.JDynAlloySemanticException;
-import ar.edu.taco.TacoAnalysisResult;
-import ar.edu.taco.TacoMain;
-import ar.edu.taco.TacoNotImplementedYetException;
+import tools.TacoAPI;
 
 /**
  * StrykerRepairSearchProblem is a class that contains all concrete elements necessary for implementing the
@@ -27,10 +27,15 @@ import ar.edu.taco.TacoNotImplementedYetException;
  * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
  * defined as implementations of search.engines.AbstractSearchEngine.
  * @author Nazareno Matías Aguirre
- * @version 0.1
+ * @version 0.1.3
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
+	/**
+	 * The initial state of the problem, this object should never change for each new problem
+	 */
+	private FixCandidate initialState;
+	
 	/**
 	 * class to fix using Stryker.
 	 */
@@ -53,8 +58,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	private String typeScopes = null;
 	
-	private Properties overridingProperties = null;
-	
 	/**
 	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
 	 * method to fix in the program/class.
@@ -68,17 +71,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
 		this.relevantClasses = new String[]{programToFix.getClassName()};
-	}
-	
-	/**
-	 * Constructor of StrykerRepairSearchProblem.
-	 * @param programToFix			:	the JML program containing the method to fix	:	{@code JMLAnnotatedClass}
-	 * @param methodToFix			:	the name of the method to fix					:	{@code String}
-	 * @param overridingProperties	:	overriding properties to be used				:	{@code Properties}
-	 */
-	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, Properties overridingProperties) {
-		this(programToFix, methodToFix);
-		this.overridingProperties = overridingProperties;
+		Properties overridingProperties = TacoAPI.instanceBuilt()?TacoAPI.getLastBuiltInstance().getOverridingProperties():defaultProperties();
+		overridingProperties.put("classToCheck",initialState().program.getClassNameAsPath());
+		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
+		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
+		overridingProperties.put("relevantClasses",mergedRelevantClasses());
+		if (!TacoAPI.instanceBuilt()) {
+			TacoAPI.getInstance(StrykerConfig.DEFAULT_PROPERTIES, overridingProperties);
+		}
 	}
 	
 	/**
@@ -92,18 +92,8 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.relevantClasses = new String[dependencies.length + 1];
 		this.relevantClasses[0] = programToFix.getClassName();
 		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
-	}
-	
-	/**
-	 * Constructor of StrykerRepairSearchProblem.
-	 * @param programToFix			:	the JML program containing the method to fix				:	{@code JMLAnnotatedClass}
-	 * @param methodToFix			:	the name of the method to fix								:	{@code String}
-	 * @param dependencies			:	a list of dependencies (class names) of the class to fix	:	{@code String[]}
-	 * @param overridingProperties	:	overriding properties to be used							:	{@code Properties}
-	 */
-	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies, Properties overridingProperties) {
-		this(programToFix, methodToFix, dependencies);
-		this.overridingProperties = overridingProperties;
+		Properties overridingProperties = TacoAPI.getLastBuiltInstance().getOverridingProperties();
+		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 	}
 	
 	/**
@@ -112,7 +102,8 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public FixCandidate initialState() {
 		if (classToFix==null) throw new IllegalStateException("program to fix not set in stryker search problem");
-		return (new FixCandidate(this.classToFix));
+		if (this.initialState == null) this.initialState = (new FixCandidate(this.classToFix));
+		return this.initialState;
 	}
 
 	/**
@@ -152,35 +143,17 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		s.program.moveLocation(StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
 		
 		if (!s.program.isValid()) return false;
-		TacoMain taco = new TacoMain(null);
-		if (this.overridingProperties == null) {
-			this.overridingProperties = defaultProperties();
-		}
-		Properties overridingProperties = this.overridingProperties;
-		overridingProperties.put("classToCheck",s.program.getClassNameAsPath());
-		overridingProperties.put("relevantClasses",mergedRelevantClasses());
-		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
-		
-		TacoAnalysisResult result = null;
+		boolean error = false;
+		boolean sat = false;
 		try {
-	
-			result = taco.run("genericTest.properties", overridingProperties);
-		}
-		catch (TacoNotImplementedYetException e) {
-			// candidate is well formed JML but taco does not support syntax.
-			// considering candidate invalid, for the moment.
-			s.program.moveLocation(sourceFolderBackup);
-			return false;
-		}
-		catch (JDynAlloySemanticException e) {
-			// candidate is syntactically well formed but JML detects it as 
-			// semantically invalid. Considering candidate invalid.
-			s.program.moveLocation(sourceFolderBackup);
-			return false;
+			sat = TacoAPI.getLastBuiltInstance().sat(s);
+		} catch (TacoNotImplementedYetException e) {
+			error = true;
+		} catch (JDynAlloySemanticException e) {
+			error = true;
 		}
 		s.program.moveLocation(sourceFolderBackup);
-		return result.get_alloy_analysis_result().isUNSAT();
+		return !sat && !error;
 	}
 	
 	/**
@@ -190,6 +163,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public void setScope(String typeScopes) {
 		if (typeScopes==null) throw new IllegalArgumentException("setting null type scope");
 		this.typeScopes = typeScopes;
+		TacoAPI.getLastBuiltInstance().getOverridingProperties().put("typeScopes", this.typeScopes);
 	}
 	
 	/**
@@ -240,9 +214,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 //		overridingProperties.put("removeQuantifiers", true);
 //		overridingProperties.put("useJavaSBP", false);
 //		overridingProperties.put("useTightUpperBounds", false);
-		if (this.typeScopes!=null) {
-			overridingProperties.put("typeScopes", this.typeScopes);
-		}
 		return overridingProperties;
 	}
 
