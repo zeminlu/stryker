@@ -97,7 +97,7 @@ public class BoundedDepthFirstSearchEngineTest {
 		 * It decides whether a state is successful or not, comparing it with
 		 * the goal of the problem. Returns true iff s is the goal
 		 */
-		public boolean success(IntState s) {
+		public boolean isSuccessful(IntState s) {
 			return (this.goal==s.getValue());
 		}
 		

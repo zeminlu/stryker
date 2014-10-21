@@ -27,7 +27,7 @@ import tools.TacoAPI;
  * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
  * defined as implementations of search.engines.AbstractSearchEngine.
  * @author Nazareno Matías Aguirre
- * @version 0.1.3
+ * @version 0.1.5
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 
@@ -71,14 +71,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
 		this.relevantClasses = new String[]{programToFix.getClassName()};
-		Properties overridingProperties = TacoAPI.instanceBuilt()?TacoAPI.getLastBuiltInstance().getOverridingProperties():defaultProperties();
+		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
 		overridingProperties.put("classToCheck",initialState().program.getClassNameAsPath());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
-		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
+		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getInstance().getCompilingSandbox());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
-		if (!TacoAPI.instanceBuilt()) {
-			TacoAPI.getInstance(StrykerConfig.DEFAULT_PROPERTIES, overridingProperties);
-		}
+		overridingProperties.put("relevancyAnalysis", true);
+		overridingProperties.put("useJavaArithmetic", false);
+		overridingProperties.put("checkArithmeticException", false);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.relevantClasses = new String[dependencies.length + 1];
 		this.relevantClasses[0] = programToFix.getClassName();
 		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
-		Properties overridingProperties = TacoAPI.getLastBuiltInstance().getOverridingProperties();
+		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 	}
 	
@@ -130,23 +130,23 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 * @param s is the fix candidate to analyze	
 	 * @return whether the fix candidate is a successful repair or not.
 	 */
-	public boolean success(FixCandidate s) {
+	public boolean isSuccessful(FixCandidate s) {
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
 		
-		if (!copy(s.program.getFilePath(), StrykerConfig.getLastBuiltInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
-			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
+		if (!copy(s.program.getFilePath(), StrykerConfig.getInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
+			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + StrykerConfig.getInstance().getCompilingSandbox());
 			return false;
 		}
 		
 		String sourceFolderBackup = s.program.getSourceFolder();
-		s.program.moveLocation(StrykerConfig.getLastBuiltInstance().getCompilingSandbox());
+		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;
 		boolean sat = false;
 		try {
-			sat = TacoAPI.getLastBuiltInstance().sat(s);
+			sat = TacoAPI.getInstance().isSAT(s);
 		} catch (TacoNotImplementedYetException e) {
 			error = true;
 		} catch (JDynAlloySemanticException e) {
@@ -163,7 +163,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public void setScope(String typeScopes) {
 		if (typeScopes==null) throw new IllegalArgumentException("setting null type scope");
 		this.typeScopes = typeScopes;
-		TacoAPI.getLastBuiltInstance().getOverridingProperties().put("typeScopes", this.typeScopes);
+		TacoAPI.getInstance().getOverridingProperties().put("typeScopes", this.typeScopes);
 	}
 	
 	/**
@@ -191,30 +191,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			return false;
 		}
 		return true;
-	}
-	
-	/*
-	 * Return default overriding properties,
-	 * these are used when no overriding properties where provided when instanciating this class
-	 */
-	private Properties defaultProperties() {
-		Properties overridingProperties = new Properties();
-		overridingProperties.put("relevancyAnalysis", true);
-//		overridingProperties.put("checkNullDereference", true);
-		overridingProperties.put("useJavaArithmetic", false);
-		overridingProperties.put("checkArithmeticException", false);
-//		overridingProperties.put("inferScope", true);
-//		overridingProperties.put("objectScope", 3);
-//		overridingProperties.put("loopUnroll", 3);
-//		overridingProperties.put("skolemizeInstanceInvariant", true);
-//		overridingProperties.put("skolemizeInstanceAbstraction", true);
-//		overridingProperties.put("generateUnitTestCase", false);
-//		overridingProperties.put("attemptToCorrectBug", false);
-//		overridingProperties.put("maxStrykerMethodsPerFile", 1);
-//		overridingProperties.put("removeQuantifiers", true);
-//		overridingProperties.put("useJavaSBP", false);
-//		overridingProperties.put("useTightUpperBounds", false);
-		return overridingProperties;
 	}
 
 }

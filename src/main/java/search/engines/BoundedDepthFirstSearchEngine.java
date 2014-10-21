@@ -117,7 +117,7 @@ public class BoundedDepthFirstSearchEngine<S extends State, Problem extends Abst
 			if (currDepth<=this.bound) {
 				// state is within bounds. It must be treated.
 				visited++;
-				if (problem.success(currState)) {
+				if (problem.isSuccessful(currState)) {
 					found = true;
 					this.solutionFound = currState;
 				}

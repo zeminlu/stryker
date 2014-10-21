@@ -28,7 +28,7 @@ import search.engines.BoundedDepthFirstSearchEngine;
  * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
  * intra statement mutation-based repair, without any pruning.
  * @author Nazareno Matías Aguirre
- * @version 0.4.1
+ * @version 0.4.2
  */
 public class PrivateStryker {
 	
@@ -69,7 +69,6 @@ public class PrivateStryker {
 		if (subjectClass==null) throw new IllegalArgumentException("program is null");
 		if (subjectMethod==null) throw new IllegalArgumentException("method is null");
 		if (!subjectClass.isValid()) throw new IllegalArgumentException("program does not compile");
-		if (!StrykerConfig.instanceBuilt()) StrykerConfig.getInstance(StrykerConfig.DEFAULT_PROPERTIES);
 		this.subjectClass = subjectClass;
 		this.subjectMethod = subjectMethod;
 		this.relevantClasses = new String[] {subjectClass.getClassName()};
@@ -170,7 +169,7 @@ public class PrivateStryker {
 		}
 		// +++++++++++++++++++++++++++++++++++++++++++++++
 		// create compilation sandbox
-		String sandboxDir = StrykerConfig.getLastBuiltInstance().getCompilingSandbox();
+		String sandboxDir = StrykerConfig.getInstance().getCompilingSandbox();
 		if (!createSandboxDir(sandboxDir)) {
 			System.err.println("couldn't create compilation sandbox directory: " + sandboxDir);
 			return false;

@@ -47,6 +47,6 @@ public interface AbstractSearchProblem<S extends State> {
 	 * @pre. s!=null.
 	 * @post. true is returned iff s is a successful state.  
 	 */
-    abstract public boolean success(S s);
+    abstract public boolean isSuccessful(S s);
    
 } 

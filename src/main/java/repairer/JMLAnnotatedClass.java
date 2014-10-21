@@ -24,7 +24,7 @@ import tools.JMLSpecsAPI;
  * <li> a file									:	the file which contains the java program </li>
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.4.1
+ * @version 0.4.2
  */
 public class JMLAnnotatedClass {
 	
@@ -67,7 +67,6 @@ public class JMLAnnotatedClass {
 		this.className = className;
 		this.program = new File(toPath(sourceFolder, className)+".java");
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
-		if (!StrykerConfig.instanceBuilt()) StrykerConfig.getInstance(StrykerConfig.DEFAULT_PROPERTIES);
 		String fullClassName = className;
 		int lastPathSeparatorIndex = fullClassName.lastIndexOf("\\.");
 		if (lastPathSeparatorIndex == -1) {
@@ -86,11 +85,11 @@ public class JMLAnnotatedClass {
 	
 	private static String toPath(String sourceFolder, String className) {
 		String path = sourceFolder;
-		if (!path.endsWith(StrykerConfig.getLastBuiltInstance().getPathSeparator())) {
-			path += StrykerConfig.getLastBuiltInstance().getPathSeparator();
+		if (!path.endsWith(StrykerConfig.getInstance().getPathSeparator())) {
+			path += StrykerConfig.getInstance().getPathSeparator();
 		}
 		path += className;
-		path = path.replaceAll("\\.", StrykerConfig.getLastBuiltInstance().getPathSeparator());
+		path = path.replaceAll("\\.", StrykerConfig.getInstance().getPathSeparator());
 		return path;
 	}
 	
@@ -119,7 +118,7 @@ public class JMLAnnotatedClass {
 	 * @return the qualified name of the class but with each dot replaced by /
 	 */
 	public String getClassNameAsPath() {
-		return this.className.replaceAll("\\.", StrykerConfig.getLastBuiltInstance().getPathSeparator());
+		return this.className.replaceAll("\\.", StrykerConfig.getInstance().getPathSeparator());
 	}
 	
 	/**
@@ -154,7 +153,7 @@ public class JMLAnnotatedClass {
 	 */
 	public boolean isValid() {
 		JMLSpecsAPI jmlSpecsApi = new JMLSpecsAPI();
-		return jmlSpecsApi.validate(this);
+		return jmlSpecsApi.isValid(this);
 	}
 
 	/**

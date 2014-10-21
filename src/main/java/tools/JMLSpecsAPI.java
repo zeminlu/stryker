@@ -22,7 +22,7 @@ public class JMLSpecsAPI {
 	 * @param javaFile	:	a {@code JMLAnnotatedClass} representing the JML annotated java source file to validate	:	{@code JMLAnnotatedClass}
 	 * @return {@code true} if the java source file and the JML specification are syntactically correct or {@code false} othertwise	:	{@code boolean}
 	 */
-	public boolean validate(JMLAnnotatedClass javaFile) {
+	public boolean isValid(JMLAnnotatedClass javaFile) {
 		JmlOptions options = new JmlOptions("jml");
 
 

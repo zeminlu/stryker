@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.1.3
+ * @version 0.2.0
  */
 public class StrykerConfig {
 	
@@ -49,11 +49,12 @@ public class StrykerConfig {
 	 * 
 	 * @param configFile	:	the properties file that will be loaded	:	{@code String}
 	 * @return an instance of {@code StrykerConfig} that uses {@code configFile} to load a configuration
+	 * @throws IllegalStateException if an instance is already built and this method is called with a different config file
 	 */
-	public static StrykerConfig getInstance(String configFile) {
+	public static StrykerConfig getInstance(String configFile) throws IllegalStateException {
 		if (instance != null) {
 			if (instance.propertiesFile.compareTo(configFile) != 0) {
-				instance = new StrykerConfig(configFile);
+				throw new IllegalStateException("StrykerConfig instance is already built using config file : " + instance.propertiesFile);
 			}
 		} else {
 			instance = new StrykerConfig(configFile);
@@ -62,21 +63,13 @@ public class StrykerConfig {
 	}
 	
 	/**
-	 * @return the last instance built
-	 * @throws IllegalStateException : if an instance hasn't been built before
+	 * @return a previously built instance or construct a new instance using {@code StrykerConfig#DEFAULT_PROPERTIES}
 	 */
-	public static StrykerConfig getLastBuiltInstance() throws IllegalStateException {
+	public static StrykerConfig getInstance() {
 		if (instance == null) {
-			throw new IllegalStateException("StrykerConfig#getLastBuiltInstance() : must make a successful call to StrykerConfig#getInstance(String) before calling this method");
+			instance = new StrykerConfig(StrykerConfig.DEFAULT_PROPERTIES);
 		}
 		return instance;
-	}
-	
-	/**
-	 * @return {@code true} if an instance of this class has been built
-	 */
-	public static boolean instanceBuilt() {
-		return instance != null;
 	}
 	
 	/**
