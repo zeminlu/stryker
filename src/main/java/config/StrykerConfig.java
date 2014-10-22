@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.0
+ * @version 0.2.1
  */
 public class StrykerConfig {
 	
@@ -136,6 +136,13 @@ public class StrykerConfig {
 			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getPathSeparator(), randomString(10));
 		}
 		return this.compilingSandbox; 
+	}
+	
+	/**
+	 * The next time {@code StrykerConfig#getCompilingSandbox()} is called a new directory will be generated
+	 */
+	public void resetCompilingSandbox() {
+		this.compilingSandbox = null;
 	}
 	
 	/**

@@ -3,10 +3,19 @@ package repairer;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import config.StrykerConfig;
 
 public class BasicProgramRepairerTest {
 
+	
+	@Before
+	public void setUp() {
+		StrykerConfig.getInstance().resetCompilingSandbox();
+	}
+	
 	/**
 	 * When an empty set of relevant classes is provided, only the class containing the method to repair 
 	 * is considered.
