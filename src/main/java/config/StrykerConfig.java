@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.1
+ * @version 0.2.2
  */
 public class StrykerConfig {
 	
@@ -105,35 +105,42 @@ public class StrykerConfig {
 	}
 	
 	/**
-	 * @return the path/file separator for the current os (e.g.: "/" for unix)
+	 * @return the file separator for the current os (e.g.: "/" for unix)
 	 */
-	public String getPathSeparator() {
+	public String getFileSeparator() {
 		return SystemUtils.FILE_SEPARATOR;
 	}
 	
 	/**
-	 * @return the value of property {@code path.output} replacing the only argument with {@link StrykerConfig#getPathSeparator()}
+	 * @return the path separator for the current os (e.g.: ":" for unix)
+	 */
+	public String getPathSeparator() {
+		return SystemUtils.PATH_SEPARATOR;
+	}
+	
+	/**
+	 * @return the value of property {@code path.output} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getOutputDir() {
-		return MessageFormat.format(this.config.getString("path.output"), getPathSeparator());
+		return MessageFormat.format(this.config.getString("path.output"), getFileSeparator());
 	}
 	
 	/**
-	 * @return the value of property {@code path.mujavaOutput} replacing the only argument with {@link StrykerConfig#getPathSeparator()}
+	 * @return the value of property {@code path.mujavaOutput} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getMutantsDir() {
-		return MessageFormat.format(this.config.getString("path.mujavaOutput"), getPathSeparator());
+		return MessageFormat.format(this.config.getString("path.mujavaOutput"), getFileSeparator());
 	}
 	
 	/**
-	 * @return the value of property {@code path.compilingSandbox} replacing the first argument with {@link StrykerConfig#getPathSeparator()} and the second with {@code randomString(10)}
+	 * @return the value of property {@code path.compilingSandbox} replacing the first argument with {@link StrykerConfig#getFileSeparator()} and the second with {@code randomString(10)}
 	 * <hr>
 	 * <b>The value returned by this method will not change until {@link StrykerConfig#getInstance(String)} is called again with a different config file</b>
 	 * @see StrykerConfig#randomString(int)
 	 */
 	public String getCompilingSandbox() {
 		if (this.compilingSandbox == null) {
-			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getPathSeparator(), randomString(10));
+			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getFileSeparator(), randomString(10));
 		}
 		return this.compilingSandbox; 
 	}

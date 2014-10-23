@@ -85,11 +85,11 @@ public class JMLAnnotatedClass {
 	
 	private static String toPath(String sourceFolder, String className) {
 		String path = sourceFolder;
-		if (!path.endsWith(StrykerConfig.getInstance().getPathSeparator())) {
-			path += StrykerConfig.getInstance().getPathSeparator();
+		if (!path.endsWith(StrykerConfig.getInstance().getFileSeparator())) {
+			path += StrykerConfig.getInstance().getFileSeparator();
 		}
 		path += className;
-		path = path.replaceAll("\\.", StrykerConfig.getInstance().getPathSeparator());
+		path = path.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator());
 		return path;
 	}
 	
@@ -118,7 +118,7 @@ public class JMLAnnotatedClass {
 	 * @return the qualified name of the class but with each dot replaced by /
 	 */
 	public String getClassNameAsPath() {
-		return this.className.replaceAll("\\.", StrykerConfig.getInstance().getPathSeparator());
+		return this.className.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator());
 	}
 	
 	/**
