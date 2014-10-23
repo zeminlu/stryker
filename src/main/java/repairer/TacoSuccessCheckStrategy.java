@@ -27,7 +27,7 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
 		
-		if (!copy(s.program.getFilePath(), StrykerConfig.getInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
+		if (!copy(s.program.getFilePath(), StrykerConfig.getInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()) + ".java")) {
 			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + StrykerConfig.getInstance().getCompilingSandbox());
 			return false;
 		}
