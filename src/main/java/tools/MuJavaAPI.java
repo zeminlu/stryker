@@ -80,16 +80,16 @@ public class MuJavaAPI {
 		
 		outputDir += randomString(10);
 		
-		if (!outputDir.endsWith(StrykerConfig.getInstance().getPathSeparator())) {
-			outputDir += StrykerConfig.getInstance().getPathSeparator();
+		if (!outputDir.endsWith(StrykerConfig.getInstance().getFileSeparator())) {
+			outputDir += StrykerConfig.getInstance().getFileSeparator();
 		}
 		
 		if (!fixCandidate.getMutations().isEmpty()) {
 			outputDir += "from_" + md5HashToString(fixCandidate.getProgram().getMd5Digest());
 		}
 		
-		if (!outputDir.endsWith(StrykerConfig.getInstance().getPathSeparator())) {
-			outputDir += StrykerConfig.getInstance().getPathSeparator();
+		if (!outputDir.endsWith(StrykerConfig.getInstance().getFileSeparator())) {
+			outputDir += StrykerConfig.getInstance().getFileSeparator();
 		}
 		
 		MutationRequest request = new MutationRequest(clazz, methods, ops, inputDir, outputDir);
@@ -270,11 +270,11 @@ public class MuJavaAPI {
 	}
 	
 	private String removeLastPartOfPath(String originalPath, String className) {
-		String classNameToPath = className.replaceAll("\\.", StrykerConfig.getInstance().getPathSeparator()) + ".java";
+		String classNameToPath = className.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()) + ".java";
 		int indexToCut = originalPath.indexOf(classNameToPath);
 		String result = originalPath.substring(0, indexToCut-1);
-		if (!result.endsWith(StrykerConfig.getInstance().getPathSeparator())) {
-			result += StrykerConfig.getInstance().getPathSeparator();
+		if (!result.endsWith(StrykerConfig.getInstance().getFileSeparator())) {
+			result += StrykerConfig.getInstance().getFileSeparator();
 		}
 		return result;
 	}
