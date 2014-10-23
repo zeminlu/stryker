@@ -183,8 +183,8 @@ public class TacoAPI {
         // Generation of error-exposing class from junit test.                                  
 
         try {
-        	String PATH_SEP = ":";
-        	String FILE_SEP = "/";
+        	String PATH_SEP = StrykerConfig.getInstance().getPathSeparator();
+        	String FILE_SEP = StrykerConfig.getInstance().getFileSeparator();
             String currentJunit = null;
 
             String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(PATH_SEP)+1) /*+ FILE_SEP*/; 
