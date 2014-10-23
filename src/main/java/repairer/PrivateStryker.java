@@ -58,6 +58,16 @@ public class PrivateStryker {
 	 * max depth to be considered in the search of program repairs
 	 */
 	private int maxDepth = 3;
+
+	/**
+	 * It indicates whether RAC based checks are enabled, to decide if a candidate is
+	 * a valid fix or not.
+	 */
+	private boolean racEnabled;
+
+	
+	private String typeScope = null;
+
 	
 	/**
 	 * Constructor of class ProgramRepair. It sets the subject of the repair process
@@ -163,6 +173,7 @@ public class PrivateStryker {
 		if (subjectClass==null || subjectMethod==null) throw new IllegalStateException("program or method is null");
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod, this.relevantClasses);
+		if (racEnabled) problem.setRacStrategy();
 		if (this.typeScope!=null) {
 			// if a scope is provided, we pass it to the problem (to be used in success method).
 			problem.setScope(this.typeScope);
@@ -312,6 +323,12 @@ public class PrivateStryker {
 		this.typeScope = typeScope;
 	}
 	
-	private String typeScope = null;
+	/**
+	 * Enables RAC checking for fix candidates. With this enabled, each fix candidate is first
+	 * checked against collected inputs using RAC, prior to calling bounded verification.
+	 */
+	public void enableRac() {
+		this.racEnabled = true;
+	}
 	
 }

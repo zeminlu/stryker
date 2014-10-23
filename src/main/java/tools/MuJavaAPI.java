@@ -69,7 +69,7 @@ public class MuJavaAPI {
 		List<FixCandidate> mutants = new LinkedList<FixCandidate>();
 		
 		this.mutantHashes = new HashSet<byte[]>();
-		
+				
 		Mutator mutator = new Mutator();
 		
 		String clazz = fixCandidate.getProgram().getClassNameAsPath();
@@ -265,7 +265,7 @@ public class MuJavaAPI {
 		List<MutantIdentifier> mutations = new LinkedList<MutantIdentifier>();
 		mutations.addAll(parentMutations);
 		mutations.add(mi.getMutantIdentifier());
-		FixCandidate wrap = new FixCandidate(program, mutations);
+		FixCandidate wrap = new FixCandidate(program, mi.getMethod(), mutations);
 		return wrap;
 	}
 	

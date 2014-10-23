@@ -1,15 +1,7 @@
 package repairer;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Properties;
-
-import ar.edu.jdynalloy.JDynAlloySemanticException;
-import ar.edu.taco.TacoNotImplementedYetException;
 
 import config.StrykerConfig;
 
@@ -30,6 +22,7 @@ import tools.TacoAPI;
  * @version 0.1.5
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
+	
 
 	/**
 	 * The initial state of the problem, this object should never change for each new problem
@@ -57,7 +50,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 * FIXME improve the representation
 	 */
 	private String typeScopes = null;
-	
+
+
+	/**
+	 * Strategy used for checking fix candidates. By default, the strategy is
+	 * TACO based bounded verification.
+	 */
+	private SuccessCheckStrategy checkStrategy = new TacoSuccessCheckStrategy();
+
 	/**
 	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
 	 * method to fix in the program/class.
@@ -82,10 +82,11 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	}
 	
 	/**
-	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, and the name of the
-	 * method to fix in the program/class.
-	 * @param programToFix is the JML program containing the method to fix
+	 * Constructor of StrykerRepairSearchProblem. It receives a JML program to fix, the name of the
+	 * method to fix in the program/class, and the list of classes the JML program depends on.
+	 * @param programToFix is the JML program containing the method to fix.
 	 * @param methodToFix is the name of the method to fix.
+	 * @param dependencies is the list (as an array) of dependencies of the program to fix.
 	 */
 	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies) {
 		this(programToFix, methodToFix);
@@ -102,7 +103,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public FixCandidate initialState() {
 		if (classToFix==null) throw new IllegalStateException("program to fix not set in stryker search problem");
-		if (this.initialState == null) this.initialState = (new FixCandidate(this.classToFix));
+		if (this.initialState == null) this.initialState = (new FixCandidate(this.classToFix, this.methodToFix));
 		return this.initialState;
 	}
 
@@ -122,38 +123,17 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 
 	/**
 	 * Decides whether a given fix candidate is a successful repair or not. To decide it,
-	 * TACO is called for bounded verification of the method to repair against its JML specification.
+	 * a particular success check strategy is used (this part of the design employs the Strategy design
+	 * pattern). By default, TACO is called for bounded verification of the method to repair against its 
+	 * JML specification. RAC+TACO (i.e., checking candidate against collected test inputs before calling TACO)
+	 * can also be enabled, using "setRacStrategy()".
 	 * If fix candidate does not compile, it considers the candidate unsuccessful. If the fix candidate
 	 * leads to a "not yet implemented" exception when calling TACO, it consider the candidate unsuccessful.
-	 * FIXME This code may not be the best way of calling TACO. It must be improved. So far, only
-	 * paths are passed, no other verification parameters are checked.
 	 * @param s is the fix candidate to analyze	
 	 * @return whether the fix candidate is a successful repair or not.
 	 */
 	public boolean isSuccessful(FixCandidate s) {
-		if (s==null) throw new IllegalArgumentException("null fix candidate");
-		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
-		
-		if (!copy(s.program.getFilePath(), StrykerConfig.getInstance().getCompilingSandbox() + s.program.getClassName().replaceAll("\\.", "/") + ".java")) {
-			System.err.println("couldn't copy " + s.program.getFilePath() + " to " + StrykerConfig.getInstance().getCompilingSandbox());
-			return false;
-		}
-		
-		String sourceFolderBackup = s.program.getSourceFolder();
-		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
-		
-		if (!s.program.isValid()) return false;
-		boolean error = false;
-		boolean sat = false;
-		try {
-			sat = TacoAPI.getInstance().isSAT(s);
-		} catch (TacoNotImplementedYetException e) {
-			error = true;
-		} catch (JDynAlloySemanticException e) {
-			error = true;
-		}
-		s.program.moveLocation(sourceFolderBackup);
-		return !sat && !error;
+		return (this.checkStrategy.isSuccessful(s));
 	}
 	
 	/**
@@ -165,6 +145,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.typeScopes = typeScopes;
 		TacoAPI.getInstance().getOverridingProperties().put("typeScopes", this.typeScopes);
 	}
+
+	/**
+	 * Sets RAC+TACO as the strategy for checking fix candidates 
+	 */
+	public void setRacStrategy() {
+		this.checkStrategy = new TacoWithRacSuccessCheckStrategy();
+	}
+
 	
 	/**
 	 * @return a {@code String} representation of the relevant classes : {@code String}
@@ -179,18 +167,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		}
 		return mrc;
 	}
-	
-	private boolean copy(String srcPath, String destPath) {
-		Path source = FileSystems.getDefault().getPath(srcPath);
-		Path target = FileSystems.getDefault().getPath(destPath);
-		try {
-			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
+
 
 }
