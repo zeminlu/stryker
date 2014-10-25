@@ -265,7 +265,7 @@ public class TacoAPI {
 
 	        return null;
 	    }
-		
+
 	
 	/**
 	 * @param candidate	:	an instance of {@code FixCandidate} for which {@link TacoAPI#isSAT(FixCandidate)} has previously been called	:	{@code FixCandidate}
