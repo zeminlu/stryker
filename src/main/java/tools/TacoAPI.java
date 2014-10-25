@@ -1,9 +1,13 @@
 package tools;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,10 +35,12 @@ import ar.edu.taco.jml.parser.JmlParser;
 import ar.edu.taco.junit.RecoveredInformation;
 import ar.edu.taco.stryker.api.impl.MuJavaController;
 import ar.edu.taco.stryker.api.impl.OpenJMLController;
+import ar.edu.taco.stryker.api.impl.MuJavaController.MsgDigest;
 import ar.edu.taco.stryker.api.impl.input.MuJavaFeedback;
 import ar.edu.taco.stryker.api.impl.input.MuJavaInput;
 import ar.edu.taco.stryker.api.impl.input.OpenJMLInput;
 import ar.edu.taco.stryker.api.impl.input.OpenJMLInputWrapper;
+import ar.edu.taco.utils.FileUtils;
 import repairer.FixCandidate;
 
 /**
@@ -163,66 +169,103 @@ public class TacoAPI {
 	public CounterExample getLastCounterExample() {
 					
 		if (!this.lastRunIsSat) throw new IllegalStateException("calling getLastCounterExample on invalid state");
-        String junitFile = null;
-        // Begin JUNIT Generation Stage
+		
+    	String PATH_SEP = ":";
+    	String FILE_SEP = "/";
+
+		
         List<JCompilationUnitType> compilation_units = JmlParser.getInstance().getCompilationUnits();
-        String classToCheck = this.lastFixCandidate.getProgram().getClassName();
+        String classToCheck = this.lastFixCandidate.getProgram().getFilePath();
         String methodToCheck = this.lastFixCandidate.getMethodToFix() + "_0" ;
+        TacoAnalysisResult analysis_result = this.lastAnalysisResult;
 
-        SnapshotStage snapshotStage = new SnapshotStage(compilation_units, this.lastAnalysisResult, classToCheck, methodToCheck);
-        snapshotStage.execute();
-
-        RecoveredInformation recoveredInformation = snapshotStage.getRecoveredInformation();
-        recoveredInformation.setFileNameSuffix(StrykerStage.fileSuffix);
+	        SnapshotStage snapshotStage = new SnapshotStage(
+	                compilation_units, analysis_result, classToCheck, methodToCheck);
+	        snapshotStage.execute();
 
 
-        JUnitStage jUnitStage = new JUnitStage(recoveredInformation);
-        jUnitStage.execute();
-        junitFile = jUnitStage.getJunitFileName();
+	        RecoveredInformation recoveredInformation = snapshotStage.getRecoveredInformation();
+	        recoveredInformation.setFileNameSuffix(StrykerStage.fileSuffix);
 
-        // Generation of error-exposing class from junit test.                                  
 
-        try {
-        	String PATH_SEP = ":";
-        	String FILE_SEP = "/";
-            String currentJunit = null;
+	        JUnitStage jUnitStage = new JUnitStage(recoveredInformation);
+	        jUnitStage.execute();
 
-            String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(PATH_SEP)+1) /*+ FILE_SEP*/; 
-            String packageToWrite = "ar.edu.output.junit";
-            String fileClasspath = tempFilename.substring(0, tempFilename.lastIndexOf(new String("ar.edu.generated.junit").replaceAll("\\.", FILE_SEP)));
-            fileClasspath = fileClasspath.replaceFirst("generated", "output");
-            String currentClasspath = System.getProperty("java.class.path")+PATH_SEP+fileClasspath+PATH_SEP+System.getProperty("user.dir")+FILE_SEP+"generated";
-            currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
+	        String junitFile = jUnitStage.getJunitFileName();
 
-            File[] file1 = new File[]{new File(currentJunit)};
-            JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
-            StandardJavaFileManager fileManager = javaCompiler.getStandardFileManager(null, null, null);
-            Iterable<? extends JavaFileObject> compilationUnit1 =
-                    fileManager.getJavaFileObjectsFromFiles(Arrays.asList(file1));
-            javaCompiler.getTask(null, fileManager, null, null, null, compilationUnit1).call();
-            fileManager.close();
-            javaCompiler = null;
-            file1 = null;
-            fileManager = null;
+	        String currentJunit = null;
 
-            //                                      if(compilationResult == 0) {
-            ClassLoader cl = ClassLoader.getSystemClassLoader();
-            @SuppressWarnings("resource")
+	        String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1) /*+ FILE_SEP*/; 
+	        String packageToWrite = "ar.edu.output.junit";
+	        String fileClasspath = tempFilename.substring(0, tempFilename.lastIndexOf(
+	                new String("ar.edu.generated.junit").replaceAll("\\.", FILE_SEP)));
+	        fileClasspath = fileClasspath.replaceFirst("generated", "output");
+	        currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
 
-            ClassLoader cl2 = new URLClassLoader(new URL[]{new File(fileClasspath).toURI().toURL()}, cl);
-            //                                      ClassLoaderTools.addFile(fileClasspath);
-            String classToLoad = packageToWrite+"."+TacoMain.obtainClassNameFromFileName(junitFile);
-            Class<?> clazz = cl2.loadClass(classToLoad);
-            cl = null;
-            cl2 = null;
-                        
-            return (new CounterExample(clazz, junitFile));
-        }
-		catch (Exception e) {
-			// Problem while generating counterexample. Returning null.
-			return null;
-		}
-	}
+	        File[] file1 = new File[]{new File(currentJunit)};
+	        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+	        StandardJavaFileManager fileManager = javaCompiler.getStandardFileManager(null, null, null);
+	        Iterable<? extends JavaFileObject> compilationUnit1 =
+	                fileManager.getJavaFileObjectsFromFiles(Arrays.asList(file1));
+	        javaCompiler.getTask(null, fileManager, null, null, null, compilationUnit1).call();
+	        try {
+	            fileManager.close();
+	        } catch (IOException e1) {
+	            // TODO: Define what to do!
+	            e1.printStackTrace();
+	        }
+	        javaCompiler = null;
+	        file1 = null;
+	        fileManager = null;
+
+	        //                                      if(compilationResult == 0) {
+	        System.out.println("junit counterexample compilation succeded");
+	        ClassLoader cl = ClassLoader.getSystemClassLoader();
+	        ClassLoader cl2;
+	        try {
+	            cl2 = new URLClassLoader(new URL[]{new File(fileClasspath).toURI().toURL()}, cl);
+	            //                                      ClassLoaderTools.addFile(fileClasspath);
+	            String classToLoad = packageToWrite+"."+TacoMain.obtainClassNameFromFileName(junitFile);
+	            Class<?> clazz = cl2.loadClass(classToLoad);
+	            cl = null;
+	            cl2 = null;
+	            //                                          log.warn("The class just stored is: "+clazz.getName());
+	            System.out.println("preparing to store a test class... "+packageToWrite+"." + 
+	                    MuJavaController.obtainClassNameFromFileName(junitFile));
+	            //                                          Result result = null;
+	            //                                          final Object oToRun = clazz.newInstance();
+	            DigestOutputStream dos;
+	            File duplicatesTempFile = null;
+	            String content = null;
+	            try {
+	                content = FileUtils.readFile(junitFile);
+	            }
+	            catch (Exception e) {
+	                throw new IllegalArgumentException("invalid or null file");
+	            }
+	            try {
+	                duplicatesTempFile = File.createTempFile("forDuplicatesJunit", null);
+	                dos = new DigestOutputStream(new FileOutputStream(duplicatesTempFile, false), MessageDigest.getInstance("MD5"));
+	                dos.write(content.getBytes());
+	                dos.flush();
+	                dos.close();
+	            }
+	            catch (Exception e) {
+	                throw new IllegalArgumentException("exception thrown while trying to compute digest in class VariablizedSATVerdicts");
+	            }
+	            
+	            return (new CounterExample(clazz, junitFile));
+	        } catch (MalformedURLException e1) {
+	            // TODO: Define what to do!
+	            e1.printStackTrace();
+	        } catch (ClassNotFoundException e1) {
+	            // TODO: Define what to do!
+	            e1.printStackTrace();
+	        }
+
+	        return null;
+	    }
+		
 	
 	/**
 	 * @param candidate	:	an instance of {@code FixCandidate} for which {@link TacoAPI#isSAT(FixCandidate)} has previously been called	:	{@code FixCandidate}
