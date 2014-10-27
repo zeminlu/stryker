@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.2
+ * @version 0.2.4
  */
 public class StrykerConfig {
 	
@@ -143,6 +143,20 @@ public class StrykerConfig {
 			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getFileSeparator(), randomString(10));
 		}
 		return this.compilingSandbox; 
+	}
+	
+	/**
+	 * @return the value of property {@code path.junitPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
+	 */
+	public String getJunitPath() {
+		return MessageFormat.format(this.config.getString("path.junitPath"), getFileSeparator());
+	}
+	
+	/**
+	 * @return the value of property {@code path.hamcrestPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
+	 */
+	public String getHamcrestPath() {
+		return MessageFormat.format(this.config.getString("path.hamcrestPath"), getFileSeparator());
 	}
 	
 	/**

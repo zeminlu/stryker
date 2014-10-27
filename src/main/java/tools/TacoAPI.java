@@ -175,7 +175,7 @@ public class TacoAPI {
 
 		
         List<JCompilationUnitType> compilation_units = JmlParser.getInstance().getCompilationUnits();
-        String classToCheck = this.lastFixCandidate.getProgram().getFilePath();
+        String classToCheck = this.lastFixCandidate.getProgram().getClassName();//this.lastFixCandidate.getProgram().getFilePath();
         String methodToCheck = this.lastFixCandidate.getMethodToFix() + "_0" ;
         TacoAnalysisResult analysis_result = this.lastAnalysisResult;
 
@@ -196,27 +196,35 @@ public class TacoAPI {
 	        String currentJunit = null;
 
 	        String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1) /*+ FILE_SEP*/; 
+	        String editedTestFolderPath = tempFilename.replaceAll("generated", "output");
+	        File editedTestFolderFile = new File(editedTestFolderPath);
+	        editedTestFolderFile.mkdirs();
 	        String packageToWrite = "ar.edu.output.junit";
 	        String fileClasspath = tempFilename.substring(0, tempFilename.lastIndexOf(
 	                new String("ar.edu.generated.junit").replaceAll("\\.", FILE_SEP)));
 	        fileClasspath = fileClasspath.replaceFirst("generated", "output");
 	        currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
 
-	        File[] file1 = new File[]{new File(currentJunit)};
-	        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
-	        StandardJavaFileManager fileManager = javaCompiler.getStandardFileManager(null, null, null);
-	        Iterable<? extends JavaFileObject> compilationUnit1 =
-	                fileManager.getJavaFileObjectsFromFiles(Arrays.asList(file1));
-	        javaCompiler.getTask(null, fileManager, null, null, null, compilationUnit1).call();
-	        try {
-	            fileManager.close();
-	        } catch (IOException e1) {
-	            // TODO: Define what to do!
-	            e1.printStackTrace();
+	        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
+	        	System.err.println("Error while compiling " + currentJunit);
+	        	return null;
 	        }
-	        javaCompiler = null;
-	        file1 = null;
-	        fileManager = null;
+	        
+//	        File[] file1 = new File[]{new File(currentJunit)};
+//	        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+//	        StandardJavaFileManager fileManager = javaCompiler.getStandardFileManager(null, null, null);
+//	        Iterable<? extends JavaFileObject> compilationUnit1 =
+//	                fileManager.getJavaFileObjectsFromFiles(Arrays.asList(file1));
+//	        javaCompiler.getTask(null, fileManager, null, null, null, compilationUnit1).call();
+//	        try {
+//	            fileManager.close();
+//	        } catch (IOException e1) {
+//	            // TODO: Define what to do!
+//	            e1.printStackTrace();
+//	        }
+//	        javaCompiler = null;
+//	        file1 = null;
+//	        fileManager = null;
 
 	        //                                      if(compilationResult == 0) {
 	        System.out.println("junit counterexample compilation succeded");
