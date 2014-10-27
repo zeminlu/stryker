@@ -6,9 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import mujava.app.Reloader;
+
 import tools.CounterExample;
+import tools.JavaCompilerAPI;
 import tools.RacAPI;
 import tools.TacoAPI;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
@@ -53,6 +57,16 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		String sourceFolderBackup = s.program.getSourceFolder();
 		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
+		
+		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+			System.err.println("error al compilar el FixCandidate!");
+			return false;
+		}
+		
+		Reloader reloader = new Reloader(Arrays.asList(classpathToCompile), Thread.currentThread().getContextClassLoader());
+		reloader.rloadClass(s.getProgram().getClassName(), true);
+		Thread.currentThread().setContextClassLoader(reloader);
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;
