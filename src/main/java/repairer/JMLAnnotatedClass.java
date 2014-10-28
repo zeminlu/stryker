@@ -68,7 +68,7 @@ public class JMLAnnotatedClass {
 		this.program = new File(toPath(sourceFolder, className)+".java");
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");		
 		String fullClassName = className;
-		int lastPathSeparatorIndex = fullClassName.lastIndexOf("\\.");
+		int lastPathSeparatorIndex = fullClassName.lastIndexOf(".");
 		if (lastPathSeparatorIndex == -1) {
 			this.classPackage = "";
 		} else {

@@ -119,6 +119,22 @@ public class BasicProgramRepairerWithRacTest {
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired", isRepaired);
 	}
+	
+	/**
+	 * Tests that attempts to repair a very simple incorrect program
+	 * Running repair only up to depth 0 (only the initial candidate considered) using BFS.  
+	 * Repair must return false, indicating the program cannot be repair (up to depth 0).
+	 */
+	@Test
+	public void programRepairWithSimpleIncorrectMethodInBfs_2() {
+		// extension .java is assumed for programs
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
+		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
+		repairer.setBfsStrategy();
+		repairer.enableRac();
+		boolean isRepaired = repairer.repair();
+		assertFalse("method cannot be repaired", isRepaired);
+	}
 
 	
 	/**
