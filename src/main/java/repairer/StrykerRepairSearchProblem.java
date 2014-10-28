@@ -72,7 +72,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.methodToFix = methodToFix;
 		this.relevantClasses = new String[]{programToFix.getClassName()};
 		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
-		overridingProperties.put("classToCheck",initialState().program.getClassNameAsPath());
+		overridingProperties.put("classToCheck",initialState().program.getClassName());//.getClassNameAsPath());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
 		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getInstance().getCompilingSandbox());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
