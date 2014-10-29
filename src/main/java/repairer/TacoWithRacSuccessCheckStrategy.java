@@ -64,9 +64,9 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 			return false;
 		}
 		
-		Reloader reloader = new Reloader(Arrays.asList(classpathToCompile), Thread.currentThread().getContextClassLoader());
-		reloader.rloadClass(s.getProgram().getClassName(), true);
-		Thread.currentThread().setContextClassLoader(reloader);
+		JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
+		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
+		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;

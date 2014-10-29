@@ -18,6 +18,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 
+import config.StrykerConfig;
+
 import ar.edu.taco.engine.StrykerStage;
 import ar.edu.taco.stryker.api.impl.DarwinistController;
 import ar.edu.taco.stryker.api.impl.input.DarwinistInput;
@@ -145,7 +147,14 @@ public class RacAPI {
         }
         final Method methodToRunInCallable = methodToRun; 
         methodToRunInCallable.setAccessible(true);
-        final Object oToRun =  junitInputClass.newInstance();
+        String testFolder = counterexample.getJunitFile();
+        int classNameIdx = testFolder.indexOf(junitInputClass.getName().replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
+        if (classNameIdx > 0) {
+        	testFolder = testFolder.substring(0, classNameIdx);
+        	String[] junitTestClassPath = new String[]{testFolder};
+        	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
+        }
+        final Object oToRun =  JavaCompilerAPI.getInstance().reloadClass(junitInputClass.getName()).newInstance();//junitInputClass.newInstance();
         final Object[] inputToInvoke = new Object[]{newFileClasspath, qualifiedName, methodName};
         Callable<Boolean> task = new Callable<Boolean>() {
             public Boolean call() throws InvocationTargetException {

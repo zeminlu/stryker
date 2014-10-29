@@ -233,20 +233,20 @@ public class TacoAPI {
 	        try {
 	            cl2 = new URLClassLoader(new URL[]{new File(fileClasspath).toURI().toURL()}, cl);
 	            //                                      ClassLoaderTools.addFile(fileClasspath);
-	            String classToLoad = packageToWrite+"."+TacoMain.obtainClassNameFromFileName(junitFile);
+	            String classToLoad = packageToWrite+"."+TacoMain.obtainClassNameFromFileName(currentJunit);
 	            Class<?> clazz = cl2.loadClass(classToLoad);
 	            cl = null;
 	            cl2 = null;
 	            //                                          log.warn("The class just stored is: "+clazz.getName());
 	            System.out.println("preparing to store a test class... "+packageToWrite+"." + 
-	                    MuJavaController.obtainClassNameFromFileName(junitFile));
+	                    MuJavaController.obtainClassNameFromFileName(currentJunit));
 	            //                                          Result result = null;
 	            //                                          final Object oToRun = clazz.newInstance();
 	            DigestOutputStream dos;
 	            File duplicatesTempFile = null;
 	            String content = null;
 	            try {
-	                content = FileUtils.readFile(junitFile);
+	                content = FileUtils.readFile(currentJunit);
 	            }
 	            catch (Exception e) {
 	                throw new IllegalArgumentException("invalid or null file");
@@ -262,7 +262,7 @@ public class TacoAPI {
 	                throw new IllegalArgumentException("exception thrown while trying to compute digest in class VariablizedSATVerdicts");
 	            }
 	            
-	            return (new CounterExample(clazz, junitFile));
+	            return (new CounterExample(clazz, currentJunit));
 	        } catch (MalformedURLException e1) {
 	            // TODO: Define what to do!
 	            e1.printStackTrace();
