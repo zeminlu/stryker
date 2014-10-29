@@ -160,7 +160,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		repairer.setBfsStrategy();
 		repairer.enableRac();

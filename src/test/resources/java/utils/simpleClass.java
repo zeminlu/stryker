@@ -30,7 +30,7 @@ public class SimpleClass {
       /*@ requires newX >= 0;
       @ ensures \result >= 0;
       @*/
-    public static int decX(int newX) {
+    public int decX(int newX) {
             return (newX-1); //mutGenLimit 1
     }
 
