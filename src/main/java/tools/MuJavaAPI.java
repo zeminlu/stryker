@@ -14,19 +14,21 @@ import openjava.ptree.ParseTreeException;
 import repairer.FixCandidate;
 import repairer.JMLAnnotatedClass;
 import mujava.OpenJavaException;
+import mujava.api.Configuration;
 import mujava.api.Mutant;
 import mujava.api.MutantIdentifier;
 import mujava.api.MutantsInformationHolder;
 import mujava.app.MutantInfo;
 import mujava.app.MutationRequest;
 import mujava.app.Mutator;
+import mujava.op.PRVO;
 import mujava.util.JustCodeDigest;
 
 /**
  * This class allows the use of {@code muJava++} to generate mutants ({@code FixCandidate})
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.3.4
+ * @version 0.4.1
  * @see FixCandidate
  * @see JMLAnnotatedClass
  */
@@ -40,11 +42,38 @@ public class MuJavaAPI {
 	 */
 	private Set<byte[]> mutantHashes;
 	
+	private static MuJavaAPI instance;
+	
+	/**
+	 * @return an instance of this class using {@code StrykerConfig.getInstance().getMutantsDir()} as mutant output directory
+	 */
+	public static MuJavaAPI getInstance() {
+		if (instance == null) {
+			instance = new MuJavaAPI();
+		} else if (instance.outputDirectory.compareTo(StrykerConfig.getInstance().getMutantsDir()) != 0) {
+			throw new IllegalStateException("MuJavaAPI instance is already built using mutants output dir : " + instance.outputDirectory);
+		}
+		return instance;
+	}
+	
+	/**
+	 * @param outputDirectory	:	the directory used to store generated mutants	:	{@code String}
+	 * @return an instance of this class using {@code outputDirectory} as mutant output directory
+	 */
+	public static MuJavaAPI getInstance(String outputDirectory) {
+		if (instance == null) {
+			instance = new MuJavaAPI(outputDirectory);
+		} else if (instance.outputDirectory.compareTo(outputDirectory) != 0) {
+			throw new IllegalStateException("MuJavaAPI instance is already built using mutants output dir : " + instance.outputDirectory);
+		}
+		return instance;
+	}
+	
 	/**
 	 * Constructor
 	 * mutants will be written to {@code /tmp/} folder
 	 */
-	public MuJavaAPI() {
+	private MuJavaAPI() {
 		this(StrykerConfig.getInstance().getMutantsDir());
 	}
 	
@@ -52,8 +81,9 @@ public class MuJavaAPI {
 	 * Constructor
 	 * @param outputDirectory : the location where all mutants will be written : {@code String}
 	 */
-	public MuJavaAPI(String outputDirectory) {
+	private MuJavaAPI(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
+		Configuration.add(PRVO.ENABLE_SUPER, Boolean.FALSE);
 	}
 	
 	

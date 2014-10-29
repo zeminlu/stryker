@@ -117,7 +117,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
 		if (s==null) throw new IllegalArgumentException("null candidate passed for computing successors");
-		MuJavaAPI mjAPI = new MuJavaAPI();
+		MuJavaAPI mjAPI = MuJavaAPI.getInstance();
 		return mjAPI.generateMutants(s, methodToFix);
 	}
 
