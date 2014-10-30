@@ -203,7 +203,7 @@ public class TacoAPI {
 	        String fileClasspath = tempFilename.substring(0, tempFilename.lastIndexOf(
 	                new String("ar.edu.generated.junit").replaceAll("\\.", FILE_SEP)));
 	        fileClasspath = fileClasspath.replaceFirst("generated", "output");
-	        currentJunit = JunitTestBuilderTools.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);//TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
+	        currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
 
 	        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
 	        	System.err.println("Error while compiling " + currentJunit);
