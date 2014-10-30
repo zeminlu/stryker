@@ -105,15 +105,15 @@ public class RacAPI {
 	public boolean testsPassed(FixCandidate candidate, List<CounterExample> collectedInputs) throws InstantiationException, IllegalAccessException {
 		if (candidate==null) throw new IllegalArgumentException("checking if collected tests pass on null candidate");
 		if (collectedInputs==null) throw new IllegalArgumentException("checking if collected tests pass on null list of inputs");
-		boolean testFailed = false;
+		boolean testPassed = true;
 		int i = 0;
-		while (i<collectedInputs.size() && !testFailed) {
+		while (i<collectedInputs.size() && testPassed) {
 			CounterExample curr = collectedInputs.get(i);
 			// check if curr passes as a test
-			testFailed = testPassed(candidate, curr);
+			testPassed = testPassed(candidate, curr);
 			i++;
 		}
-		return !testFailed;
+		return testPassed;
 	}
 
 	/**
@@ -137,16 +137,6 @@ public class RacAPI {
 		Boolean threadTimeout = false;
 		
         Class<?> junitInputClass = counterexample.getJunitInput();
-//        Method[] methods = junitInputClass.getMethods();
-//        Method methodToRun = null;
-//        for(Method m : methods) {
-//            if(m.isAnnotationPresent(Test.class)) {
-//                methodToRun = m;
-//                break;
-//            }
-//        }
-//        final Method methodToRunInCallable = methodToRun; 
-//        methodToRunInCallable.setAccessible(true);
         String testFolder = counterexample.getJunitFile();
         int classNameIdx = testFolder.indexOf(junitInputClass.getName().replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
         if (classNameIdx > 0) {
@@ -165,9 +155,11 @@ public class RacAPI {
         		break;
         	}
         }
+        methodToRun.setAccessible(true);
         final Method methodToRunInCallable = methodToRun;
         final Object oToRun = junitTestClass.newInstance();
         final Object[] inputToInvoke = new Object[]{newFileClasspath, qualifiedName, methodName};
+        
         Callable<Boolean> task = new Callable<Boolean>() {
             public Boolean call() throws InvocationTargetException {
                 Boolean result = false;
@@ -262,6 +254,8 @@ public class RacAPI {
         }
         StrykerStage.racMillis += (System.currentTimeMillis() - nanoPrev);
         System.out.println("test ran");
+//        System.out.println("result: " + result);
+//        System.out.println("timeout: " + threadTimeout);
         return (result==true); // apparently result can be null, that's why I'm writing it like this
     
 	}
