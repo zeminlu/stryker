@@ -131,22 +131,22 @@ public class RacAPI {
 		if (counterexample==null) throw new IllegalArgumentException("checking if test passes on null test");
 		
 		String newFileClasspath = candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir")+ ":" + "lib/stryker/jml4c.jar";
-		String qualifiedName = candidate.getProgram().getClassNameAsPath();
+		String qualifiedName = candidate.getProgram().getClassName();//.getClassNameAsPath();
 		String methodName = candidate.getMethodToFix();
 		
 		Boolean threadTimeout = false;
 		
         Class<?> junitInputClass = counterexample.getJunitInput();
-        Method[] methods = junitInputClass.getMethods();
-        Method methodToRun = null;
-        for(Method m : methods) {
-            if(m.isAnnotationPresent(Test.class)) {
-                methodToRun = m;
-                break;
-            }
-        }
-        final Method methodToRunInCallable = methodToRun; 
-        methodToRunInCallable.setAccessible(true);
+//        Method[] methods = junitInputClass.getMethods();
+//        Method methodToRun = null;
+//        for(Method m : methods) {
+//            if(m.isAnnotationPresent(Test.class)) {
+//                methodToRun = m;
+//                break;
+//            }
+//        }
+//        final Method methodToRunInCallable = methodToRun; 
+//        methodToRunInCallable.setAccessible(true);
         String testFolder = counterexample.getJunitFile();
         int classNameIdx = testFolder.indexOf(junitInputClass.getName().replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
         if (classNameIdx > 0) {
@@ -154,7 +154,19 @@ public class RacAPI {
         	String[] junitTestClassPath = new String[]{testFolder};
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
-        final Object oToRun =  JavaCompilerAPI.getInstance().reloadClass(junitInputClass.getName()).newInstance();//junitInputClass.newInstance();
+        JavaCompilerAPI.getInstance().reloadClass(qualifiedName);
+        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(junitInputClass.getName());
+        
+        Method[] methods = junitTestClass.getDeclaredMethods();
+        Method methodToRun = null;
+        for (Method m : methods) {
+        	if(m.isAnnotationPresent(Test.class)) {
+        		methodToRun = m;
+        		break;
+        	}
+        }
+        final Method methodToRunInCallable = methodToRun;
+        final Object oToRun = junitTestClass.newInstance();
         final Object[] inputToInvoke = new Object[]{newFileClasspath, qualifiedName, methodName};
         Callable<Boolean> task = new Callable<Boolean>() {
             public Boolean call() throws InvocationTargetException {
@@ -168,10 +180,10 @@ public class RacAPI {
                     System.out.println("time taken: "+(timepost - timeprev));
                 } catch (IllegalAccessException e) {
                 	System.out.println("Entered IllegalAccessException");
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 } catch (IllegalArgumentException e) {
                 	System.out.println("Entered IllegalArgumentException");
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 } catch (InvocationTargetException e) {
                     //                                                    e.printStackTrace();
                 	System.out.println("Entered InvocationTargetException");
