@@ -1,49 +1,98 @@
 package tools;
 
+import repairer.FixCandidate;
+import ar.edu.taco.TacoAnalysisResult;
+import ar.edu.taco.junit.RecoveredInformation;
+
 /**
  * This class represents a counterexample built by a SAT solver when returning SAT
  * 
  * @author Nazareno Aguirre
+ * @version 2.1
  */
 public class CounterExample {
-
-	/**
-	 * Class object containing the junit witnessing the counterexample
-	 */
-	private Class<?> junitInput;
-    
-	/**
-	 * Name of the file where the counterexample is stored.
-	 */
-	private String junitFile;
 	
 	/**
-	 * Constructor of class CounterExample. It receives the class object and file name corresponding to the
-	 * counterexample
-	 * @param junitInput is the class object of the junit corresponding to the counterexample
-	 * @param junitFile is the name of the file containing the counterexample (as a junit test)
+	 * The fix candidate from which this counter example as built
 	 */
-    public CounterExample(Class<?> junitInput, String junitFile) {
-    	if (junitInput == null) throw new IllegalArgumentException("null junit input");
-    	if (junitFile == null || junitFile.length()==0) throw new IllegalArgumentException("null or empty junit file");
-    	this.junitInput = junitInput;
-    	this.junitFile = junitFile;
-    }
-	
-    /**
-     * Returns the object corresponding the junit input
-     * @return the object corresponding the junit input
-     */
-    public Class<?> getJunitInput() {
-    	return this.junitInput;
-    }
-    
+	private FixCandidate fixCandidate;
 
-    /**
-     * Returns the name of the file containing the counterexample (as a junit test)
-     * @return the name of the file containing the counterexample (as a junit test)
-     */
-    public String getJunitFile() {
-    	return this.junitFile;
-    }
+	/**
+	 * Counter example built by TACO
+	 */
+	private RecoveredInformation counterexample;
+	
+	/**
+	 * Analysis result from TACO
+	 */
+	private TacoAnalysisResult analysis_result;
+	
+	/**
+	 * Builds a new instance using a {@code RecoveredInformation} and a {@code TacoAnalysisResult} object
+	 * 
+	 * @param counterexample	:	the counter example (if exists) built by TACO				:	{@code RecoveredInformation}
+	 * @param analysis_result	:	the analysis result from TACO								:	{@code TacoAnalysisResult}
+	 * @param fixCandidate		:	The fix candidate from which this counter example as built	:	{@code FixCandidate}
+	 * @throws IllegalArgumentException if the analysis gave sat and the counter example is {@code null} or if the analysis gave unsat and the counter example is not {@code null}
+	 */
+	public CounterExample(RecoveredInformation counterexample, TacoAnalysisResult analysis_result, FixCandidate fixCandidate) {
+		if (analysis_result.get_alloy_analysis_result().isSAT() && counterexample == null) {
+			throw new IllegalArgumentException("Taco result is sat but counter example is null");
+		}
+		if (analysis_result.get_alloy_analysis_result().isUNSAT() && counterexample != null) {
+			throw new IllegalArgumentException("Taco result is unsat but counter example is not null");
+		}
+		this.counterexample = counterexample;
+		this.analysis_result = analysis_result;
+		this.fixCandidate = fixCandidate;
+	}
+	
+	/**
+	 * @return {@code true} if a counter example was built by TACO
+	 */
+	public boolean counterExampleExist() {
+		return this.counterexample != null;
+	}
+	
+	/**
+	 * @return the counter example (if exists) built by TACO or {@code null} if a counter example was not built
+	 */
+	public RecoveredInformation getRecoveredInformation() {
+		return this.counterexample;
+	}
+	
+	/**
+	 * @return the analysis result from TACO
+	 */
+	public TacoAnalysisResult getTacoAnalysisResult() {
+		return this.analysis_result;
+	}
+	
+	/**
+	 * @return the fix candidate from which this counter example as built
+	 */
+	public FixCandidate getFixCandidate() {
+		return this.fixCandidate;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		CounterExample other;
+		if (o instanceof CounterExample) {
+			other = (CounterExample)o;
+		} else {
+			if (o == null) return false;
+			return o.equals(this);
+		}
+		boolean thisSat = this.analysis_result.get_alloy_analysis_result().isSAT();
+		boolean otherSat = other.analysis_result.get_alloy_analysis_result().isSAT();
+		//System.out.println("SAT comparison: " + thisSat + "|" + otherSat);
+		if (!(thisSat && otherSat)) {
+			return false;
+		}
+		String thisCE = this.counterexample.getSnapshot().toString();
+		String otherCE = other.counterexample.getSnapshot().toString();
+		//System.out.println("CE comparison: " + thisCE + "|" + otherCE);
+		return thisCE.compareTo(otherCE) == 0;
+	}
 }

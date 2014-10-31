@@ -6,10 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import mujava.app.Reloader;
 
 import tools.CounterExample;
 import tools.JavaCompilerAPI;
@@ -37,6 +34,8 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 	 * invalid candidates).
 	 */
 	private List<CounterExample> collectedCounterExamples = new ArrayList<CounterExample>();
+	
+	private List<Path> builtJunitTests = new ArrayList<Path>();
 
 	/**
 	 * It checks whether a given candidate is a successful fix or not by doing the following:
@@ -70,11 +69,15 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;
+		boolean[] testsResults;
 		boolean racPassed = true;
 		boolean isFix = false;
 		try {
 			// call jmlrac before taco
-			racPassed = RacAPI.getInstance().testsPassed(s, collectedCounterExamples);
+			testsResults = RacAPI.getInstance().runJUnits(s, this.builtJunitTests);
+			for (int tr = 0; tr < testsResults.length && racPassed; tr++) {
+				racPassed = testsResults[tr];
+			}
 			if (racPassed) {
 				// if rac checks pass, call TACO to check whether the 
 				// fix candidate is indeed a fix.
@@ -82,7 +85,12 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 				if (!isFix) {
 					// if candidate is invalid, collect the input obtained from
 					// the SAT check, for future verifications
-					collectedCounterExamples.add(TacoAPI.getInstance().getLastCounterExample());
+					CounterExample lastCounterExample = TacoAPI.getInstance().getLastCounterExample();
+					if (!this.collectedCounterExamples.contains(lastCounterExample)) {
+						Path junitTest = RacAPI.getInstance().buildJUnit(s, lastCounterExample);
+						this.builtJunitTests.add(junitTest);
+						collectedCounterExamples.add(TacoAPI.getInstance().getLastCounterExample());
+					}
 				}
 			}
 			else {

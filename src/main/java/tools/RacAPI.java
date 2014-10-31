@@ -1,13 +1,14 @@
 package tools;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,13 +18,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
-
 import config.StrykerConfig;
 
+import ar.edu.taco.TacoMain;
+import ar.edu.taco.engine.JUnitStage;
 import ar.edu.taco.engine.StrykerStage;
-import ar.edu.taco.stryker.api.impl.DarwinistController;
-import ar.edu.taco.stryker.api.impl.input.DarwinistInput;
-import ar.edu.taco.stryker.api.impl.input.OpenJMLInput;
 import repairer.FixCandidate;
 
 /**
@@ -33,13 +32,14 @@ import repairer.FixCandidate;
  * <li> Given a java source file and a list of JUnit tests, run the tests on the java source file </li>
  * <li> Given a java source file and a counterexample build a JUnit test </li>
  * 
- * TODO: add author
+ * @author Nazareno Matías Aguirre
+ * @author Simón Emmanuel Gutiérrez Brida
  * 
  * @see FixCandidate
  * @see CounterExample
  * @see Path
  *
- * @version 0.1u
+ * @version 2.0
  */
 public class RacAPI {
 	
@@ -52,7 +52,7 @@ public class RacAPI {
 		return instance;
 	}
 	
-	private RacAPI() { }
+	private RacAPI() {}
 	
 	/**
 	 * This method takes a {@code FixCandidate} and a {@code CounterExample} and build a JUnit test.
@@ -62,9 +62,45 @@ public class RacAPI {
 	 * 
 	 * @return a path to the JUnit test built : {@code Path}
 	 */
-	private Path buildJUnit(FixCandidate candidate, CounterExample ce) {
-		//TODO: implement this method
-		throw new UnsupportedOperationException ("RacAPI#buildJUnit(FixCandidate, CounterExample) : not yet implemented");
+	public Path buildJUnit(FixCandidate candidate, CounterExample ce) {
+		if (!ce.counterExampleExist()) {
+			throw new IllegalArgumentException("RacAPI#buildJUnit(FixCandidate, CounterExample): trying to build a junit test with no counter example");
+		}
+		
+    	String FILE_SEP = StrykerConfig.getInstance().getFileSeparator();
+    	
+    	String classToCheck = candidate.getProgram().getClassName();
+      	String methodToCheck = candidate.getMethodToFix() + "_0" ;
+
+	    JUnitStage jUnitStage = new JUnitStage(ce.getRecoveredInformation());
+	    jUnitStage.execute();
+
+	    String junitFile = jUnitStage.getJunitFileName();
+
+	    String currentJunit = null;
+
+	    String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1); 
+	    String editedTestFolderPath = tempFilename.replaceAll("generated", "output");
+	    File editedTestFolderFile = new File(editedTestFolderPath);
+	    editedTestFolderFile.mkdirs();
+	    String fileClasspath = tempFilename.substring(
+	    							0,
+	    							tempFilename.lastIndexOf(
+	    									"ar.edu.generated.junit".replaceAll("\\.", FILE_SEP)
+	    							)
+	    						);
+	    fileClasspath = fileClasspath.replaceFirst("generated", "output");
+	    String packageToWrite = "ar.edu.output.junit";
+	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
+
+        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
+        	System.err.println("Error while compiling " + currentJunit);
+        	return null;
+        }
+	       
+	    System.out.println("junit counterexample compilation succeded");
+
+        return new File(currentJunit).toPath();
 	}
 	
 	/**
@@ -74,78 +110,29 @@ public class RacAPI {
 	 * @param junitTest	:	the path leading to the JUnit test to run					:	{@code Path}
 	 * 
 	 * @return {@code true} or {@code false} depending if the test passes or not	:	{@code boolean}
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	private boolean runJUnit(FixCandidate candidate, Path junitTest) {
-		//TODO: implement this method
-		throw new UnsupportedOperationException ("RacAPI#runJUnit(FixCandidate, Path) : not yet implemented");
-	}
-	
-	/**
-	 * This method runs a list of JUnit tests for a given {@code FixCandidate}
-	 * 
-	 * @param candidate		:	the java source code for which the JUnit test will be run	:	{@code FixCandidate}	
-	 * @param junitTests	:	the list of paths leading to the JUnit tests to run			:	{@code List<Path>}
-	 * 
-	 * @return a boolean array representing the result of running each JUnit test	:	{@code boolean[]}
-	 */
-	private boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests) {
-		//TODO: implement this method
-		throw new UnsupportedOperationException ("RacAPI#runJUnits(FixCandidate, List<Path>) : not yet implemented");
-	}
-
-	/**
-	 * Checks whether fix candidate "passes" on a list of collected inputs, i.e., if the candidate, ran using RAC for each of the 
-	 * collected inputs, it does not violate the contracts.
-	 * @param candidate is the fix candidate to evaluate.
-	 * @param collectedInputs is the list of collected inputs to check the fix candidate with.
-	 * @return true iff fix candidate does not violate any contract on any of the collected inputs.
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	public boolean testsPassed(FixCandidate candidate, List<CounterExample> collectedInputs) throws InstantiationException, IllegalAccessException {
-		if (candidate==null) throw new IllegalArgumentException("checking if collected tests pass on null candidate");
-		if (collectedInputs==null) throw new IllegalArgumentException("checking if collected tests pass on null list of inputs");
-		boolean testPassed = true;
-		int i = 0;
-		while (i<collectedInputs.size() && testPassed) {
-			CounterExample curr = collectedInputs.get(i);
-			// check if curr passes as a test
-			testPassed = testPassed(candidate, curr);
-			i++;
-		}
-		return testPassed;
-	}
-
-	/**
-	 * Checks whether fix candidate "passes" on a given collected input, i.e., if the candidate, ran using RAC for the 
-	 * collected input, it does not violate the contracts.
-	 * @param candidate is the fix candidate to evaluate.
-	 * @param counterexample is the input to check the fix candidate with.
-	 * @return true iff fix candidate does not violate any contract on the provided input.
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * FIXME this method is "borrowed" from comitaco. It may not be the best way of running a test using RAC.
-	 */
-	private boolean testPassed(FixCandidate candidate, CounterExample counterexample) throws InstantiationException, IllegalAccessException {
+	public boolean runJUnit(FixCandidate candidate, Path junitTest) throws InstantiationException, IllegalAccessException {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
-		if (counterexample==null) throw new IllegalArgumentException("checking if test passes on null test");
+		if (junitTest==null) throw new IllegalArgumentException("checking if test passes on null test");
 		
 		String newFileClasspath = candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir")+ ":" + "lib/stryker/jml4c.jar";
-		String qualifiedName = candidate.getProgram().getClassName();//.getClassNameAsPath();
+		String qualifiedName = candidate.getProgram().getClassName();
 		String methodName = candidate.getMethodToFix();
+		String junitPackage = "ar.edu.output.junit";
 		
-		Boolean threadTimeout = false;
-		
-        Class<?> junitInputClass = counterexample.getJunitInput();
-        String testFolder = counterexample.getJunitFile();
-        int classNameIdx = testFolder.indexOf(junitInputClass.getName().replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
-        if (classNameIdx > 0) {
-        	testFolder = testFolder.substring(0, classNameIdx);
+        String testFolder = junitTest.toString();
+        String className = junitTest.toString().replace(".java", "");
+        int packageIdx = testFolder.indexOf(junitPackage.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
+        if (packageIdx > 0) {
+        	testFolder = testFolder.substring(0, packageIdx);
+        	className = className.substring(testFolder.length());
         	String[] junitTestClassPath = new String[]{testFolder};
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
         JavaCompilerAPI.getInstance().reloadClass(qualifiedName);
-        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(junitInputClass.getName());
+        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."));
         
         Method[] methods = junitTestClass.getDeclaredMethods();
         Method methodToRun = null;
@@ -207,8 +194,6 @@ public class RacAPI {
                     } else if (retValue.contains("ThreadDeath")) {
                         System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
                         result = null;
-//                        System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
-                        result = null;
                     } else {
                         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" +
                                 "\nFAILED METHODDDD FOR NO REASON!!!!!!!!!!!!!!!!!!!!" +
@@ -225,7 +210,6 @@ public class RacAPI {
                 return result;
             }
         };
-        threadTimeout = false;
         long nanoPrev = System.currentTimeMillis();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executor.submit(task);
@@ -233,10 +217,8 @@ public class RacAPI {
         try {
             result = future.get(300, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ex) {
-            //                                            System.out.println("TIMEOUT POR FUERA DE RAC!!!!!!!!!!!!!!!!!!");
             result = false;
-            threadTimeout = true;
-            runningThread.stop();
+            runningThread.interrupt();
             executor.shutdownNow();
             executor = Executors.newSingleThreadExecutor();
             // handle the timeout
@@ -254,10 +236,43 @@ public class RacAPI {
         }
         StrykerStage.racMillis += (System.currentTimeMillis() - nanoPrev);
         System.out.println("test ran");
-//        System.out.println("result: " + result);
-//        System.out.println("timeout: " + threadTimeout);
-        return (result==true); // apparently result can be null, that's why I'm writing it like this
-    
+        return result;
+	}
+	
+	/**
+	 * This method runs a list of JUnit tests for a given {@code FixCandidate}
+	 * 
+	 * @param candidate		:	the java source code for which the JUnit test will be run	:	{@code FixCandidate}	
+	 * @param junitTests	:	the list of paths leading to the JUnit tests to run			:	{@code List<Path>}
+	 * 
+	 * @return a boolean array representing the result of running each JUnit test	:	{@code boolean[]}
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests, boolean stopAtFirstFail) throws InstantiationException, IllegalAccessException {
+		boolean[] results = new boolean[junitTests.size()];
+		Arrays.fill(results, true);
+		for (int t = 0; t < junitTests.size(); t++) {
+			results[t] = this.runJUnit(candidate, junitTests.get(t));
+			if (!results[t] && stopAtFirstFail) {
+				break;
+			}
+		}
+		return results;
+	}
+	
+	/**
+	 * This method runs a list of JUnit tests for a given {@code FixCandidate}
+	 * 
+	 * @param candidate		:	the java source code for which the JUnit test will be run	:	{@code FixCandidate}	
+	 * @param junitTests	:	the list of paths leading to the JUnit tests to run			:	{@code List<Path>}
+	 * 
+	 * @return a boolean array representing the result of running each JUnit test	:	{@code boolean[]}
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests) throws InstantiationException, IllegalAccessException {
+		return this.runJUnits(candidate, junitTests, true);
 	}
 	
 }

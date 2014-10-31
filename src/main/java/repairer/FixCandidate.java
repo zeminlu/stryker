@@ -105,5 +105,14 @@ public class FixCandidate implements State {
 		if (!(other instanceof FixCandidate)) return false;
 		return (this.program.getMd5Digest().equals(((FixCandidate) other).program.getMd5Digest()));
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof FixCandidate) {
+			return equals((FixCandidate)other);
+		}
+		if (other == null) return false;
+		return other.equals(this);
+	}
 
 }
