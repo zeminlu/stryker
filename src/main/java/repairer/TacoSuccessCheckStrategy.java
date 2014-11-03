@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import tools.JavaCompilerAPI;
 import tools.TacoAPI;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoNotImplementedYetException;
@@ -34,6 +35,16 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		String sourceFolderBackup = s.program.getSourceFolder();
 		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
+		
+		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+			System.err.println("error al compilar el FixCandidate!");
+			return false;
+		}
+		
+		JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
+		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
+		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;
