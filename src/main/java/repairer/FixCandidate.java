@@ -3,7 +3,7 @@ package repairer;
 import java.util.LinkedList;
 import java.util.List;
 
-import mujava.api.MutantIdentifier;
+import mujava.api.Mutation;
 import search.State;
 
 /**
@@ -29,7 +29,7 @@ public class FixCandidate implements State {
 	 *  Holds the mutant identifiers that led to current candidate
 		empty for initial fix candidate.
 	 */
-	protected List<MutantIdentifier> mutations;
+	protected List<Mutation> mutations;
 	
 	/**
 	 * Constructor of class FixCandidate. It receives the jml program corresponding to the candidate, and
@@ -43,7 +43,7 @@ public class FixCandidate implements State {
 		if (methodToFix==null) throw new IllegalArgumentException("creating candidate with null method to fix");
 		this.program = program;
 		this.methodToFix = methodToFix;
-		this.mutations = new LinkedList<MutantIdentifier>(); // initial candidate does not come from a mutation.
+		this.mutations = new LinkedList<Mutation>(); // initial candidate does not come from a mutation.
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class FixCandidate implements State {
 	 * @param methodToFix is the name of the method to fix.
 	 * @param mutation is the mutation that led to the candidate.
 	 */
-	public FixCandidate(JMLAnnotatedClass program, String methodToFix, MutantIdentifier mutation) {
+	public FixCandidate(JMLAnnotatedClass program, String methodToFix, Mutation mutation) {
 		this(program, methodToFix);
 		if (mutation==null) throw new IllegalArgumentException("creating candidate with null mutation");
 		this.mutations.add(mutation);
@@ -66,7 +66,7 @@ public class FixCandidate implements State {
 	 * @param methodToFix is the name of the method to fix.
 	 * @param mutation is the mutation that led to the candidate.
 	 */
-	public FixCandidate(JMLAnnotatedClass program, String methodToFix, List<MutantIdentifier> mutations) {
+	public FixCandidate(JMLAnnotatedClass program, String methodToFix, List<Mutation> mutations) {
 		this(program, methodToFix);
 		if (mutations==null) throw new IllegalArgumentException("creating candidate with null mutations");
 		this.mutations.addAll(mutations);
@@ -83,7 +83,7 @@ public class FixCandidate implements State {
 	/**
 	 * @return the mutations applied to this {@code FixCandidate}, the result will never be {@code null}
 	 */
-	public List<MutantIdentifier> getMutations() {
+	public List<Mutation> getMutations() {
 		return this.mutations;
 	}
 

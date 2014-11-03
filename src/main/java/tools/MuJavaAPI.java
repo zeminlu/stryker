@@ -16,7 +16,7 @@ import repairer.JMLAnnotatedClass;
 import mujava.OpenJavaException;
 import mujava.api.Configuration;
 import mujava.api.Mutant;
-import mujava.api.MutantIdentifier;
+import mujava.api.Mutation;
 import mujava.api.MutantsInformationHolder;
 import mujava.app.MutantInfo;
 import mujava.app.MutationRequest;
@@ -288,13 +288,13 @@ public class MuJavaAPI {
 	 * @param mi	:	the mutant	:	{@code MutantInfo}
 	 * @return	a {@code FixCandidate} object instanciated from the data of {@code mi}	:	{@code FixCandidate}
 	 */
-	private FixCandidate wrapMutant(MutantInfo mi, List<MutantIdentifier> parentMutations) {
+	private FixCandidate wrapMutant(MutantInfo mi, List<Mutation> parentMutations) {
 		String baseDir = removeLastPartOfPath(mi.getPath(), mi.getName());
 		String clazzName = mi.getName();
 		JMLAnnotatedClass program = new JMLAnnotatedClass(baseDir, clazzName);
-		List<MutantIdentifier> mutations = new LinkedList<MutantIdentifier>();
+		List<Mutation> mutations = new LinkedList<Mutation>();
 		mutations.addAll(parentMutations);
-		mutations.add(mi.getMutantIdentifier());
+		mutations.add(mi.getMutation());
 		FixCandidate wrap = new FixCandidate(program, mi.getMethod(), mutations);
 		return wrap;
 	}

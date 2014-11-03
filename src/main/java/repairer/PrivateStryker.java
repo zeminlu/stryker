@@ -19,7 +19,7 @@ import java.util.Set;
 
 import config.StrykerConfig;
 
-import mujava.api.MutantIdentifier;
+import mujava.api.Mutation;
 import search.engines.AbstractBoundedSearchEngine;
 import search.engines.BoundedBreadthFirstSearchEngine;
 import search.engines.BoundedDepthFirstSearchEngine;
@@ -205,7 +205,7 @@ public class PrivateStryker {
 			String solutionLocation = solution.program.getAbsolutePath() + solution.program.getClassName() + ".java";
 			System.out.println("*** FOUND SOLUTION! Get it from: " + solutionLocation);
 			System.out.println("*** Mutations that produced the fix: ");
-			for (MutantIdentifier mutation : solution.getMutations()) {
+			for (Mutation mutation : solution.getMutations()) {
 				System.out.println(mutation.toString() + " in method " + (mutation.isOneLineInMethodOp()?(this.subjectMethod + " in line " + mutation.getAffectedLine()):"not a method mutation"));
 			}
 			System.out.println("*** Stats: " + engine.report());

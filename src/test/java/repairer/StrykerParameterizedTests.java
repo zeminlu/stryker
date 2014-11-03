@@ -18,11 +18,32 @@ import tools.StrykerOptions;
 import tools.StrykerOptions.SearchStrategy;
 import tools.TestingTools;
 
+/**
+ * Parameterized tests for stryker
+ * 
+ * @author Simón Emmanuel Gutiérrez Brida
+ * @version 0.1u
+ * @see ProgramData
+ * @see StrykerOptions
+ * @see TestingTools
+ */
 @RunWith(Parameterized.class)
 public class StrykerParameterizedTests {
+	/**
+	 * The program to fix
+	 */
 	private ProgramData programData;
+	/**
+	 * Stryker settings to use
+	 */
 	private StrykerOptions strykerOptions;
+	/**
+	 * the method to fix
+	 */
 	private String methodToFix;
+	/**
+	 * if a fix is expected or not
+	 */
 	private boolean fixExpected;
 	
 	public StrykerParameterizedTests(ProgramData programData, StrykerOptions strykerOptions, String methodToFix, boolean fixExpected) {
@@ -34,7 +55,6 @@ public class StrykerParameterizedTests {
 	
 	@Before
 	public void setUp() {
-		System.out.println("setUp called");
 		StrykerConfig.getInstance().resetCompilingSandbox();
 	}
 	
@@ -82,17 +102,31 @@ public class StrykerParameterizedTests {
 		
 		//PARAMETERS
 		return Arrays.asList(new Object[][] {
+				//SIMPLE CLASS DECX
 				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
 				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
 				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
 				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
+				//SIMPLE CLASS ALTTWICEPLUSONE
+				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_noRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_noRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 		});
 	}
 	
 	@Test
 	public void testFixFoundAsExpected() {
 		String toFixMessage = "method " + this.methodToFix + " of " + this.programData.getProgramToFix().getClassName();
-		assertTrue(toFixMessage + (fixExpected?" was fixed as expected":" was not fixed as expected"), TestingTools.programFixedAsExpected(this.programData, this.strykerOptions, this.methodToFix, this.fixExpected));
+		assertTrue(toFixMessage + (fixExpected?" was not fixed as expected":" was fixed but was a fix was not expected"), TestingTools.programFixedAsExpected(this.programData, this.strykerOptions, this.methodToFix, this.fixExpected));
 	}
 
 }
