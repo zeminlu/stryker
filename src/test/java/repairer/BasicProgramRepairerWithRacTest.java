@@ -23,10 +23,10 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void emptyRelevantClasses() {
 		String[] relevantClasses = new String[]{};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		PrivateStryker repairer = new PrivateStryker(subject, "getX", relevantClasses, 0);
 		repairer.enableRac();
-		assertTrue("Only the class to repair is relevant", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("SimpleClass")==0);
+		assertTrue("Only the class to repair is relevant", repairer.getClassesDependencies().length == 1 && repairer.getClassesDependencies()[0].compareTo("utils.SimpleClass")==0);
 	}
 	
 	/**
@@ -35,7 +35,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void nonEmptyRelevantClasses() {
 		String[] relevantClasses = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		PrivateStryker repairer = new PrivateStryker(subject, "setX", relevantClasses, 0);
 		repairer.enableRac();
 		boolean relevantClassesSizeIsCorrect = repairer.getClassesDependencies().length == 4;
@@ -65,7 +65,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleCorrectMethod() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "getX", 0);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -80,7 +80,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleCorrectMethodInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "setX", 0);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -97,7 +97,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethod() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -112,7 +112,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -128,7 +128,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodInBfs_2() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -145,7 +145,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -160,7 +160,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -177,7 +177,7 @@ public class BasicProgramRepairerWithRacTest {
 	//@Test
 	public void programRepairWithSimpleIncorrectMethodDepthTwo() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 2);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -193,7 +193,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthTwoInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 2);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -210,7 +210,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOne() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 1);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -225,7 +225,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleUnrepairableIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "twicePlusOne", 1);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -242,7 +242,7 @@ public class BasicProgramRepairerWithRacTest {
 	// @Test
 	public void programRepairWithSimpleIncorrectMethodDepthThree() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "altTwicePlusOne", 3);
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
@@ -257,7 +257,7 @@ public class BasicProgramRepairerWithRacTest {
 	// @Test
 	public void programRepairWithSimpleIncorrectMethodDepthThreeInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "altTwicePlusOne", 3);
 		repairer.setBfsStrategy();
 		repairer.enableRac();

@@ -57,6 +57,9 @@ public class RepairCLI {
 		classes.setArgs(Option.UNLIMITED_VALUES);
 		classes.setValueSeparator(',');
 		
+		Option rac = new Option("r", "rac", false, "enables the use of RAC");
+		rac.setRequired(false);
+		
 		options.addOption(help);
 		options.addOption(path);
 		options.addOption(className);
@@ -64,6 +67,7 @@ public class RepairCLI {
 		options.addOption(depth);
 		options.addOption(classes);
 		options.addOption(scope);
+		options.addOption(rac);
 
 		CommandLineParser parser = new BasicParser();
 		try {
@@ -95,6 +99,13 @@ public class RepairCLI {
 			if (cmd.hasOption("s")) {
 				String typeScope = cmd.getOptionValue('s');
 				repairer.setScope(typeScope);
+			}
+			boolean useRac = false;
+			if (cmd.hasOption("r")) {
+				useRac = true;
+			}
+			if (useRac) {
+				repairer.enableRac();
 			}
 			repairer.repair();
 		}
