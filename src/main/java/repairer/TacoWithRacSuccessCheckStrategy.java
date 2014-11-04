@@ -59,7 +59,8 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
 		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
-			System.err.println("error al compilar el FixCandidate!");
+			System.err.println("error while compiling FixCandidate!");
+			s.program.moveLocation(sourceFolderBackup);
 			return false;
 		}
 		
@@ -67,7 +68,10 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
 		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
 		
-		if (!s.program.isValid()) return false;
+		if (!s.program.isValid()) {
+			s.program.moveLocation(sourceFolderBackup);
+			return false;
+		}
 		boolean error = false;
 		boolean[] testsResults;
 		boolean racPassed = true;
@@ -91,9 +95,9 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 						this.builtJunitTests.add(junitTest);
 						collectedCounterExamples.add(TacoAPI.getInstance().getLastCounterExample());
 					}
+				} else {
 				}
-			}
-			else {
+			} else {
 				isFix = false;
 			}
 		} catch (TacoNotImplementedYetException e) {

@@ -64,7 +64,6 @@ public class PrivateStryker {
 	 * a valid fix or not.
 	 */
 	private boolean racEnabled;
-
 	
 	private String typeScope = null;
 

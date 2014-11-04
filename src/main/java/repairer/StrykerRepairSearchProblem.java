@@ -152,7 +152,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public void setRacStrategy() {
 		this.checkStrategy = new TacoWithRacSuccessCheckStrategy();
 	}
-
 	
 	/**
 	 * @return a {@code String} representation of the relevant classes : {@code String}

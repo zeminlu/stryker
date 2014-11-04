@@ -21,10 +21,12 @@ public class StrykerOptions {
 	 */
 	public static enum SearchStrategy {BFS, DFS}
 	
+	public static enum RAC {DISABLED, ENABLED, CONCURRENT}
+	
 	/**
 	 * If stryker will use RAC or not to fix the program
 	 */
-	private boolean useRac;
+	private RAC rac;
 	
 	/**
 	 * The strategy that stryker will use to find a fix
@@ -55,10 +57,10 @@ public class StrykerOptions {
 	 * @param maxDepth			:	max depth to be considered in the search of program repairs								:	{@code int}
 	 * @param enableRac			:	if stryker will use RAC or not to fix the program										:	{@code boolean}
 	 */
-	public StrykerOptions(SearchStrategy searchStrategy, Map<String, Integer> scopes, int maxDepth, boolean enableRac) {
+	public StrykerOptions(SearchStrategy searchStrategy, Map<String, Integer> scopes, int maxDepth, RAC rac) {
 		this.searchStrategy = searchStrategy;
 		this.maxDepth = maxDepth;
-		this.useRac = enableRac;
+		this.rac = rac;
 		this.scope = createScopeString(scopes);
 	}
 	
@@ -71,8 +73,8 @@ public class StrykerOptions {
 	 * @param enableRac			:	if stryker will use RAC or not to fix the program										:	{@code boolean}
 	 * @param configFile		:	the config file that will be used by {@code StrykerConfig}								:	{@code String}
 	 */
-	public StrykerOptions(SearchStrategy searchStrategy, Map<String, Integer> scopes, int maxDepth, boolean enableRac, String configFile) {
-		this(searchStrategy, scopes, maxDepth, enableRac);
+	public StrykerOptions(SearchStrategy searchStrategy, Map<String, Integer> scopes, int maxDepth, RAC rac, String configFile) {
+		this(searchStrategy, scopes, maxDepth, rac);
 		this.configFile = configFile;
 		if (!this.configFile.isEmpty()) { //TODO: should also check that the file exist
 			StrykerConfig.getInstance(this.configFile);
@@ -109,7 +111,11 @@ public class StrykerOptions {
 	 * @return if stryker will use RAC or not to fix the program
 	 */
 	public boolean useRac() {
-		return useRac;
+		return this.rac.equals(RAC.ENABLED) || this.rac.equals(RAC.CONCURRENT);
+	}
+	
+	public boolean useConcurrentRac() {
+		return this.rac.equals(RAC.CONCURRENT);
 	}
 
 	/**

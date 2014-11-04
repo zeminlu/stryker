@@ -1,5 +1,7 @@
 package tools;
 
+import java.util.Map.Entry;
+
 import repairer.FixCandidate;
 import ar.edu.taco.TacoAnalysisResult;
 import ar.edu.taco.junit.RecoveredInformation;
@@ -90,8 +92,28 @@ public class CounterExample {
 		if (!(thisSat && otherSat)) {
 			return false;
 		}
-		String thisCE = this.counterexample.getSnapshot().toString();
-		String otherCE = other.counterexample.getSnapshot().toString();
+		String thisCE = "";
+		for (Entry<String,Object> v : this.counterexample.getSnapshot().entrySet()) {
+			String key = v.getKey();
+			String value = v.getValue().toString();
+			int atIdx = value.indexOf("@");
+			if (atIdx > 0) {
+				value = value.substring(0, atIdx);
+			}
+			thisCE += key + "=" + value + "|";
+		}
+		thisCE = thisCE.substring(0, thisCE.length() - 1);
+		String otherCE = "";
+		for (Entry<String,Object> v : other.counterexample.getSnapshot().entrySet()) {
+			String key = v.getKey();
+			String value = v.getValue().toString();
+			int atIdx = value.indexOf("@");
+			if (atIdx > 0) {
+				value = value.substring(0, atIdx);
+			}
+			otherCE += key + "=" + value + "|";
+		}
+		otherCE = otherCE.substring(0, otherCE.length() - 1);
 		//System.out.println("CE comparison: " + thisCE + "|" + otherCE);
 		return thisCE.compareTo(otherCE) == 0;
 	}

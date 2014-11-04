@@ -43,6 +43,8 @@ import repairer.FixCandidate;
  */
 public class RacAPI {
 	
+	public static boolean verbose = false;
+	
 	private Thread runningThread = null;
 
 	private static RacAPI instance = null;
@@ -94,11 +96,11 @@ public class RacAPI {
 	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
 
         if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
-        	System.err.println("Error while compiling " + currentJunit);
+        	if (RacAPI.verbose) System.err.println("Error while compiling " + currentJunit);
         	return null;
         }
 	       
-	    System.out.println("junit counterexample compilation succeded");
+        if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
         return new File(currentJunit).toPath();
 	}
@@ -146,7 +148,6 @@ public class RacAPI {
         final Method methodToRunInCallable = methodToRun;
         final Object oToRun = junitTestClass.newInstance();
         final Object[] inputToInvoke = new Object[]{newFileClasspath, qualifiedName, methodName};
-        
         Callable<Boolean> task = new Callable<Boolean>() {
             public Boolean call() throws InvocationTargetException {
                 Boolean result = false;
@@ -156,17 +157,17 @@ public class RacAPI {
                     methodToRunInCallable.invoke(oToRun, inputToInvoke);
                     long timepost = System.currentTimeMillis();
                     result = true;
-                    System.out.println("time taken: "+(timepost - timeprev));
+                    if (RacAPI.verbose) System.out.println("time taken: "+(timepost - timeprev));
                 } catch (IllegalAccessException e) {
-                	System.out.println("Entered IllegalAccessException");
+                	if (RacAPI.verbose) System.out.println("Entered IllegalAccessException");
                     e.printStackTrace();
                 } catch (IllegalArgumentException e) {
-                	System.out.println("Entered IllegalArgumentException");
+                	if (RacAPI.verbose) System.out.println("Entered IllegalArgumentException");
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
                     //                                                    e.printStackTrace();
-                	System.out.println("Entered InvocationTargetException");
-                	System.out.println("QUIT BECAUSE OF JML RAC");
+                	if (RacAPI.verbose) System.out.println("Entered InvocationTargetException");
+                	if (RacAPI.verbose) System.out.println("QUIT BECAUSE OF JML RAC");
                     String retValue = null;
                     StringWriter sw = null;
                     PrintWriter pw = null;
@@ -184,27 +185,27 @@ public class RacAPI {
                         } catch (IOException ignore) {}
                     }
                     if (retValue.contains("JMLInternalNormalPostconditionError")) {
-                        System.out.println("Fallo por la postcondicion!!");
+                    	if (RacAPI.verbose) System.out.println("Fallo por la postcondicion!!");
                         result = false;
                     } else if (retValue.contains("JMLExitExceptionalPostconditionError")) { 
-                        result = null;
+                        result = false;
                     } else if (retValue.contains("NullPointerException")) {
-                        System.out.println("NULL POINTER EXCEPTION EN RAC!!!!!!!!!!!!");
-                        result = null;
+                    	if (RacAPI.verbose) System.out.println("NULL POINTER EXCEPTION EN RAC!!!!!!!!!!!!");
+                        result = true;
                     } else if (retValue.contains("ThreadDeath")) {
-                        System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
-                        result = null;
+                    	if (RacAPI.verbose) System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
+                        result = true;
                     } else {
-                        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" +
+                    	if (RacAPI.verbose) System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" +
                                 "\nFAILED METHODDDD FOR NO REASON!!!!!!!!!!!!!!!!!!!!" +
                                 "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                        e.printStackTrace();
-                        result = null;
+                    	if (RacAPI.verbose) e.printStackTrace();
+                        result = false;
                     }
                 } catch (Throwable e) {
-                	System.out.println("Entered throwable");
-                    System.out.println("THROWABLEEE!!!!!!!!!!!!!!!!!!!!!!");
-                    e.printStackTrace();
+                	if (RacAPI.verbose) System.out.println("Entered throwable");
+                	if (RacAPI.verbose) System.out.println("THROWABLEEE!!!!!!!!!!!!!!!!!!!!!!");
+                	if (RacAPI.verbose) e.printStackTrace();
                     return false;
                 }
                 return result;
@@ -213,29 +214,33 @@ public class RacAPI {
         long nanoPrev = System.currentTimeMillis();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executor.submit(task);
-        boolean result = true;
+        boolean result = false;
         try {
             result = future.get(300, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ex) {
-            result = false;
-            runningThread.interrupt();
+            //runningThread.interrupt();
+        	runningThread.stop();
             executor.shutdownNow();
             executor = Executors.newSingleThreadExecutor();
+            result = true;
             // handle the timeout
         } catch (InterruptedException e) {
-            System.out.println("Interrupted");
+        	if (RacAPI.verbose) System.out.println("Interrupted");
+        	result = true;
             // handle the interrupts
         } catch (ExecutionException e) {
             // handle other exceptions
-        	System.out.println("Excecution Exception");
+        	if (RacAPI.verbose) System.out.println("Excecution Exception");
+        	result = true;
         } catch (Throwable e) {
-        	System.out.println("Exception");
+        	if (RacAPI.verbose) System.out.println("Exception");
+        	result = true;
             // handle other exceptions
         } finally {
             future.cancel(true); // may or may not desire this	
         }
         StrykerStage.racMillis += (System.currentTimeMillis() - nanoPrev);
-        System.out.println("test ran");
+        if (RacAPI.verbose) System.out.println("test ran");
         return result;
 	}
 	
@@ -252,12 +257,16 @@ public class RacAPI {
 	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests, boolean stopAtFirstFail) throws InstantiationException, IllegalAccessException {
 		boolean[] results = new boolean[junitTests.size()];
 		Arrays.fill(results, true);
-		for (int t = 0; t < junitTests.size(); t++) {
+		//System.out.print("About to run " + junitTests.size() + " tests...");
+		int t = 0;
+		for (t = 0; t < junitTests.size(); t++) {
 			results[t] = this.runJUnit(candidate, junitTests.get(t));
 			if (!results[t] && stopAtFirstFail) {
 				break;
 			}
 		}
+		//System.out.println("...runned " + (t<junitTests.size()?(t+1):t) + " tests");
+		//System.out.println(Arrays.toString(results));
 		return results;
 	}
 	

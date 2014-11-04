@@ -15,6 +15,7 @@ import config.StrykerConfig;
 
 import tools.ProgramData;
 import tools.StrykerOptions;
+import tools.StrykerOptions.RAC;
 import tools.StrykerOptions.SearchStrategy;
 import tools.TestingTools;
 
@@ -77,26 +78,26 @@ public class StrykerParameterizedTests {
 			//NO SCOPES
 				//NO RAC
 					//DFS
-					StrykerOptions noScopes_noRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, null, 0, false);
-					StrykerOptions noScopes_noRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, null, 1, false);
-					StrykerOptions noScopes_noRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, null, 2, false);
-					StrykerOptions noScopes_noRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, null, 3, false);
+					StrykerOptions noScopes_noRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, null, 0, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, null, 1, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, null, 2, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, null, 3, RAC.DISABLED);
 					//BFS
-					StrykerOptions noScopes_noRac_BFS_MD_0 = new StrykerOptions(SearchStrategy.BFS, null, 0, false);
-					StrykerOptions noScopes_noRac_BFS_MD_1 = new StrykerOptions(SearchStrategy.BFS, null, 1, false);
-					StrykerOptions noScopes_noRac_BFS_MD_2 = new StrykerOptions(SearchStrategy.BFS, null, 2, false);
-					StrykerOptions noScopes_noRac_BFS_MD_3 = new StrykerOptions(SearchStrategy.BFS, null, 3, false);
+					StrykerOptions noScopes_noRac_BFS_MD_0 = new StrykerOptions(SearchStrategy.BFS, null, 0, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_BFS_MD_1 = new StrykerOptions(SearchStrategy.BFS, null, 1, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_BFS_MD_2 = new StrykerOptions(SearchStrategy.BFS, null, 2, RAC.DISABLED);
+					StrykerOptions noScopes_noRac_BFS_MD_3 = new StrykerOptions(SearchStrategy.BFS, null, 3, RAC.DISABLED);
 				//RAC
 					//DFS
-					StrykerOptions noScopes_withRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, null, 0, true);
-					StrykerOptions noScopes_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, null, 1, true);
-					StrykerOptions noScopes_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, null, 2, true);
-					StrykerOptions noScopes_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, null, 3, true);
+					StrykerOptions noScopes_withRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, null, 0, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, null, 1, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, null, 2, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, null, 3, RAC.ENABLED);
 					//BFS
-					StrykerOptions noScopes_withRac_BFS_MD_0 = new StrykerOptions(SearchStrategy.BFS, null, 0, true);
-					StrykerOptions noScopes_withRac_BFS_MD_1 = new StrykerOptions(SearchStrategy.BFS, null, 1, true);
-					StrykerOptions noScopes_withRac_BFS_MD_2 = new StrykerOptions(SearchStrategy.BFS, null, 2, true);
-					StrykerOptions noScopes_withRac_BFS_MD_3 = new StrykerOptions(SearchStrategy.BFS, null, 3, true);
+					StrykerOptions noScopes_withRac_BFS_MD_0 = new StrykerOptions(SearchStrategy.BFS, null, 0, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_BFS_MD_1 = new StrykerOptions(SearchStrategy.BFS, null, 1, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_BFS_MD_2 = new StrykerOptions(SearchStrategy.BFS, null, 2, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_BFS_MD_3 = new StrykerOptions(SearchStrategy.BFS, null, 3, RAC.ENABLED);
 			//SIMPLE CLASS
 			//SINGLY LINKED LIST
 		
