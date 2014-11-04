@@ -28,7 +28,7 @@ import tools.TestingTools;
  * @see TestingTools
  */
 @RunWith(Parameterized.class)
-public class StrykerParameterizedTests {
+public class StrykerParameterizedTest {
 	/**
 	 * The program to fix
 	 */
@@ -46,7 +46,7 @@ public class StrykerParameterizedTests {
 	 */
 	private boolean fixExpected;
 	
-	public StrykerParameterizedTests(ProgramData programData, StrykerOptions strykerOptions, String methodToFix, boolean fixExpected) {
+	public StrykerParameterizedTest(ProgramData programData, StrykerOptions strykerOptions, String methodToFix, boolean fixExpected) {
 		this.programData = programData;
 		this.strykerOptions = strykerOptions;
 		this.methodToFix = methodToFix;
