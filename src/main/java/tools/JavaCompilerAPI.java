@@ -135,6 +135,16 @@ public class JavaCompilerAPI {
 		return this.reloader.rloadClass(className, true);
 	}
 	
+	public Class<?> reloadClass(String className, boolean forceReload) {
+		if (!forceReload) {
+			return this.reloadClass(className);
+		}
+		if (this.reloader == null) {
+			throw new IllegalStateException("JavaCompilerAPI#reloadClass(String) called without a reloader built");
+		}
+		return this.reloader.rloadClass(className, true);
+	}
+	
 	private String classToFile(String clazz) {
 		String classAsFile = null;
 		String classAsPath = clazz.replace(".", StrykerConfig.getInstance().getFileSeparator()) + ".class";

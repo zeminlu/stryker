@@ -113,6 +113,7 @@ public class StrykerParameterizedTest {
 						StrykerOptions scopes_1_3_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 1, RAC.ENABLED);
 						StrykerOptions scopes_1_3_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 2, RAC.ENABLED);
 						StrykerOptions scopes_1_3_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 3, RAC.ENABLED);
+						StrykerOptions scopes_1_3_withRac_DFS_MD_4 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 4, RAC.ENABLED);
 		
 		//PARAMETERS
 		return Arrays.asList(new Object[][] {
@@ -132,13 +133,14 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
 //				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
-//				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 				//SINGLY LINKED LIST CONTAINS
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_0, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_1, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_2, methodToFix_SinglyLinkedList_contains, false},
-				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_3, methodToFix_SinglyLinkedList_contains, true},
+//				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_3, methodToFix_SinglyLinkedList_contains, false},
+//				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true},
 		});
 	}
 	

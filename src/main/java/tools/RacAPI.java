@@ -134,7 +134,7 @@ public class RacAPI {
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
         
-        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."));
+        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), true);
         
         Method[] methods = junitTestClass.getDeclaredMethods();
         Method methodToRun = null;
