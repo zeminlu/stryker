@@ -5,6 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -16,7 +17,8 @@ import repairer.JMLAnnotatedClass;
  * input: class name, method to fix, qualified path to class, and max depth for search.
  * 
  * @author Nazareno Matías Aguirre
- * @version 0.2
+ * @author Simón Emmanuel Gutiérrez Brida
+ * @version 0.4
  *
  */
 public class RepairCLI {
@@ -60,6 +62,15 @@ public class RepairCLI {
 		Option rac = new Option("r", "rac", false, "enables the use of RAC");
 		rac.setRequired(false);
 		
+		OptionGroup searchStrategies = new OptionGroup();
+		searchStrategies.setRequired(false);
+		
+		Option bfs = new Option("b", "bfs", false, "uses a breadth first search strategy");
+		Option dfs = new Option("d", "dfs", false, "uses a depth first search strategy");
+		
+		searchStrategies.addOption(bfs);
+		searchStrategies.addOption(dfs);
+		
 		options.addOption(help);
 		options.addOption(path);
 		options.addOption(className);
@@ -68,6 +79,7 @@ public class RepairCLI {
 		options.addOption(classes);
 		options.addOption(scope);
 		options.addOption(rac);
+		options.addOptionGroup(searchStrategies);
 
 		CommandLineParser parser = new BasicParser();
 		try {
@@ -106,6 +118,12 @@ public class RepairCLI {
 			}
 			if (useRac) {
 				repairer.enableRac();
+			}
+			if (cmd.hasOption("b")) {
+				repairer.setBfsStrategy();
+			}
+			if (cmd.hasOption("d")) {
+				repairer.setDfsStrategy();
 			}
 			repairer.repair();
 		}

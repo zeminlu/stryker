@@ -133,7 +133,7 @@ public class RacAPI {
         	String[] junitTestClassPath = new String[]{testFolder};
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
-        JavaCompilerAPI.getInstance().reloadClass(qualifiedName);
+        
         Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."));
         
         Method[] methods = junitTestClass.getDeclaredMethods();
@@ -191,7 +191,7 @@ public class RacAPI {
                         result = false;
                     } else if (retValue.contains("NullPointerException")) {
                     	if (RacAPI.verbose) System.out.println("NULL POINTER EXCEPTION EN RAC!!!!!!!!!!!!");
-                        result = true;
+                        result = false;
                     } else if (retValue.contains("ThreadDeath")) {
                     	if (RacAPI.verbose) System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
                         result = true;
@@ -219,7 +219,7 @@ public class RacAPI {
             result = future.get(300, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ex) {
             //runningThread.interrupt();
-        	runningThread.stop();
+        	runningThread.interrupt();
             executor.shutdownNow();
             executor = Executors.newSingleThreadExecutor();
             result = true;

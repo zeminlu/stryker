@@ -103,24 +103,24 @@ public class StrykerParameterizedTest {
 		
 		//PARAMETERS
 		return Arrays.asList(new Object[][] {
-				//SIMPLE CLASS DECX
-				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
-				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
-				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
-				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
-				//SIMPLE CLASS ALTTWICEPLUSONE
-				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_noRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_noRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
-				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
-				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+//				//SIMPLE CLASS DECX
+//				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
+//				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
+//				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
+//				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
+//				//SIMPLE CLASS ALTTWICEPLUSONE
+//				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_noRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_noRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
+//				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+//				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
-				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+//				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 		});
 	}
 	
