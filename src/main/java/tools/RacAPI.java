@@ -200,7 +200,7 @@ public class RacAPI {
                                 "\nFAILED METHODDDD FOR NO REASON!!!!!!!!!!!!!!!!!!!!" +
                                 "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     	if (RacAPI.verbose) e.printStackTrace();
-                        result = false;
+                        result = true;
                     }
                 } catch (Throwable e) {
                 	if (RacAPI.verbose) System.out.println("Entered throwable");

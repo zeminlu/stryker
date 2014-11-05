@@ -2,14 +2,18 @@ package tools;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import mujava.app.Reloader;
+import mujava.util.JustCodeDigest;
 
 import config.StrykerConfig;
 
@@ -18,10 +22,12 @@ import config.StrykerConfig;
  * this class also offers the functionality of {@code Reloader}
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.2
+ * @version 0.3
  * @see Reloader
  */
 public class JavaCompilerAPI {
+	
+	private Map<String, byte[]> loadedClassesHashes;
 	
 	private static JavaCompilerAPI instance;
 	
@@ -44,7 +50,9 @@ public class JavaCompilerAPI {
 		return instance;
 	}
 	
-	private JavaCompilerAPI() {}
+	private JavaCompilerAPI() {
+		this.loadedClassesHashes = new HashMap<String, byte[]>();
+	}
 
 	/**
 	 * Given a path to a java file a list of folders, this method will try
@@ -57,6 +65,10 @@ public class JavaCompilerAPI {
 	 */
 	public boolean compile(String pathToFile, String[] classpath) {
 		File fileToCompile = new File(pathToFile);
+		File compiledFile = new File(pathToFile.replace(".java", ".class"));
+		if (compiledFile.exists()) {
+			return true;
+		}
 		if (!fileToCompile.exists() || !fileToCompile.isFile() || !fileToCompile.getName().endsWith(".java")) {
 			return false;
 		}
@@ -99,7 +111,43 @@ public class JavaCompilerAPI {
 		if (this.reloader == null) {
 			throw new IllegalStateException("JavaCompilerAPI#reloadClass(String) called without a reloader built");
 		}
+		String classFileToReload = classToFile(className);
+		if (classFileToReload == null) {
+			//TODO: maybe an exception or a message log?
+			return null;
+		}
+		File javaFileToReload = new File(classFileToReload.replace(".class", ".java"));
+		if (this.loadedClassesHashes.containsKey(javaFileToReload.getPath())) {
+			byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
+			byte[] oldMD5Hash = this.loadedClassesHashes.get(javaFileToReload.getPath());
+			boolean javaFileWasModified = !Arrays.equals(newMD5Hash, oldMD5Hash);
+			if (javaFileWasModified) {
+				return this.reloader.rloadClass(className, false);
+			} else {
+				this.loadedClassesHashes.put(javaFileToReload.getPath(), newMD5Hash);
+			}
+		} else {
+			if (javaFileToReload.exists()) {
+				byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
+				this.loadedClassesHashes.put(javaFileToReload.getPath(), newMD5Hash);
+			}
+		}
 		return this.reloader.rloadClass(className, true);
+	}
+	
+	private String classToFile(String clazz) {
+		String classAsFile = null;
+		String classAsPath = clazz.replace(".", StrykerConfig.getInstance().getFileSeparator()) + ".class";
+		for (String cp : this.reloaderClasspath) {
+			cp = cp.endsWith(StrykerConfig.getInstance().getFileSeparator())?cp:(cp+StrykerConfig.getInstance().getFileSeparator());
+			String fullClassPath = cp + classAsPath;
+			File classFile = new File(fullClassPath);
+			if (classFile.exists()) {
+				classAsFile = fullClassPath;
+				break;
+			}
+		}
+		return classAsFile;
 	}
 	
 	/**

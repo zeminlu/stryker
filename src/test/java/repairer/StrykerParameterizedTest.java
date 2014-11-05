@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +76,7 @@ public class StrykerParameterizedTest {
 			String methodToFix_SimpleClass_altTwicePlusOne = "altTwicePlusOne";
 			
 			//SINGLY LINKED LIST
+			String methodToFix_SinglyLinkedList_contains = "contains";
 		//STRYKER OPTIONS DEFINITIONS
 			//NO SCOPES
 				//NO RAC
@@ -100,6 +103,16 @@ public class StrykerParameterizedTest {
 					StrykerOptions noScopes_withRac_BFS_MD_3 = new StrykerOptions(SearchStrategy.BFS, null, 3, RAC.ENABLED);
 			//SIMPLE CLASS
 			//SINGLY LINKED LIST
+					//NO RAC
+					//RAC
+						//DFS
+						Map<String, Integer> scopes_1_3 = new HashMap<String, Integer>();
+						scopes_1_3.put("roops.core.SinglyLinkedList", 1);
+						scopes_1_3.put("roops.core.SinglyLinkedListNode", 3);
+						StrykerOptions scopes_1_3_withRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 0, RAC.ENABLED);
+						StrykerOptions scopes_1_3_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 1, RAC.ENABLED);
+						StrykerOptions scopes_1_3_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 2, RAC.ENABLED);
+						StrykerOptions scopes_1_3_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 3, RAC.ENABLED);
 		
 		//PARAMETERS
 		return Arrays.asList(new Object[][] {
@@ -119,8 +132,13 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
 //				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
-				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+//				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				//SINGLY LINKED LIST CONTAINS
+//				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_0, methodToFix_SinglyLinkedList_contains, false},
+//				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_1, methodToFix_SinglyLinkedList_contains, false},
+//				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_2, methodToFix_SinglyLinkedList_contains, false},
+				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_3, methodToFix_SinglyLinkedList_contains, true},
 		});
 	}
 	

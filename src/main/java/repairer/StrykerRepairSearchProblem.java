@@ -1,7 +1,11 @@
 package repairer;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import config.StrykerConfig;
 
@@ -19,11 +23,12 @@ import tools.TacoAPI;
  * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
  * defined as implementations of search.engines.AbstractSearchEngine.
  * @author Nazareno Matías Aguirre
- * @version 0.1.5
+ * @version 0.1.6
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 	
-
+	private Set<String> hashes;
+	
 	/**
 	 * The initial state of the problem, this object should never change for each new problem
 	 */
@@ -71,6 +76,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.classToFix = programToFix;
 		this.methodToFix = methodToFix;
 		this.relevantClasses = new String[]{programToFix.getClassName()};
+		this.hashes = new TreeSet<String>();
 		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
 		overridingProperties.put("classToCheck",initialState().program.getClassName());//.getClassNameAsPath());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
@@ -117,8 +123,20 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
 		if (s==null) throw new IllegalArgumentException("null candidate passed for computing successors");
+//		String candidateHash = Arrays.toString(s.getProgram().getMd5Digest());
+		List<FixCandidate> filteredSuccessors = new LinkedList<FixCandidate>();
+//		if (this.hashes.add(candidateHash)) {
+//			
+//		}
 		MuJavaAPI mjAPI = MuJavaAPI.getInstance();
-		return mjAPI.generateMutants(s, methodToFix);
+		List<FixCandidate> successors = mjAPI.generateMutants(s, methodToFix);
+		for (FixCandidate successor : successors) {
+			String successorHash = Arrays.toString(successor.getProgram().getMd5Digest());
+			if (this.hashes.add(successorHash)) {
+				filteredSuccessors.add(successor);
+			}
+		}
+		return filteredSuccessors;
 	}
 
 	/**
