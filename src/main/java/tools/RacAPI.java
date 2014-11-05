@@ -191,7 +191,7 @@ public class RacAPI {
                         result = false;
                     } else if (retValue.contains("NullPointerException")) {
                     	if (RacAPI.verbose) System.out.println("NULL POINTER EXCEPTION EN RAC!!!!!!!!!!!!");
-                        result = false;
+                        result = true;
                     } else if (retValue.contains("ThreadDeath")) {
                     	if (RacAPI.verbose) System.out.println("THREAD DEATH EN RAC!!!!!!!!!!!!!!!!");
                         result = true;
