@@ -122,6 +122,8 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
 //				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
+				//SIMPLE CLASS TWICEPLUSONE
+				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_twicePlusOne, true},
 //				//SIMPLE CLASS ALTTWICEPLUSONE
 //				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
 //				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
@@ -133,7 +135,7 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_withRac_BFS_MD_2, methodToFix_SimpleClass_altTwicePlusOne, false},
 //				{simpleClass, noScopes_noRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
-				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+//				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 				//SINGLY LINKED LIST CONTAINS
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_0, methodToFix_SinglyLinkedList_contains, false},

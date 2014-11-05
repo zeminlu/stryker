@@ -1,6 +1,8 @@
 package tools;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -26,6 +28,19 @@ import config.StrykerConfig;
  * @see Reloader
  */
 public class JavaCompilerAPI {
+	
+	private PrintWriter out = new PrintWriter(System.out);
+	private PrintWriter err = new PrintWriter(new ByteArrayOutputStream());
+	private String[] jml4cArgs = {
+          "-Xlint:all",			//0
+          "-nowarn",			//1
+          "-maxProblems",		//2
+          "9999999",			//3
+          "-cp",				//4
+          "",					//5	CLASSPATH
+          "-1.7",				//6
+          ""					//7	CLASS TO COMPILE
+	};
 	
 	private Map<String, byte[]> loadedClassesHashes;
 	
@@ -78,6 +93,28 @@ public class JavaCompilerAPI {
 		Iterable<? extends JavaFileObject> compilationUnit = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(files));
 		boolean compileResult = compiler.getTask(null, fileManager, null, Arrays.asList(new String[] {"-classpath", convertPathsToString(classpath)}), null, compilationUnit).call();
 		return compileResult;
+	}
+	
+	public boolean compileWithJML4C(String pathToFile, String[] classpath) {
+		File fileToCompile = new File(pathToFile);
+		File compiledFile = new File(pathToFile.replace(".java", ".class"));
+		if (compiledFile.exists()) {
+			return true;
+		}
+		if (!fileToCompile.exists() || !fileToCompile.isFile() || !fileToCompile.getName().endsWith(".java")) {
+			return false;
+		}
+		setJML4Cclasspath(classpath);
+		setJML4CtargetClass(pathToFile);
+		return org.jmlspecs.jml4.rac.Main.compile(this.jml4cArgs, this.out, this.err, null);
+	}
+	
+	private void setJML4Cclasspath(String[] classpath) {
+		this.jml4cArgs[5] = this.convertPathsToString(classpath);
+	}
+	
+	private void setJML4CtargetClass(String pathToFile) {
+		this.jml4cArgs[7] = pathToFile;
 	}
 	
 	/**

@@ -145,5 +145,15 @@
   		<artifactId>reflections</artifactId>
   		<version>0.9.9-RC2</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.jmlspecs</groupId>
+  		<artifactId>jml4c</artifactId>
+  		<version>1.00</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.jmlspecs</groupId>
+  		<artifactId>jml4rt</artifactId>
+  		<version>1.00</version>
+  	</dependency>
   </dependencies>
 </project>
