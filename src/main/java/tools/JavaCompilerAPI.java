@@ -1,6 +1,5 @@
 package tools;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -30,7 +29,7 @@ import config.StrykerConfig;
 public class JavaCompilerAPI {
 	
 	private PrintWriter out = new PrintWriter(System.out);
-	private PrintWriter err = new PrintWriter(new ByteArrayOutputStream());
+	private PrintWriter err = new PrintWriter(System.err);
 	private String[] jml4cArgs = {
           "-Xlint:all",			//0
           "-nowarn",			//1
@@ -97,10 +96,6 @@ public class JavaCompilerAPI {
 	
 	public boolean compileWithJML4C(String pathToFile, String[] classpath) {
 		File fileToCompile = new File(pathToFile);
-		File compiledFile = new File(pathToFile.replace(".java", ".class"));
-		if (compiledFile.exists()) {
-			return true;
-		}
 		if (!fileToCompile.exists() || !fileToCompile.isFile() || !fileToCompile.getName().endsWith(".java")) {
 			return false;
 		}
@@ -159,6 +154,7 @@ public class JavaCompilerAPI {
 			byte[] oldMD5Hash = this.loadedClassesHashes.get(javaFileToReload.getPath());
 			boolean javaFileWasModified = !Arrays.equals(newMD5Hash, oldMD5Hash);
 			if (javaFileWasModified) {
+				System.out.println("======RELOAD AVOIDED=====");
 				return this.reloader.rloadClass(className, false);
 			} else {
 				this.loadedClassesHashes.put(javaFileToReload.getPath(), newMD5Hash);

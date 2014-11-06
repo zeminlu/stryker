@@ -95,12 +95,7 @@ public class RacAPI {
 	    String packageToWrite = "ar.edu.output.junit";
 	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
 
-//        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
-//        	if (RacAPI.verbose) System.err.println("Error while compiling " + currentJunit);
-//        	return null;
-//        }
-        
-        if (!JavaCompilerAPI.getInstance().compileWithJML4C(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
+        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
         	if (RacAPI.verbose) System.err.println("Error while compiling " + currentJunit);
         	return null;
         }
@@ -124,7 +119,7 @@ public class RacAPI {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
 		if (junitTest==null) throw new IllegalArgumentException("checking if test passes on null test");
 		
-		String newFileClasspath = candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir")+ ":" + "mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
+		String newFileClasspath = candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + "mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
 		String qualifiedName = candidate.getProgram().getClassName();
 		String methodName = candidate.getMethodToFix();
 		String junitPackage = "ar.edu.output.junit";
@@ -182,8 +177,6 @@ public class RacAPI {
                         pw = new PrintWriter(sw);
                         e.printStackTrace(pw);
                         retValue = sw.toString();
-                        //                                                        System.out.println(retValue);
-                        //                                                        System.out.println("------------------------------------------------------------------------------------------------");
                     } finally {
                         try {
                             if(pw != null)  pw.close();

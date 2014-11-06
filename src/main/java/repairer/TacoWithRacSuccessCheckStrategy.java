@@ -58,7 +58,13 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
 		
 		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
-		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+//		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+//			System.err.println("error while compiling FixCandidate!");
+//			s.program.moveLocation(sourceFolderBackup);
+//			return false;
+//		}
+		
+		if (!JavaCompilerAPI.getInstance().compileWithJML4C(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
 			System.err.println("error while compiling FixCandidate!");
 			s.program.moveLocation(sourceFolderBackup);
 			return false;
