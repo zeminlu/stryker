@@ -119,7 +119,7 @@ public class RacAPI {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
 		if (junitTest==null) throw new IllegalArgumentException("checking if test passes on null test");
 		
-		String newFileClasspath = candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + "mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
+		String newFileClasspath = StrykerConfig.getInstance().getCompilingSandbox() + ":" + "jml4rt/";//candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + ".";//"mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
 		String qualifiedName = candidate.getProgram().getClassName();
 		String methodName = candidate.getMethodToFix();
 		String junitPackage = "ar.edu.output.junit";
@@ -134,7 +134,7 @@ public class RacAPI {
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
         
-        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), true);
+        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), false);
         
         Method[] methods = junitTestClass.getDeclaredMethods();
         Method methodToRun = null;
@@ -215,7 +215,7 @@ public class RacAPI {
         Future<Boolean> future = executor.submit(task);
         boolean result = false;
         try {
-            result = future.get(300, TimeUnit.MILLISECONDS);
+            result = future.get(300, TimeUnit.DAYS);//.MILLISECONDS);
         } catch (TimeoutException ex) {
             //runningThread.interrupt();
         	runningThread.interrupt();

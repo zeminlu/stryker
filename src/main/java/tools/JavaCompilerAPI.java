@@ -64,7 +64,21 @@ public class JavaCompilerAPI {
 		return instance;
 	}
 	
+	/**
+	 * @return an instance of this class
+	 */
+	public static JavaCompilerAPI getInstance(Reloader reloader) {
+		if (instance == null) instance = new JavaCompilerAPI(reloader);
+		if (instance != null && instance.reloader != reloader) throw new IllegalArgumentException("a previous instance was constructed with another reloader");
+		return instance;
+	}
+	
 	private JavaCompilerAPI() {
+		this.loadedClassesHashes = new HashMap<String, byte[]>();
+	}
+	
+	private JavaCompilerAPI(Reloader reloader) {
+		this.reloader = reloader;
 		this.loadedClassesHashes = new HashMap<String, byte[]>();
 	}
 
@@ -153,7 +167,7 @@ public class JavaCompilerAPI {
 			byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
 			byte[] oldMD5Hash = this.loadedClassesHashes.get(javaFileToReload.getPath());
 			boolean javaFileWasModified = !Arrays.equals(newMD5Hash, oldMD5Hash);
-			if (javaFileWasModified) {
+			if (!javaFileWasModified) {
 				System.out.println("======RELOAD AVOIDED=====");
 				return this.reloader.rloadClass(className, false);
 			} else {
