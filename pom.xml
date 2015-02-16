@@ -92,7 +92,7 @@
   	<dependency>
   		<groupId>ar.edu.unrc.exa.dc</groupId>
   		<artifactId>mujavapp</artifactId>
-  		<version>0.07</version>
+  		<version>0.08</version>
   	</dependency>
   	<dependency>
   		<groupId>net.sourceforge.jmlspecs</groupId>

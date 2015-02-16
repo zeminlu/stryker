@@ -74,6 +74,7 @@ public class StrykerParameterizedTest {
 			String methodToFix_SimpleClass_setX = "setX";
 			String methodToFix_SimpleClass_twicePlusOne = "twicePlusOne";
 			String methodToFix_SimpleClass_altTwicePlusOne = "altTwicePlusOne";
+			String methodToFix_SimpleClass_multByfive = "multByfive";
 			
 			//SINGLY LINKED LIST
 			String methodToFix_SinglyLinkedList_contains = "contains";
@@ -96,6 +97,9 @@ public class StrykerParameterizedTest {
 					StrykerOptions noScopes_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, null, 1, RAC.ENABLED);
 					StrykerOptions noScopes_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, null, 2, RAC.ENABLED);
 					StrykerOptions noScopes_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, null, 3, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_4 = new StrykerOptions(SearchStrategy.DFS, null, 4, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_5 = new StrykerOptions(SearchStrategy.DFS, null, 5, RAC.ENABLED);
+					StrykerOptions noScopes_withRac_DFS_MD_6 = new StrykerOptions(SearchStrategy.DFS, null, 6, RAC.ENABLED);
 					//BFS
 					StrykerOptions noScopes_withRac_BFS_MD_0 = new StrykerOptions(SearchStrategy.BFS, null, 0, RAC.ENABLED);
 					StrykerOptions noScopes_withRac_BFS_MD_1 = new StrykerOptions(SearchStrategy.BFS, null, 1, RAC.ENABLED);
@@ -123,7 +127,7 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_withRac_DFS_MD_1, methodToFix_SimpleClass_decX, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_1, methodToFix_SimpleClass_decX, true},
 				//SIMPLE CLASS TWICEPLUSONE
-				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_twicePlusOne, true},
+//				{simpleClass, noScopes_withRac_DFS_MD_2, methodToFix_SimpleClass_twicePlusOne, true},
 //				//SIMPLE CLASS ALTTWICEPLUSONE
 //				{simpleClass, noScopes_noRac_DFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
 //				{simpleClass, noScopes_noRac_BFS_MD_1, methodToFix_SimpleClass_altTwicePlusOne, false},
@@ -137,6 +141,8 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_noRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
+				//SIMPLE CLASS MULTBYFIVE
+				{simpleClass, noScopes_withRac_DFS_MD_6, methodToFix_SimpleClass_multByfive, true},
 				//SINGLY LINKED LIST CONTAINS
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_0, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_1, methodToFix_SinglyLinkedList_contains, false},
