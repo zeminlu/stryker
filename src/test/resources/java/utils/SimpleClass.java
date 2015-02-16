@@ -48,11 +48,7 @@ public class SimpleClass {
 		  	return (newX - 0)/1; //mutGenLimit 3 
 	}
 
-	/*@ requires newX >= 0;
-	  @ ensures \result == newX*5;
-	  @*/
-    public int multByfive(int newX) {
-    	return newX + 1 + 1 + 1 + 1; //mutGenLimit 10
-    }
+    
+    
     
 }
