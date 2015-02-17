@@ -44,6 +44,7 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
 		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
+		ClassLoader classLoaderBackup = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
 		
 		if (!s.program.isValid()) return false;
@@ -57,6 +58,7 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 			error = true;
 		}
 		s.program.moveLocation(sourceFolderBackup);
+		Thread.currentThread().setContextClassLoader(classLoaderBackup);
 		return !sat && !error;
 	}
 	

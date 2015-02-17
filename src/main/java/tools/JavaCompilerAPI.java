@@ -64,6 +64,10 @@ public class JavaCompilerAPI {
 		return instance;
 	}
 	
+	public static void resetInstance() {
+		instance = null;
+	}
+	
 	/**
 	 * @return an instance of this class
 	 */
@@ -166,6 +170,8 @@ public class JavaCompilerAPI {
 		if (this.loadedClassesHashes.containsKey(javaFileToReload.getPath())) {
 			byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
 			byte[] oldMD5Hash = this.loadedClassesHashes.get(javaFileToReload.getPath());
+//			printHash(newMD5Hash);
+//			printHash(oldMD5Hash);
 			boolean javaFileWasModified = !Arrays.equals(newMD5Hash, oldMD5Hash);
 			if (!javaFileWasModified) {
 				System.out.println("======RELOAD AVOIDED=====");
@@ -180,6 +186,10 @@ public class JavaCompilerAPI {
 			}
 		}
 		return this.reloader.rloadClass(className, true);
+	}
+	
+	private void printHash(byte[] theHash) {
+		System.out.println("HASH: " + Arrays.toString(theHash));
 	}
 	
 	public Class<?> reloadClass(String className, boolean forceReload) {

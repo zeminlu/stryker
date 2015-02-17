@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import tools.JavaCompilerAPI;
 import config.StrykerConfig;
 
 public class BasicProgramRepairerTest {
@@ -14,6 +15,7 @@ public class BasicProgramRepairerTest {
 	@Before
 	public void setUp() {
 		StrykerConfig.getInstance().resetCompilingSandbox();
+		JavaCompilerAPI.resetInstance();
 	}
 	
 	/**
