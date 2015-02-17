@@ -96,9 +96,10 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies) {
 		this(programToFix, methodToFix);
-		this.relevantClasses = new String[dependencies.length + 1];
-		this.relevantClasses[0] = programToFix.getClassName();
-		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
+		this.relevantClasses = dependencies;
+//		this.relevantClasses = new String[dependencies.length + 1];
+//		this.relevantClasses[0] = programToFix.getClassName();
+//		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
 		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 	}
