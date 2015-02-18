@@ -241,11 +241,11 @@ public class BasicProgramRepairerTest {
 	 * Attempts to repair a simple program with various dependencies, failing to do so due to the max
 	 * depth in the search.
 	 */
-	// @Test
+	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_multikeymap() {
-		String sourceFolder = "src/test/resources/java/examples/stryker/multikeymap";
-		String[] dependencies = new String[]{"MultiKey", "HashEntry"};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "MultiKeyMap");
+		String sourceFolder = "src/test/resources/java/";
+		String[] dependencies = new String[]{"examples.stryker.multikeymap.MultiKey", "examples.stryker.multikeymap.HashEntry"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples.stryker.multikeymap.MultiKeyMap");
 		PrivateStryker repairer = new PrivateStryker(subject, "equalKey", dependencies, 0);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired with this depth", isRepaired);

@@ -1,6 +1,4 @@
-
-import HashEntry;
-import MultiKey;
+package examples.stryker.multikeymap;
 
 public class MultiKeyMap
 {
