@@ -27,7 +27,7 @@ public class StrykerRepairSearchProblemTest {
 	public void testGetSuccessors_nullMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no method to fix");
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, null);
 	}
 	
@@ -36,13 +36,13 @@ public class StrykerRepairSearchProblemTest {
 	public void testGetSuccessors_emptyMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("no method to fix");
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "");
 	}
 	
 	@Test
 	public void testGetSuccessors_initialStateIsOriginal() {
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "getX");
 		FixCandidate initialState = problem.initialState();
 		assertTrue("initial state is the original program", Arrays.equals(program.getMd5Digest(), initialState.program.getMd5Digest()));
@@ -51,8 +51,8 @@ public class StrykerRepairSearchProblemTest {
 	@Test
 	public void testGetSuccessors_inexistentMethodToMutate() {
 		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("class " + "SimpleClass" + " doesn't have method " + "nonExistenceMethod");
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		exception.expectMessage("class " + "utils.SimpleClass" + " doesn't have method " + "nonExistenceMethod");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		@SuppressWarnings("unused")
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "nonExistenceMethod");
 	}
@@ -95,7 +95,7 @@ public class StrykerRepairSearchProblemTest {
 	
 	@Test
 	public void testGetSuccessors_mutationsList() {
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne");
 		List<FixCandidate> successors = problem.getSuccessors(problem.initialState());
 		assertTrue("successors generated", !successors.isEmpty());
@@ -116,17 +116,17 @@ public class StrykerRepairSearchProblemTest {
 	@Test
 	public void testMergedRelevantClasses_emptyDependencies() {
 		String[] dependencies = new String[]{};
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne", dependencies);
-		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo(program.getClassName())==0);
+		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo("")==0);
 	}
 	
 	@Test
 	public void testMergedRelevantClasses_nonEmptyDependencies() {
 		String[] dependencies = new String[]{"a.b.Clase1", "a.Main", "a.b.util.Pair"};
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(program, "twicePlusOne", dependencies);
-		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo(program.getClassName()+",a.b.Clase1,a.Main,a.b.util.Pair")==0);
+		assertTrue("merged relevant classes is correct", problem.mergedRelevantClasses().compareTo("a.b.Clase1,a.Main,a.b.util.Pair")==0);
 	}
 
 }
