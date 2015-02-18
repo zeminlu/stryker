@@ -39,7 +39,7 @@ public class JMLAnnotatedClassTest {
 	@Test
 	public void programCreationWithSimpleJavaFile() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		assertTrue("program does compile", subject.isValid());
 	}
 	
@@ -47,7 +47,7 @@ public class JMLAnnotatedClassTest {
 	public void programHasMethodWithNullMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("method name is null");
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		program.hasMethod(null);
 	}
 	
@@ -55,19 +55,19 @@ public class JMLAnnotatedClassTest {
 	public void programHasMethodWithEmptyMethod() {
 		exception.expect(IllegalArgumentException.class);
 		exception.expectMessage("empty method name");
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		program.hasMethod("");
 	}
 	
 	@Test
 	public void programHasMethodWithNonExistingMethod() {
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		assertTrue("SimpleClass doesn't have method spainmordortwoforone", !program.hasMethod("spainmordortwoforone"));
 	}
 	
 	@Test
 	public void programHasMethodWithExistingMethod() {
-		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "SimpleClass");
+		JMLAnnotatedClass program = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");
 		assertTrue("SimpleClass doesn't have method twicePlusOne", program.hasMethod("twicePlusOne"));
 	}
 
