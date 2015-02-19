@@ -38,7 +38,7 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 		
 		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
 		if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
-			System.err.println("error al compilar el FixCandidate!");
+			System.err.println("error while compiling FixCandidate!");
 			return false;
 		}
 		
