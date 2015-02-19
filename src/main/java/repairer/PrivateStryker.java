@@ -201,7 +201,7 @@ public class PrivateStryker {
 		boolean outcome = engine.performSearch();
 		if (outcome) {
 			FixCandidate solution = engine.getSolution();
-			String solutionLocation = solution.program.getAbsolutePath() + solution.program.getClassName() + ".java";
+			String solutionLocation = solution.program.getAbsolutePath() + solution.program.getClassName().replace(".", StrykerConfig.getInstance().getFileSeparator()) + ".java";
 			System.out.println("*** FOUND SOLUTION! Get it from: " + solutionLocation);
 			System.out.println("*** Mutations that produced the fix: ");
 			for (Mutation mutation : solution.getMutations()) {
