@@ -46,6 +46,11 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 	 * is indeed a valid fix.  
 	 */
 	public boolean isSuccessful(FixCandidate s) {
+		//TODO: make the following changes :
+		//1 - 	given that the jmlrac version of the candidate is only needed to run the junit tests
+		//		put the necessary code to do that in RacAPI#runJunits
+		//2 -	compile the candidate just before running TacoAPI#isSat
+		//		(maybe move the compile code inside that method?)
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
 		
@@ -57,22 +62,11 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		String sourceFolderBackup = s.program.getSourceFolder();
 		s.program.moveLocation(StrykerConfig.getInstance().getCompilingSandbox());
 		
-		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
-		
-		if (!JavaCompilerAPI.getInstance().compileWithJML4C(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
-			System.err.println("error while compiling FixCandidate!");
-			s.program.moveLocation(sourceFolderBackup);
-			return false;
-		}
-		
-		JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
-		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
-		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
-		
 		if (!s.program.isValid()) {
 			s.program.moveLocation(sourceFolderBackup);
 			return false;
 		}
+		ClassLoader currentThreadClassLoaderBackup = Thread.currentThread().getContextClassLoader();
 		boolean error = false;
 		boolean[] testsResults;
 		boolean racPassed = true;
@@ -86,6 +80,15 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 			if (racPassed) {
 				// if rac checks pass, call TACO to check whether the 
 				// fix candidate is indeed a fix.
+				String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+				if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+					System.err.println("error while compiling FixCandidate!");
+					return false;
+				}
+				JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
+				JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
+				
+				Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
 				isFix = !TacoAPI.getInstance().isSAT(s);
 				if (!isFix) {
 					// if candidate is invalid, collect the input obtained from
@@ -109,6 +112,7 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 			error = true;
 		}
 		s.program.moveLocation(sourceFolderBackup);
+		Thread.currentThread().setContextClassLoader(currentThreadClassLoaderBackup);
 		return isFix && !error;
 	}
 

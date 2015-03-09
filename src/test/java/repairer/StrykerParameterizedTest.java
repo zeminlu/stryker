@@ -67,6 +67,7 @@ public class StrykerParameterizedTest {
 		//PROGRAM DATA DEFINITIONS
 		ProgramData simpleClass = new ProgramData("src/test/resources/java/", "utils.SimpleClass");
 		ProgramData singlyLinkedList = new ProgramData("src/test/resources/java/", "roops.core.SinglyLinkedList", new String[]{"roops.core.SinglyLinkedListNode"});
+		ProgramData singlyLinkedListBug7 = new ProgramData("src/test/resources/java", "roops.core.objects.SinglyLinkedListContainsBug7", new String[]{"roops.core.objects.SinglyLinkedListNode"});
 		
 		//METHOD TO FIX DEFINITIONS
 			//SIMPLE CLASS
@@ -149,6 +150,8 @@ public class StrykerParameterizedTest {
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_2, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_3, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true},
+				//SINGLY LINKED LIST (STRYKER) CONTAINS BUG7
+//				{singlyLinkedListBug7, scopes_1_3_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true}
 		});
 	}
 	

@@ -88,7 +88,6 @@ public class CounterExample {
 		}
 		boolean thisSat = this.analysis_result.get_alloy_analysis_result().isSAT();
 		boolean otherSat = other.analysis_result.get_alloy_analysis_result().isSAT();
-		//System.out.println("SAT comparison: " + thisSat + "|" + otherSat);
 		if (!(thisSat && otherSat)) {
 			return false;
 		}
@@ -114,7 +113,6 @@ public class CounterExample {
 			otherCE += key + "=" + value + "|";
 		}
 		otherCE = otherCE.substring(0, otherCE.length() - 1);
-		//System.out.println("CE comparison: " + thisCE + "|" + otherCE);
 		return thisCE.compareTo(otherCE) == 0;
 	}
 }

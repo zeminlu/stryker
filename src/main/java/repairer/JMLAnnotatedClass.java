@@ -7,10 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import com.google.common.io.Files;
+
 import config.StrykerConfig;
-
 import mujava.util.JustCodeDigest;
-
 import tools.JMLSpecsAPI;
 
 /**
@@ -27,27 +27,27 @@ import tools.JMLSpecsAPI;
  * @version 0.4.2
  */
 public class JMLAnnotatedClass {
-	
+
 	/**
 	 * stores the source folder of the file corresponding to the program.
 	 */
 	private String sourceFolder;
-	
+
 	/**
 	 * stores the qualified name of the class corresponding to the program.
 	 */
 	private String className;
-	
+
 	/**
 	 * stores the absolute path name of the file containing the class.
 	 */
 	private String absPath;
-	
+
 	/**
 	 * stores the file corresponding to the program.
 	 */
 	private File program;
-	
+
 	/**
 	 * stores the package of the class 
 	 */
@@ -75,14 +75,14 @@ public class JMLAnnotatedClass {
 			this.classPackage = toPath(fullClassName.substring(0, lastPathSeparatorIndex), "");
 		}
 	}
-	
+
 	public void moveLocation(String sourceFolder) {
 		if (!isReadable(sourceFolder, this.className)) throw new IllegalArgumentException("creating program with non existent file");
 		this.sourceFolder = toPath(sourceFolder, "");
 		this.program = new File(toPath(sourceFolder, className)+".java");
 		this.absPath = toPath((new File(toPath(sourceFolder, ""))).getAbsolutePath(), "");	
 	}
-	
+
 	private static String toPath(String sourceFolder, String className) {
 		String path = sourceFolder;
 		if (!path.endsWith(StrykerConfig.getInstance().getFileSeparator())) {
@@ -92,42 +92,42 @@ public class JMLAnnotatedClass {
 		path = path.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator());
 		return path;
 	}
-	
+
 	/**
 	 * @return the package of the class
 	 */
 	public String getClassPackage() {
 		return this.classPackage;
 	}
-	
+
 	/**
 	 * @return the source folder of the file corresponding to the program : {@code String}
 	 */
 	public String getSourceFolder() {
 		return this.sourceFolder;
 	}
-	
+
 	/**
 	 * @return the qualified name of the class corresponding to the program : {@code String}
 	 */
 	public String getClassName() {
 		return this.className;
 	}
-	
+
 	/**
 	 * @return the qualified name of the class but with each dot replaced by /
 	 */
 	public String getClassNameAsPath() {
 		return this.className.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator());
 	}
-	
+
 	/**
 	 * @return the absolute path name of the file containing the class : {@code String}
 	 */
 	public String getAbsolutePath() {
 		return this.absPath;
 	}
-	
+
 	/**
 	 * @return the file corresponding to the program : {@code String}
 	 */
@@ -163,14 +163,14 @@ public class JMLAnnotatedClass {
 	public byte[] getMd5Digest() {
 		return JustCodeDigest.digest(this.program);
 	}
-	
+
 	/**
 	 * @return the path to the program asociated with this instance
 	 */
 	public String getFilePath() {
 		return this.program.getAbsolutePath();
 	}
-	
+
 	/**
 	 * this method checks whether a method belongs to the class represented by this instance.
 	 * @param methodName	:	the name of a method to check	: {@code String}
@@ -185,35 +185,66 @@ public class JMLAnnotatedClass {
 		Pattern pattern = Pattern.compile(methodDecl);
 		return pattern.matcher(readFile(this.program)).find();
 	}
-	
+
 	/*
 	 * This method is used to read a file and returns the content of the file as a String
 	 */
 	private static String readFile(File f) {
-        String result = null;
-        FileReader fr = null;
-        try {
-                fr = new FileReader(f);
-        } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
-        BufferedReader br = new BufferedReader(fr);
-        String line = "";
-        try {
-                while ((line = br.readLine()) != null) {
-                        result += line;
-                }
-        } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
-        try {
-                br.close();
-        } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
-        return result;
-}
+		String result = null;
+		FileReader fr = null;
+		try {
+			fr = new FileReader(f);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		BufferedReader br = new BufferedReader(fr);
+		String line = "";
+		try {
+			while ((line = br.readLine()) != null) {
+				result += line;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	/**
+	 * Makes a backup file (.bak) of the file associated with this instance
+	 * 
+	 * @return {@code true} if the backup was created with no problems
+	 */
+	public boolean makeBackup() {
+		File backupFile = new File(this.program.getAbsolutePath()+".bak");
+		try {
+			backupFile.createNewFile();
+			Files.copy(program, backupFile);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Deletes the file associated with this instance and restores the backup made with {@code JMLAnnotatedClass#makeBackup()}
+	 * 
+	 * @return {@code true} if the backup was successfully restored
+	 */
+	public boolean restoreBackup() {
+		File backupFile = new File(this.program.getAbsolutePath()+".bak");
+		File originalFile = this.program;
+		if (originalFile.delete()) {
+			return backupFile.renameTo(originalFile);
+		}
+		return false;
+	}
 }

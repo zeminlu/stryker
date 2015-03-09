@@ -82,7 +82,7 @@
   	<dependency>
   		<groupId>ar.edu.itba</groupId>
   		<artifactId>comitaco</artifactId>
-  		<version>0.01</version>
+  		<version>0.02</version>
   	</dependency>
   	<dependency>
   		<groupId>edu.mit</groupId>

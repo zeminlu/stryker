@@ -16,7 +16,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.4
+ * @version 0.2.6
  */
 public class StrykerConfig {
 	
@@ -43,7 +43,7 @@ public class StrykerConfig {
 	 * The location of the folder that will be used as compiling environment
 	 */
 	private String compilingSandbox = null;
-
+	
 	/**
 	 * Gets an instance of {@code StrykerConfig}
 	 * 
@@ -160,6 +160,20 @@ public class StrykerConfig {
 	}
 	
 	/**
+	 * @return the value of property {@code tests.output}
+	 */
+	public String getTestsOutputDir() {
+		return this.config.getString("tests.output");
+	}
+	
+	/**
+	 * @return the value of property {@code tests.package}
+	 */
+	public String getTestsPackage() {
+		return this.config.getString("tests.package");
+	}
+	
+	/**
 	 * The next time {@code StrykerConfig#getCompilingSandbox()} is called a new directory will be generated
 	 */
 	public void resetCompilingSandbox() {
@@ -179,6 +193,13 @@ public class StrykerConfig {
 		for (int i = 0; i < len; i++)
 			sb.append(AB.charAt(rnd.nextInt(AB.length())));
 		return sb.toString();
+	}
+
+	/**
+	 * @return the path to the test template file
+	 */
+	public String getTestTemplatePath() {
+		return this.config.getString("tests.template");
 	}
 	
 }

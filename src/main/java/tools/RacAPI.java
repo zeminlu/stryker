@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
-import config.StrykerConfig;
 
-import ar.edu.taco.TacoMain;
-import ar.edu.taco.engine.JUnitStage;
+import config.StrykerConfig;
+//import ar.edu.taco.TacoMain;
+//import ar.edu.taco.engine.JUnitStage;
 import ar.edu.taco.engine.StrykerStage;
 import repairer.FixCandidate;
 
@@ -69,40 +69,53 @@ public class RacAPI {
 			throw new IllegalArgumentException("RacAPI#buildJUnit(FixCandidate, CounterExample): trying to build a junit test with no counter example");
 		}
 		
-    	String FILE_SEP = StrykerConfig.getInstance().getFileSeparator();
-    	
-    	String classToCheck = candidate.getProgram().getClassName();
-      	String methodToCheck = candidate.getMethodToFix() + "_0" ;
+//    	String FILE_SEP = StrykerConfig.getInstance().getFileSeparator();
+//    	
+//    	String classToCheck = candidate.getProgram().getClassName();
+//      	String methodToCheck = candidate.getMethodToFix() + "_0" ;
+//
+//	    JUnitStage jUnitStage = new JUnitStage(ce.getRecoveredInformation());
+//	    jUnitStage.execute();
+//
+//	    String junitFile = jUnitStage.getJunitFileName();
+//
+//	    String currentJunit = null;
+//
+//	    String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1); 
+//	    String editedTestFolderPath = tempFilename.replaceAll("generated", "output");
+//	    File editedTestFolderFile = new File(editedTestFolderPath);
+//	    editedTestFolderFile.mkdirs();
+//	    String fileClasspath = tempFilename.substring(
+//	    							0,
+//	    							tempFilename.lastIndexOf(
+//	    									"ar.edu.generated.junit".replaceAll("\\.", FILE_SEP)
+//	    							)
+//	    						);
+//	    fileClasspath = fileClasspath.replaceFirst("generated", "output");
+//	    String packageToWrite = "ar.edu.output.junit";
+//	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
+		
+		TestBuilder builder = new TestBuilder(ce.getRecoveredInformation());
+		String testPath = null;
+		try {
+			testPath = builder.createUnitTest();
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | SecurityException | IOException e) {
+			if (RacAPI.verbose) {
+				System.err.println("Error while generating test");
+				e.printStackTrace();
+			}
+			return null;
+		}
 
-	    JUnitStage jUnitStage = new JUnitStage(ce.getRecoveredInformation());
-	    jUnitStage.execute();
-
-	    String junitFile = jUnitStage.getJunitFileName();
-
-	    String currentJunit = null;
-
-	    String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1); 
-	    String editedTestFolderPath = tempFilename.replaceAll("generated", "output");
-	    File editedTestFolderFile = new File(editedTestFolderPath);
-	    editedTestFolderFile.mkdirs();
-	    String fileClasspath = tempFilename.substring(
-	    							0,
-	    							tempFilename.lastIndexOf(
-	    									"ar.edu.generated.junit".replaceAll("\\.", FILE_SEP)
-	    							)
-	    						);
-	    fileClasspath = fileClasspath.replaceFirst("generated", "output");
-	    String packageToWrite = "ar.edu.output.junit";
-	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
-
-        if (!JavaCompilerAPI.getInstance().compile(currentJunit, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
-        	if (RacAPI.verbose) System.err.println("Error while compiling " + currentJunit);
+        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
+        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
         	return null;
         }
 	       
         if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
-        return new File(currentJunit).toPath();
+        //return new File(currentJunit).toPath();
+        return new File(testPath).toPath();
 	}
 	
 	/**
@@ -119,7 +132,7 @@ public class RacAPI {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
 		if (junitTest==null) throw new IllegalArgumentException("checking if test passes on null test");
 		
-		String newFileClasspath = StrykerConfig.getInstance().getCompilingSandbox() + ":" + "jml4rt/";//candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + ".";//"mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
+		final String newFileClasspath = StrykerConfig.getInstance().getCompilingSandbox() + ":" + "lib/stryker/jml4c.jar";//candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + ".";//"mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
 		String qualifiedName = candidate.getProgram().getClassName();
 		String methodName = candidate.getMethodToFix();
 		String junitPackage = "ar.edu.output.junit";
@@ -134,7 +147,8 @@ public class RacAPI {
         	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
         }
         
-        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClass(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), false);
+        final Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(candidate.getProgram().getClassName(), Arrays.asList(new String[]{testFolder, StrykerConfig.getInstance().getCompilingSandbox()}));
+        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClassFrom(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), Arrays.asList(new String[]{testFolder, StrykerConfig.getInstance().getCompilingSandbox()}));
         
         Method[] methods = junitTestClass.getDeclaredMethods();
         Method methodToRun = null;
@@ -153,6 +167,25 @@ public class RacAPI {
                 Boolean result = false;
                 try {
                     runningThread = Thread.currentThread();
+                    //DELETE+++
+                    if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox()+"delete/ReflectionTestSimpleClass.java", new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+                    	System.out.println("la super kakona");
+                    }
+                    Class<?> reflectionTestSimpleClassClass = JavaCompilerAPI.getInstance().reloadClassFrom("delete.ReflectionTestSimpleClass", StrykerConfig.getInstance().getCompilingSandbox());
+                    Object reflectionTestSimpleClassInstance = reflectionTestSimpleClassClass.newInstance();
+                    Method[] methodsRTSC = reflectionTestSimpleClassClass.getDeclaredMethods();
+                    Method testMethod = null;
+                    for (Method m : methodsRTSC) {
+                    	if (m.getName().compareTo("test") == 0) {
+                    		testMethod = m;
+                    		break;
+                    	}
+                    }
+                    if (testMethod != null) {
+                    	testMethod.setAccessible(true);
+                    	testMethod.invoke(reflectionTestSimpleClassInstance, new Object[]{candidateClass});
+                    }
+                    //DELETE---
                     long timeprev = System.currentTimeMillis();
                     methodToRunInCallable.invoke(oToRun, inputToInvoke);
                     long timepost = System.currentTimeMillis();
@@ -255,7 +288,21 @@ public class RacAPI {
 	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests, boolean stopAtFirstFail) throws InstantiationException, IllegalAccessException {
 		boolean[] results = new boolean[junitTests.size()];
 		Arrays.fill(results, true);
-		//System.out.print("About to run " + junitTests.size() + " tests...");
+		if (junitTests.isEmpty()) {
+			return results;
+		}
+		
+		candidate.getProgram().makeBackup();
+		
+		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+		
+		if (!JavaCompilerAPI.getInstance().compileWithJML4C(StrykerConfig.getInstance().getCompilingSandbox() + candidate.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+			System.err.println("error while compiling rac version of FixCandidate!");
+			Arrays.fill(results, false);
+			candidate.getProgram().restoreBackup();
+			return results;
+		}
+		
 		int t = 0;
 		for (t = 0; t < junitTests.size(); t++) {
 			results[t] = this.runJUnit(candidate, junitTests.get(t));
@@ -263,8 +310,9 @@ public class RacAPI {
 				break;
 			}
 		}
-		//System.out.println("...runned " + (t<junitTests.size()?(t+1):t) + " tests");
-		//System.out.println(Arrays.toString(results));
+
+		
+		candidate.getProgram().restoreBackup();
 		return results;
 	}
 	
@@ -281,5 +329,10 @@ public class RacAPI {
 	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests) throws InstantiationException, IllegalAccessException {
 		return this.runJUnits(candidate, junitTests, true);
 	}
+	
+	
+	//DELETE
+	
+	
 	
 }
