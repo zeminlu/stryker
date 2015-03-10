@@ -22,6 +22,12 @@ import ar.edu.taco.TacoException;
 import ar.edu.taco.junit.RecoveredInformation;
 import ar.edu.taco.junit.RecoveredInformation.StaticFieldInformation;
 
+/**
+ * Class used to create a new test, this class is based on {@link ar.edu.taco.junit.UnitTestBuilder}
+ * 
+ * @author Simon Emmanuel Gutierrez Brida
+ * @version 0.1.5u
+ */
 public class TestBuilder {
 	private static final String THIZ_0 = "thiz_0";
 
@@ -74,7 +80,7 @@ public class TestBuilder {
         }
 
         List<String> initializations = new LinkedList<String>();
-        List<UpdateCommand> updates = new LinkedList<UpdateCommand>();
+        Set<UpdateCommand> updates = new TreeSet<UpdateCommand>();
         List<String> params = null;
         
         List<String> objectDefinitionStatements = new ArrayList<String>();
@@ -89,6 +95,8 @@ public class TestBuilder {
         } else if (!isStatic){
         	thizInstance = clazz.newInstance();
         }
+        
+        this.createdInstances.put(System.identityHashCode(thizInstance), "instance");
         
         // Fields initialization
         if (thizInstance != null) {
@@ -120,7 +128,7 @@ public class TestBuilder {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    private void getStaticFieldsInitializationStatements(Class<?> clazz, String storedVariableName, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
+    private void getStaticFieldsInitializationStatements(Class<?> clazz, String storedVariableName, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
 
         if (!clazz.isAssignableFrom(Integer.class) && !clazz.isAssignableFrom(Long.class) && !clazz.isAssignableFrom(Float.class)){
 
@@ -164,7 +172,7 @@ public class TestBuilder {
                                 int instanceLength = Array.getLength(fieldValue);
 
                                 this.createdInstances.put(System.identityHashCode(fieldValue), arrayObjectVariableName);
-                                String statement = field.getType().getCanonicalName() + " " + arrayObjectVariableName + " = new " + componentType.getName() + "[" + instanceLength + "];";
+                                String statement = field.getType().getCanonicalName() + " " + arrayObjectVariableName + " = new " + componentType.getName() + "[" + instanceLength + "]";
                                 objectDefinitionStatements.add(statement);
                                 
                                 updates.add(new UpdateCommand(storedVariableName, shortFieldName, arrayObjectVariableName));
@@ -193,8 +201,8 @@ public class TestBuilder {
                     	}
                     	imports.add(abstractClass);
                     	imports.add(concreteClass);
-                    	int lastAbstractDot = Math.max(0, abstractClass.lastIndexOf('.'));
-                    	int lastConcreteDot = Math.max(0, concreteClass.lastIndexOf('.'));
+                    	int lastAbstractDot = abstractClass.lastIndexOf('.')+1;
+                    	int lastConcreteDot = concreteClass.lastIndexOf('.')+1;
                     	abstractClassSimple = abstractClass.substring(lastAbstractDot, abstractClass.length());
                     	concreteClassSimple = concreteClass.substring(lastConcreteDot, concreteClass.length());
                     	if (fieldValue != null) {
@@ -222,7 +230,7 @@ public class TestBuilder {
      */
     private String generateVariableName(Object value) {
         if (value == null) {
-            return "null_0";
+            return "null";
         }
 
         if (this.createdInstances.containsKey(System.identityHashCode(value))) {
@@ -265,7 +273,7 @@ public class TestBuilder {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    private void getFieldsInitializationStatements(Class<?> clazz, Object instance, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
+    private void getFieldsInitializationStatements(Class<?> clazz, Object instance, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
     	if (clazz.getDeclaredFields().length > 0 && !clazz.isAssignableFrom(Integer.class) && !clazz.isAssignableFrom(Long.class) && !clazz.isAssignableFrom(Float.class)) {
             String instanceGeneratedVariableName = generateVariableName(instance);
 
@@ -290,7 +298,7 @@ public class TestBuilder {
                                 int instanceLength = Array.getLength(fieldValue);
 
                                 this.createdInstances.put(System.identityHashCode(fieldValue), arrayObjectVariableName);
-                                String statement = field.getType().getCanonicalName() + " " + arrayObjectVariableName + " = new " + componentType.getName() + "[" + instanceLength + "];";
+                                String statement = field.getType().getCanonicalName() + " " + arrayObjectVariableName + " = new " + componentType.getName() + "[" + instanceLength + "]";
                                 objectDefinitionStatements.add(statement);
                                 
                                 updates.add(new UpdateCommand(instanceGeneratedVariableName, shortFieldName, arrayObjectVariableName));
@@ -324,17 +332,19 @@ public class TestBuilder {
                             isMap = true;
                     	} else if (Object.class.isAssignableFrom(field.getType())) {
                     		isObject = true;
+                    		abstractClass = fieldValue!=null?fieldValue.getClass().getCanonicalName():null;
+                    		concreteClass = abstractClass;
                     	}
                     	
                     	if (abstractClass != null) {
                     		imports.add(abstractClass);
-                    		int abstractClassLastDot = Math.max(0, abstractClass.lastIndexOf('.'));
+                    		int abstractClassLastDot = abstractClass.lastIndexOf('.')+1;
                     		abstractClassSimple = abstractClass.substring(abstractClassLastDot, abstractClass.length());
                     	}
                     	
                     	if (concreteClass != null) {
                     		imports.add(concreteClass);
-                    		int concreteClassLastDot = Math.max(0, concreteClass.lastIndexOf('.'));
+                    		int concreteClassLastDot = concreteClass.lastIndexOf('.')+1;
                     		concreteClassSimple = concreteClass.substring(concreteClassLastDot, concreteClass.length());
                     	}
                     	if (fieldValue == null) {
@@ -345,7 +355,6 @@ public class TestBuilder {
                     		if (!isObject) {
                     			buildStatement = abstractClassSimple + " " + buildVariable + " = new " + concreteClassSimple + "()";
                     		} else {
-                    			Object thizInstance = null;
                                 Constructor<?>[] cons = fieldValue.getClass().getConstructors();
                                 Constructor<?> c = cons[0];
                                 Class<?>[] parTypes = null;
@@ -379,14 +388,7 @@ public class TestBuilder {
                                     }
                                     index++;
                                 }
-                                try {
-                                    thizInstance = c.newInstance(concretePars);
-                                } catch (InstantiationException ex){
-                                    ex.printStackTrace();
-                                } catch (Exception ex) {
-                                    throw new RuntimeException("DYNJALLOY ERROR! Possibly the class does not provide a constructor than can run on its parameters default values.");
-                                }
-                                buildStatement = thizInstance.getClass().getCanonicalName() + " " + buildVariable +" = new "  + thizInstance.getClass().getCanonicalName() + "(";
+                                buildStatement = abstractClassSimple + " " + buildVariable +" = new "  + concreteClassSimple + "(";
                                 if (concretePars != null){
                                     for (int idx = 0; idx < concretePars.length; idx++){
                                         if (parTypes[idx].isPrimitive()){
@@ -401,7 +403,7 @@ public class TestBuilder {
                                             buildStatement += ",";
                                     }
                                 }
-                                buildStatement += ");";
+                                buildStatement += ")";
                     		}
                     		//BUILD STATEMENT DEFINITION---
                     		this.createdInstances.put(System.identityHashCode(fieldValue), buildVariable);
@@ -416,6 +418,7 @@ public class TestBuilder {
                             }
                             //GET STATEMENTS---
                     	}
+                    	updates.add(new UpdateCommand(instanceGeneratedVariableName, shortFieldName, buildVariable));
                     }
                 }
             }
@@ -431,7 +434,7 @@ public class TestBuilder {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private List<String> getParametersInitializationStatements(Class<?> clazz, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws InstantiationException, IllegalAccessException {
+    private List<String> getParametersInitializationStatements(Class<?> clazz, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws InstantiationException, IllegalAccessException {
         List<String> paramsNames = new ArrayList<String>();
 
         if (recoveredInformation.getMethodParametersNames().size() > 0) {
@@ -523,7 +526,7 @@ public class TestBuilder {
      * @throws IllegalArgumentException
      * @throws InstantiationException 
      */
-    private String createStatementsForParameter(Class<?> clazz, String parameterName, Object instance, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+    private String createStatementsForParameter(Class<?> clazz, String parameterName, Object instance, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
         String generatedVariableName = parameterName;
 
         if (!this.createdInstances.containsKey(System.identityHashCode(instance))) {
@@ -597,19 +600,25 @@ public class TestBuilder {
             		concreteClass = "java.util.IdentityHashMap";
             	} else if (Object.class.isAssignableFrom(clazz)) {
             		isObject = true;
+            		abstractClass = clazz.getCanonicalName();
+            		concreteClass = abstractClass;
             	}
+            	if (abstractClass != null) {
+            		imports.add(abstractClass);
+            		int lastAbstractClassDot = abstractClass.lastIndexOf('.')+1;
+            		abstractClassSimple = abstractClass.substring(lastAbstractClassDot, abstractClass.length());
+            	}
+        		if (concreteClass != null) {
+        			imports.add(concreteClass);
+        			int lastConcreteClassDot = concreteClass.lastIndexOf('.')+1;
+            		concreteClassSimple = concreteClass.substring(lastConcreteClassDot, concreteClass.length());
+        		}
             	if (isArray && instance != null) {
             		Class<?> componentType = clazz.getComponentType();
                     int instanceLength = Array.getLength(instance);
             		getValueForArray(componentType, parameterValue, objectDefinitionStatements, objectInitializationStatements);
             		buildStatement = clazz.getCanonicalName() + " " + generatedVariableName + " = new " + componentType.getName() + "[" + instanceLength + "]";
             	} else if (!isObject || (isArray && instance == null)) {
-            		int lastAbstractClassDot = Math.max(abstractClass.lastIndexOf('.'), 0);
-            		abstractClassSimple = abstractClass.substring(lastAbstractClassDot, abstractClass.length());
-            		int lastConcreteClassDot = Math.max(concreteClass.lastIndexOf('.'), 0);
-            		concreteClassSimple = concreteClass.substring(lastConcreteClassDot, concreteClass.length());
-            		imports.add(abstractClass);
-            		imports.add(concreteClass);
             		if (fieldValue == null) {
             			objectDefinitionStatements.add(clazz.getCanonicalName() + " " + generatedVariableName + " = null");
                         this.createdInstances.put(System.identityHashCode(instance), generatedVariableName);
@@ -646,7 +655,7 @@ public class TestBuilder {
                         }
                         index++;
                     }
-                    buildStatement = clazz.getCanonicalName() + " " + generatedVariableName +" = new "  + clazz.getCanonicalName() + "(";
+                    buildStatement = abstractClassSimple + " " + generatedVariableName +" = new "  + concreteClassSimple + "(";
                     if (concretePars != null){
                         for (int idx = 0; idx < concretePars.length; idx++){
                             if (parTypes[index].isPrimitive()){
@@ -687,7 +696,7 @@ public class TestBuilder {
      * @throws IllegalAccessException 
      * @throws IllegalArgumentException 
      */
-    private void getStatementsForCollection(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
+    private void getStatementsForCollection(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
         Collection<?> listFieldValue = (Collection<?>) fieldValue;
         for (Object value : listFieldValue) {
             Class<?> clazz;
@@ -737,6 +746,18 @@ public class TestBuilder {
             		concreteClass = "java.util.IdentityHashMap";
             	} else {
             		isObject = true;
+            		abstractClass = value.getClass().getCanonicalName();
+            		concreteClass = abstractClass;
+            	}
+            	if (abstractClass != null) {
+            		imports.add(abstractClass);
+            		int abstractClassLastDot = abstractClass.lastIndexOf('.')+1;
+            		abstractClassSimple = abstractClass.substring(abstractClassLastDot, abstractClass.length());
+            	}
+            	if (concreteClass != null) {
+            		imports.add(concreteClass);
+            		int concreteClassLastDot = concreteClass.lastIndexOf('.')+1;
+        			concreteClassSimple = concreteClass.substring(concreteClassLastDot, concreteClass.length());
             	}
             	if (!this.createdInstances.containsKey(System.identityHashCode(value))) {
             		this.createdInstances.put(System.identityHashCode(value), variableToCreate);
@@ -746,12 +767,6 @@ public class TestBuilder {
             			objectDefinitionStatements.add(buildStatement);
             			getValueForArray(componentType, value, objectDefinitionStatements, objectInitializationStatements);
             		} else if (!isObject) {
-            			int abstractClassLastDot = Math.max(abstractClass.lastIndexOf('.'), 0);
-            			int concreteClassLastDot = Math.max(concreteClass.lastIndexOf('.'), 0);
-            			abstractClassSimple = abstractClass.substring(abstractClassLastDot, abstractClass.length());
-            			concreteClassSimple = concreteClass.substring(concreteClassLastDot, concreteClass.length());
-            			imports.add(abstractClass);
-            			imports.add(concreteClass);
             			buildStatement = abstractClassSimple + " " + variableToCreate + " = new " + concreteClassSimple + "()";
             			objectDefinitionStatements.add(buildStatement);
             			if (isList || isSet) getStatementsForCollection(variableToCreate, value, objectDefinitionStatements, objectInitializationStatements, updates);
@@ -760,7 +775,7 @@ public class TestBuilder {
             			if (!hasDefaultConstructor(value.getClass())) {
                             throw new RuntimeException("DYNJALLOY ERROR!: Type: " + value.getClass().getCanonicalName() + " has no default Constructor.");
                         }
-            			buildStatement = value.getClass().getCanonicalName() + " " + variableToCreate + " = new " + value.getClass().getCanonicalName() + "()";
+            			buildStatement = abstractClassSimple + " " + variableToCreate + " = new " + concreteClassSimple + "()";
             			objectDefinitionStatements.add(buildStatement);
             			getFieldsInitializationStatements(value.getClass(), value, objectDefinitionStatements, objectInitializationStatements, updates);
             		}
@@ -778,7 +793,7 @@ public class TestBuilder {
      * @throws IllegalAccessException 
      * @throws IllegalArgumentException 
      */
-    private void getStatementsForMap(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
+    private void getStatementsForMap(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws IllegalArgumentException, IllegalAccessException {
         Map<?, ?> mapFieldValue = (Map<?, ?>) fieldValue;
         for (Entry<?, ?> anEntry : mapFieldValue.entrySet()) {
         	Object keyValue = anEntry.getKey();
@@ -790,7 +805,7 @@ public class TestBuilder {
         }
     }
     
-    private String getKeyValueString(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, List<UpdateCommand> updates, Object keyValueObject) throws IllegalArgumentException, IllegalAccessException {
+    private String getKeyValueString(String variableName, Object fieldValue, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates, Object keyValueObject) throws IllegalArgumentException, IllegalAccessException {
     	String keyValueString = null;
 
         Class<?> clazz;
@@ -820,6 +835,8 @@ public class TestBuilder {
         	Class<?> componentType = null;
         	String abstractClass = null;
         	String concreteClass = null;
+        	String abstractClassSimple = null;
+        	String concreteClassSimple = null;
         	if (!this.createdInstances.containsKey(System.identityHashCode(keyValueObject))) {
         		this.createdInstances.put(System.identityHashCode(keyValueObject), variableToCreate);
         		if (clazz.isArray()) {
@@ -840,17 +857,23 @@ public class TestBuilder {
         			concreteClass = "java.util.IdentityHashMap";
         		} else {
         			isObject = true;
+        			abstractClass = keyValueObject.getClass().getCanonicalName();
+        			concreteClass = abstractClass;
+        		}
+        		if (abstractClass != null) {
+        			imports.add(abstractClass);
+        			int abstractClassLastDot = abstractClass.lastIndexOf('.')+1;
+        			abstractClassSimple = abstractClass.substring(abstractClassLastDot, abstractClass.length());
+        		}
+        		if (concreteClass != null) {
+        			imports.add(concreteClass);
+        			int concreteClassLastDot = concreteClass.lastIndexOf('.')+1;
+        			concreteClassSimple = concreteClass.substring(concreteClassLastDot, concreteClass.length());
         		}
         		if (isArray) {
         			objectDefinitionStatements.add(buildStatement);
         			getValueForArray(componentType, keyValueObject, objectDefinitionStatements, objectInitializationStatements);
         		} else if (!isObject) {
-        			int abstractClassLastDot = Math.max(0, abstractClass.lastIndexOf('.'));
-        			int concreteClassLastDot = Math.max(0, concreteClass.lastIndexOf('.'));
-        			String abstractClassSimple = abstractClass.substring(abstractClassLastDot, abstractClass.length());
-        			String concreteClassSimple = concreteClass.substring(concreteClassLastDot, concreteClass.length());
-        			imports.add(abstractClass);
-        			imports.add(concreteClass);
         			buildStatement = abstractClassSimple + " " + variableToCreate + " = new " + concreteClassSimple + "()";
         			objectDefinitionStatements.add(buildStatement);
         			if (isList || isSet) getStatementsForCollection(variableToCreate, keyValueObject, objectDefinitionStatements, objectInitializationStatements, updates);
@@ -859,7 +882,7 @@ public class TestBuilder {
         			if (!hasDefaultConstructor(keyValueObject.getClass())) {
                         throw new RuntimeException("DYNJALLOY ERROR!: Type: " + keyValueObject.getClass().getCanonicalName() + " has no default Constructor.");
                     }
-        			buildStatement = keyValueObject.getClass().getCanonicalName() + " " + variableToCreate + " = new " + keyValueObject.getClass().getCanonicalName() + "()";
+        			buildStatement = abstractClassSimple + " " + variableToCreate + " = new " + concreteClassSimple + "()";
         			objectDefinitionStatements.add(buildStatement);
         			getFieldsInitializationStatements(keyValueObject.getClass(), keyValueObject, objectDefinitionStatements, objectInitializationStatements, updates);
         		}

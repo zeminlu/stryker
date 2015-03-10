@@ -5,9 +5,9 @@ package tools.utils;
  * {@code updateValue(objectName, fieldName, value)}
  * 
  * @author Simon Emmanuel Gutierrez Brida
- * @version 0.1u
+ * @version 0.2u
  */
-public class UpdateCommand {
+public class UpdateCommand implements Comparable<UpdateCommand>{
 	
 	private String objectName;
 	private String fieldName;
@@ -41,5 +41,23 @@ public class UpdateCommand {
 		boolean sameFieldName = (this.fieldName == otherUpdateCommand.fieldName) || ((this.fieldName != null && otherUpdateCommand.fieldName != null) && (this.fieldName.compareTo(otherUpdateCommand.fieldName)==0));
 		boolean sameValue = (this.value == otherUpdateCommand.value) || ((this.value != null && otherUpdateCommand.value != null) && (this.value.compareTo(otherUpdateCommand.value)==0));
 		return sameObjectName && sameFieldName && sameValue;
+	}
+
+	@Override
+	public int compareTo(UpdateCommand other) {
+		if (other == null) throw new NullPointerException("object to compare is null");
+		if (this.objectName.compareTo(other.objectName) == 0) {
+			if (this.fieldName.compareTo(other.fieldName) == 0) {
+				if (this.value.compareTo(other.value) == 0) {
+					return 0;
+				} else {
+					return this.value.compareTo(other.value);
+				}
+			} else {
+				return this.fieldName.compareTo(other.fieldName) * 10;
+			}
+		} else {
+			return this.objectName.compareTo(other.objectName) * 100;
+		}
 	}
 }

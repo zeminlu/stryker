@@ -1,6 +1,5 @@
 package config;
 
-import java.text.MessageFormat;
 import java.util.Random;
 
 import org.apache.commons.configuration.Configuration;
@@ -16,7 +15,7 @@ import org.apache.commons.lang3.SystemUtils;
  * file separator  
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.2.6
+ * @version 0.3.1
  */
 public class StrykerConfig {
 	
@@ -39,10 +38,7 @@ public class StrykerConfig {
 	 */
 	private Configuration config;
 	
-	/**
-	 * The location of the folder that will be used as compiling environment
-	 */
-	private String compilingSandbox = null;
+	private String[] randomStrings = new String[1]; //holds random string values, currently only holds one
 	
 	/**
 	 * Gets an instance of {@code StrykerConfig}
@@ -81,7 +77,6 @@ public class StrykerConfig {
 	 */
 	private StrykerConfig(String configFile) {
 		this.propertiesFile = configFile;
-		this.compilingSandbox = null;
 		this.config = null;
 		loadConfig();
 	}
@@ -122,14 +117,14 @@ public class StrykerConfig {
 	 * @return the value of property {@code path.output} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getOutputDir() {
-		return MessageFormat.format(this.config.getString("path.output"), getFileSeparator());
+		return formatString(this.config.getString("path.output"));
 	}
 	
 	/**
 	 * @return the value of property {@code path.mujavaOutput} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getMutantsDir() {
-		return MessageFormat.format(this.config.getString("path.mujavaOutput"), getFileSeparator());
+		return formatString(this.config.getString("path.mujavaOutput"));
 	}
 	
 	/**
@@ -139,45 +134,42 @@ public class StrykerConfig {
 	 * @see StrykerConfig#randomString(int)
 	 */
 	public String getCompilingSandbox() {
-		if (this.compilingSandbox == null) {
-			this.compilingSandbox = MessageFormat.format(this.config.getString("path.compilingSandbox"), getFileSeparator(), randomString(10));
-		}
-		return this.compilingSandbox; 
+		return formatString(this.config.getString("path.compilingSandbox")); 
 	}
 	
 	/**
 	 * @return the value of property {@code path.junitPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getJunitPath() {
-		return MessageFormat.format(this.config.getString("path.junitPath"), getFileSeparator());
+		return formatString(this.config.getString("path.junitPath"));
 	}
 	
 	/**
 	 * @return the value of property {@code path.hamcrestPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
 	 */
 	public String getHamcrestPath() {
-		return MessageFormat.format(this.config.getString("path.hamcrestPath"), getFileSeparator());
+		return formatString(this.config.getString("path.hamcrestPath"));
 	}
 	
 	/**
 	 * @return the value of property {@code tests.output}
 	 */
 	public String getTestsOutputDir() {
-		return this.config.getString("tests.output");
+		return formatString(this.config.getString("tests.output"));
 	}
 	
 	/**
 	 * @return the value of property {@code tests.package}
 	 */
 	public String getTestsPackage() {
-		return this.config.getString("tests.package");
+		return formatString(this.config.getString("tests.package"));
 	}
 	
 	/**
 	 * The next time {@code StrykerConfig#getCompilingSandbox()} is called a new directory will be generated
 	 */
 	public void resetCompilingSandbox() {
-		this.compilingSandbox = null;
+		this.randomStrings[0] = null;
 	}
 	
 	/**
@@ -199,7 +191,20 @@ public class StrykerConfig {
 	 * @return the path to the test template file
 	 */
 	public String getTestTemplatePath() {
-		return this.config.getString("tests.template");
+		return formatString(this.config.getString("tests.template"));
+	}
+	
+	private String formatString(String original) {
+		return formatString(original, 0);
+	}
+	
+	private String formatString(String original, int randomStringIndex) {
+		if (this.randomStrings[randomStringIndex] == null) {
+			this.randomStrings[randomStringIndex] = randomString(10);
+		}
+		String firstFormat = original.replaceAll("\\{0\\}", getFileSeparator());
+		String secondFormat = firstFormat.replaceAll("\\{1\\}", this.randomStrings[randomStringIndex]);
+		return secondFormat;
 	}
 	
 }

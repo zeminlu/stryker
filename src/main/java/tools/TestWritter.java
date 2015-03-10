@@ -15,7 +15,7 @@ import config.StrykerConfig;
  * This class uses the test java source template file (testClassTemplate.java) and writes a complete test
  * 
  * @author Simon Emmanuel Gutierrez Brida
- * @version 0.1u
+ * @version 0.1.4u
  */
 public class TestWritter {
 	private static final String PACKAGE = "PACKAGE";
@@ -34,10 +34,10 @@ public class TestWritter {
 	private String className;
 	private boolean isStatic;
 	private List<String> initializationsList;
-	private List<UpdateCommand> updatesList;
+	private Set<UpdateCommand> updatesList;
 	private List<String> paramsList;
 	
-	public TestWritter(String pkg, Set<String> importList, String className, boolean isStatic, List<String> initializationsList, List<UpdateCommand> updatesList, List<String> paramsList) {
+	public TestWritter(String pkg, Set<String> importList, String className, boolean isStatic, List<String> initializationsList, Set<UpdateCommand> updatesList, List<String> paramsList) {
 		this.pkg = pkg;
 		this.importList = importList;
 		this.className = className;
@@ -68,31 +68,53 @@ public class TestWritter {
             	fos.write(("public class " + this.className + " {\n").getBytes(Charset.forName("UTF-8")));
             } else if (str.contains(TestWritter.INITIALIZATIONS)) {
             	for (String fieldInit : this.initializationsList) {
-            		fos.write((fieldInit + ";\n").getBytes(Charset.forName("UTF-8")));
+            		String modifiedString = replace(str, TestWritter.INITIALIZATIONS, fieldInit, true);
+            		fos.write((modifiedString + ";\n").getBytes(Charset.forName("UTF-8")));
             	}
             } else if (str.contains(TestWritter.UPDATES)) {
             	for (UpdateCommand update : this.updatesList) {
-            		fos.write(("updateValue(" + update.getObjectName() + ", " + update.getFieldName() + ", " + update.getValue() + ");\n").getBytes(Charset.forName("UTF-8")));
+            		String updateString = "updateValue(" + update.getObjectName() + ", \"" + update.getFieldName() + "\", " + update.getValue() + ")";
+            		String modifiedString = replace(str, TestWritter.UPDATES, updateString, true);
+            		fos.write((modifiedString + ";\n").getBytes(Charset.forName("UTF-8")));
             	}
             } else if (str.contains(TestWritter.PARAMS)) {
             	int i = 0;
+            	String modifiedString;
             	if (this.paramsList.size() > 0) {
-            		fos.write(("params = new Object[" + this.paramsList.size() + "];\n").getBytes(Charset.forName("UTF-8")));
+            		String paramsCreation = "params = new Object[" + this.paramsList.size() + "]";
+            		modifiedString = replace(str, TestWritter.PARAMS, paramsCreation, true);
+            		fos.write((modifiedString  + ";\n").getBytes(Charset.forName("UTF-8")));
             	}
             	for (String param : this.paramsList) {
-            		fos.write(("params[" + i + "] = " + param + ";\n").getBytes(Charset.forName("UTF-8")));
+            		String paramAssignment = "params[" + i + "] = " + param;
+            		modifiedString = replace(str, TestWritter.PARAMS, paramAssignment, true);
+            		fos.write((modifiedString + ";\n").getBytes(Charset.forName("UTF-8")));
             		i++;
             	}
             } else if (str.contains(TestWritter.INSTANCE_VALUE)) {
             	String value = this.isStatic?"null":"clazz.newInstance()";
-            	fos.write((str.replace(TestWritter.INSTANCE_VALUE, value) + "\n").getBytes(Charset.forName("UTF-8")));
+            	fos.write((replace(str, TestWritter.INSTANCE_VALUE, value, true) + "\n").getBytes(Charset.forName("UTF-8")));
             } else {
-            	fos.write((str + ";\n").getBytes(Charset.forName("UTF-8")));
+            	fos.write((str + "\n").getBytes(Charset.forName("UTF-8")));
             }
         }
         if (fos != null) fos.close();
         scan.close();
         return destFile.getAbsolutePath();
+	}
+	
+	private String replace(String original, String target, String replacement, boolean onlyReplaceTarget) {
+		String result = null;
+		if (onlyReplaceTarget) {
+			int targetIndex = original.indexOf(target);
+			int targetEndIndex = target.length();
+			if (targetIndex >= 0) {
+				result = original.substring(0, targetIndex) + replacement + original.substring(targetIndex+targetEndIndex, original.length());
+			}
+		} else {
+			result = original.replace(target, replacement);
+		}
+		return result;
 	}
 	
 

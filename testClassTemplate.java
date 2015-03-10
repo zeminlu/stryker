@@ -45,9 +45,9 @@ CLASS START
 
                     aField.setAccessible(false);
                 } catch (IllegalArgumentException e) {
-           throw(new java.lang.RuntimeException(e));
+           		throw(new java.lang.RuntimeException(e));
                 } catch (IllegalAccessException e) {
-           throw(new java.lang.RuntimeException(e));
+           		throw(new java.lang.RuntimeException(e));
                 }
             }
         }
