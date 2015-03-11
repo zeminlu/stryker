@@ -17,8 +17,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Test;
-
 import config.StrykerConfig;
 //import ar.edu.taco.TacoMain;
 //import ar.edu.taco.engine.JUnitStage;
@@ -107,12 +105,12 @@ public class RacAPI {
 			return null;
 		}
 
-        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJunitPath(), StrykerConfig.getInstance().getHamcrestPath()})) {
-        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
-        	return null;
-        }
-	       
-        if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
+//        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+//        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
+//        	return null;
+//        }
+//	       
+//        if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
         //return new File(currentJunit).toPath();
         return new File(testPath).toPath();
@@ -122,69 +120,73 @@ public class RacAPI {
 	 * This method runs a JUnit test for a given {@code FixCandidate}
 	 * 
 	 * @param candidate	:	the java source code for which the JUnit test will be run	:	{@code FixCandidate}
-	 * @param junitTest	:	the path leading to the JUnit test to run					:	{@code Path}
+	 * @param testPath	:	the path leading to the JUnit test to run					:	{@code Path}
 	 * 
 	 * @return {@code true} or {@code false} depending if the test passes or not	:	{@code boolean}
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public boolean runJUnit(FixCandidate candidate, Path junitTest) throws InstantiationException, IllegalAccessException {
+	public boolean runJUnit(FixCandidate candidate, Path testPath) throws InstantiationException, IllegalAccessException {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
-		if (junitTest==null) throw new IllegalArgumentException("checking if test passes on null test");
-		
-		final String newFileClasspath = StrykerConfig.getInstance().getCompilingSandbox() + ":" + "lib/stryker/jml4c.jar";//candidate.getProgram().getAbsolutePath() + ":" + System.getProperty("user.dir") + ":" + ".";//"mavenRepo/org/jmlspecs/jml4rt/1.00/jml4rt-1.00.jar";//"lib/stryker/jml4c.jar";
-		String qualifiedName = candidate.getProgram().getClassName();
-		String methodName = candidate.getMethodToFix();
-		String junitPackage = "ar.edu.output.junit";
-		
-        String testFolder = junitTest.toString();
-        String className = junitTest.toString().replace(".java", "");
-        int packageIdx = testFolder.indexOf(junitPackage.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()));
-        if (packageIdx > 0) {
-        	testFolder = testFolder.substring(0, packageIdx);
-        	className = className.substring(testFolder.length());
-        	String[] junitTestClassPath = new String[]{testFolder};
-        	JavaCompilerAPI.getInstance().updateReloaderClassPath(junitTestClassPath);
-        }
+		if (testPath==null) throw new IllegalArgumentException("checking if test passes on null test");
         
-        final Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(candidate.getProgram().getClassName(), Arrays.asList(new String[]{testFolder, StrykerConfig.getInstance().getCompilingSandbox()}));
-        Class<?> junitTestClass = JavaCompilerAPI.getInstance().reloadClassFrom(className.replaceAll(StrykerConfig.getInstance().getFileSeparator(), "."), Arrays.asList(new String[]{testFolder, StrykerConfig.getInstance().getCompilingSandbox()}));
+		String testClassName = null;
+		int outputDirIdx = testPath.toString().indexOf(StrykerConfig.getInstance().getTestsOutputDir());
+		if (outputDirIdx > 0) {
+			testClassName = testPath.toString().substring(outputDirIdx+StrykerConfig.getInstance().getTestsOutputDir().length(), testPath.toString().length());
+		} else if (outputDirIdx == 0){
+			testClassName = testPath.toString().substring(StrykerConfig.getInstance().getTestsOutputDir().length(), testPath.toString().length());
+		} else {
+			testClassName = testPath.toString();
+		}
+		testClassName = testClassName.replace(".java", "");
+		
+		testClassName = testClassName.replaceAll(StrykerConfig.getInstance().getFileSeparator(), ".");
+		
+	    if (!JavaCompilerAPI.getInstance().compile(testPath.toString(), new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+	    	if (RacAPI.verbose) System.err.println("test failed to compile: " + testPath);
+	    	return false;
+	    }
+		
+        final Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(candidate.getProgram().getClassName(), Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
+        Class<?> testClass = JavaCompilerAPI.getInstance().reloadClassFrom(testClassName, Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
         
-        Method[] methods = junitTestClass.getDeclaredMethods();
+        Method[] methods = testClass.getDeclaredMethods();
         Method methodToRun = null;
         for (Method m : methods) {
-        	if(m.isAnnotationPresent(Test.class)) {
+        	if(m.getName().compareTo("test")==0) {
         		methodToRun = m;
         		break;
         	}
         }
         methodToRun.setAccessible(true);
         final Method methodToRunInCallable = methodToRun;
-        final Object oToRun = junitTestClass.newInstance();
-        final Object[] inputToInvoke = new Object[]{newFileClasspath, qualifiedName, methodName};
+        final String methodToRepair = candidate.getMethodToFix();
+        final Object oToRun = testClass.newInstance();
+        final Object[] inputToInvoke = new Object[]{candidateClass, methodToRepair};
         Callable<Boolean> task = new Callable<Boolean>() {
             public Boolean call() throws InvocationTargetException {
                 Boolean result = false;
                 try {
                     runningThread = Thread.currentThread();
                     //DELETE+++
-                    if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox()+"delete/ReflectionTestSimpleClass.java", new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-                    	System.out.println("la super kakona");
-                    }
-                    Class<?> reflectionTestSimpleClassClass = JavaCompilerAPI.getInstance().reloadClassFrom("delete.ReflectionTestSimpleClass", StrykerConfig.getInstance().getCompilingSandbox());
-                    Object reflectionTestSimpleClassInstance = reflectionTestSimpleClassClass.newInstance();
-                    Method[] methodsRTSC = reflectionTestSimpleClassClass.getDeclaredMethods();
-                    Method testMethod = null;
-                    for (Method m : methodsRTSC) {
-                    	if (m.getName().compareTo("test") == 0) {
-                    		testMethod = m;
-                    		break;
-                    	}
-                    }
-                    if (testMethod != null) {
-                    	testMethod.setAccessible(true);
-                    	testMethod.invoke(reflectionTestSimpleClassInstance, new Object[]{candidateClass});
-                    }
+//                    if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox()+"delete/ReflectionTestSimpleClass.java", new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+//                    	System.out.println("la super kakona");
+//                    }
+//                    Class<?> reflectionTestSimpleClassClass = JavaCompilerAPI.getInstance().reloadClassFrom("delete.ReflectionTestSimpleClass", StrykerConfig.getInstance().getCompilingSandbox());
+//                    Object reflectionTestSimpleClassInstance = reflectionTestSimpleClassClass.newInstance();
+//                    Method[] methodsRTSC = reflectionTestSimpleClassClass.getDeclaredMethods();
+//                    Method testMethod = null;
+//                    for (Method m : methodsRTSC) {
+//                    	if (m.getName().compareTo("test") == 0) {
+//                    		testMethod = m;
+//                    		break;
+//                    	}
+//                    }
+//                    if (testMethod != null) {
+//                    	testMethod.setAccessible(true);
+//                    	testMethod.invoke(reflectionTestSimpleClassInstance, new Object[]{candidateClass});
+//                    }
                     //DELETE---
                     long timeprev = System.currentTimeMillis();
                     methodToRunInCallable.invoke(oToRun, inputToInvoke);
@@ -198,7 +200,6 @@ public class RacAPI {
                 	if (RacAPI.verbose) System.out.println("Entered IllegalArgumentException");
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
-                    //                                                    e.printStackTrace();
                 	if (RacAPI.verbose) System.out.println("Entered InvocationTargetException");
                 	if (RacAPI.verbose) System.out.println("QUIT BECAUSE OF JML RAC");
                 	if (RacAPI.verbose) e.printStackTrace();
@@ -274,7 +275,7 @@ public class RacAPI {
         if (RacAPI.verbose) System.out.println("test ran");
         return result;
 	}
-	
+
 	/**
 	 * This method runs a list of JUnit tests for a given {@code FixCandidate}
 	 * 

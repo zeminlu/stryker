@@ -65,7 +65,9 @@ public class TestWritter {
             		fos.write(("import " + imp + ";\n").getBytes(Charset.forName("UTF-8")));
             	}
             } else if (str.contains(TestWritter.CLASS)) {
-            	fos.write(("public class " + this.className + " {\n").getBytes(Charset.forName("UTF-8")));
+            	int lastDotIndex = this.className.lastIndexOf('.') + 1;
+            	String classNameWithNoPackage = this.className.substring(lastDotIndex, this.className.length());
+            	fos.write(("public class " + classNameWithNoPackage + " {\n").getBytes(Charset.forName("UTF-8")));
             } else if (str.contains(TestWritter.INITIALIZATIONS)) {
             	for (String fieldInit : this.initializationsList) {
             		String modifiedString = replace(str, TestWritter.INITIALIZATIONS, fieldInit, true);

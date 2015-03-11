@@ -26,7 +26,7 @@ import ar.edu.taco.junit.RecoveredInformation.StaticFieldInformation;
  * Class used to create a new test, this class is based on {@link ar.edu.taco.junit.UnitTestBuilder}
  * 
  * @author Simon Emmanuel Gutierrez Brida
- * @version 0.1.5u
+ * @version 0.1.7u
  */
 public class TestBuilder {
 	private static final String THIZ_0 = "thiz_0";
@@ -87,6 +87,10 @@ public class TestBuilder {
         List<String> objectInitializationStatements = new ArrayList<String>();
 
         imports.add("java.lang.reflect.Field");
+        imports.add("java.lang.reflect.Method");
+        imports.add("java.lang.IllegalAccessException");
+        imports.add("java.lang.reflect.InvocationTargetException");
+        imports.add("java.lang.InstantiationException");
         
         boolean isStatic = Modifier.isStatic(methodToCheck.getModifiers());
         Object thizInstance = null;
