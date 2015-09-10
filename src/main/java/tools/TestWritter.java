@@ -15,7 +15,7 @@ import config.StrykerConfig;
  * This class uses the test java source template file (testClassTemplate.java) and writes a complete test
  * 
  * @author Simon Emmanuel Gutierrez Brida
- * @version 0.1.4u
+ * @version 0.1.5
  */
 public class TestWritter {
 	private static final String PACKAGE = "PACKAGE";
@@ -36,8 +36,9 @@ public class TestWritter {
 	private List<String> initializationsList;
 	private Set<UpdateCommand> updatesList;
 	private List<String> paramsList;
+	private Set<String> importsToIgnore;
 	
-	public TestWritter(String pkg, Set<String> importList, String className, boolean isStatic, List<String> initializationsList, Set<UpdateCommand> updatesList, List<String> paramsList) {
+	public TestWritter(String pkg, Set<String> importList, String className, boolean isStatic, List<String> initializationsList, Set<UpdateCommand> updatesList, List<String> paramsList, Set<String> importsToIgnore) {
 		this.pkg = pkg;
 		this.importList = importList;
 		this.className = className;
@@ -45,6 +46,7 @@ public class TestWritter {
 		this.initializationsList = initializationsList;
 		this.updatesList = updatesList;
 		this.paramsList = paramsList;
+		this.importsToIgnore = importsToIgnore;
 	}
 	
 	public String writeTest() throws IOException {
@@ -62,7 +64,7 @@ public class TestWritter {
             	fos.write(("package " + this.pkg + ";\n").getBytes(Charset.forName("UTF-8")));
             } else if (str.contains(TestWritter.IMPORTS)){
             	for (String imp : this.importList) {
-            		fos.write(("import " + imp + ";\n").getBytes(Charset.forName("UTF-8")));
+            		if (allowImport(imp)) fos.write(("import " + imp + ";\n").getBytes(Charset.forName("UTF-8")));
             	}
             } else if (str.contains(TestWritter.CLASS)) {
             	int lastDotIndex = this.className.lastIndexOf('.') + 1;
@@ -117,6 +119,20 @@ public class TestWritter {
 			result = original.replace(target, replacement);
 		}
 		return result;
+	}
+	
+	private boolean allowImport(String imp) {
+		if (this.importsToIgnore == null) return true;
+		for (String ignoreImp : this.importsToIgnore) {
+			if (ignoreImp.endsWith("*")) {
+				int lastDotIdx = Math.max(ignoreImp.lastIndexOf('.'), 0);
+				String ignoreImpFromPackage = ignoreImp.substring(0, lastDotIdx);
+				if (imp.startsWith(ignoreImpFromPackage)) return false;
+			} else {
+				if (imp.compareTo(ignoreImp)==0) return false;
+			}
+		}
+		return true;
 	}
 	
 

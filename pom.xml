@@ -75,29 +75,9 @@
   		<version>3.3.2</version>
   	</dependency>
   	<dependency>
-  		<groupId>ar.uba.dc</groupId>
-  		<artifactId>jdynalloy</artifactId>
-  		<version>0.01</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>ar.edu.itba</groupId>
-  		<artifactId>comitaco</artifactId>
-  		<version>0.02</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>edu.mit</groupId>
-  		<artifactId>dynalloy4</artifactId>
-  		<version>1.0</version>
-  	</dependency>
-  	<dependency>
   		<groupId>ar.edu.unrc.exa.dc</groupId>
   		<artifactId>mujavapp</artifactId>
   		<version>0.08</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>net.sourceforge.jmlspecs</groupId>
-  		<artifactId>jml-specs</artifactId>
-  		<version>0.1</version>
   	</dependency>
   	<dependency>
   		<groupId>commons-cli</groupId>
@@ -109,12 +89,6 @@
   		<artifactId>annotations</artifactId>
   		<version>0.2.5</version>
   		</dependency>
-  		  	  	<dependency>
-  		<groupId>edu.mit</groupId>
-  		<artifactId>alloy4</artifactId>
-  		<version>1.0</version>
-  		
-  	</dependency>
   	
 <dependency>
 <groupId>log4j</groupId>

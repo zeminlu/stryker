@@ -26,7 +26,7 @@ import ar.edu.taco.junit.RecoveredInformation.StaticFieldInformation;
  * Class used to create a new test, this class is based on {@link ar.edu.taco.junit.UnitTestBuilder}
  * 
  * @author Simon Emmanuel Gutierrez Brida
- * @version 0.1.7u
+ * @version 0.1.8
  */
 public class TestBuilder {
 	private static final String THIZ_0 = "thiz_0";
@@ -82,6 +82,18 @@ public class TestBuilder {
         List<String> initializations = new LinkedList<String>();
         Set<UpdateCommand> updates = new TreeSet<UpdateCommand>();
         List<String> params = null;
+        Set<String> ignoreImports = new TreeSet<String>();
+        //String packageToIgnore = recoveredInformation.getClassToCheck().substring(0, recoveredInformation.getClassToCheck().lastIndexOf('.')) + ".*";
+        //ignoreImports.add(packageToIgnore);
+        ignoreImports.add("java.lang.Boolean");
+        ignoreImports.add("java.lang.Integer");
+        ignoreImports.add("java.lang.Short");
+        ignoreImports.add("java.lang.Byte");
+        ignoreImports.add("java.lang.Long");
+        ignoreImports.add("java.lang.Float");
+        ignoreImports.add("java.lang.Double");
+        ignoreImports.add("java.lang.String");
+        ignoreImports.add("java.lang.Object");
         
         List<String> objectDefinitionStatements = new ArrayList<String>();
         List<String> objectInitializationStatements = new ArrayList<String>();
@@ -120,7 +132,7 @@ public class TestBuilder {
 
         String outputClassName = className + "_" + methodName + "_" + getSuffix();
         
-        TestWritter testWritter = new TestWritter(TestBuilder.PACKAGE_NAME, imports, outputClassName, isStatic, initializations, updates, params);
+        TestWritter testWritter = new TestWritter(TestBuilder.PACKAGE_NAME, imports, outputClassName, isStatic, initializations, updates, params, ignoreImports);
         return testWritter.writeTest();
     }
 

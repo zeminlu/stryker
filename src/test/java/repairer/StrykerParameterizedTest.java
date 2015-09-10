@@ -14,7 +14,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import config.StrykerConfig;
-
 import tools.ProgramData;
 import tools.StrykerOptions;
 import tools.StrykerOptions.RAC;
@@ -67,7 +66,7 @@ public class StrykerParameterizedTest {
 		//PROGRAM DATA DEFINITIONS
 		ProgramData simpleClass = new ProgramData("src/test/resources/java/", "utils.SimpleClass");
 		ProgramData singlyLinkedList = new ProgramData("src/test/resources/java/", "roops.core.SinglyLinkedList", new String[]{"roops.core.SinglyLinkedListNode"});
-		ProgramData singlyLinkedListBug7 = new ProgramData("src/test/resources/java", "roops.core.objects.SinglyLinkedListContainsBug7", new String[]{"roops.core.objects.SinglyLinkedListNode"});
+		ProgramData singlyLinkedListBug7 = new ProgramData("src/test/resources/java/", "roops.core.objects.SinglyLinkedListContainsBug7", new String[]{"roops.core.objects.SinglyLinkedListNode"});
 		
 		//METHOD TO FIX DEFINITIONS
 			//SIMPLE CLASS
@@ -119,7 +118,18 @@ public class StrykerParameterizedTest {
 						StrykerOptions scopes_1_3_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 2, RAC.ENABLED);
 						StrykerOptions scopes_1_3_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 3, RAC.ENABLED);
 						StrykerOptions scopes_1_3_withRac_DFS_MD_4 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3, 4, RAC.ENABLED);
-		
+			//SINGLY LINKED LIST CONTAINS BUG 7
+						Map<String, Integer> scopes_1_3_SLLContains7Bug = new HashMap<String, Integer>();
+						scopes_1_3_SLLContains7Bug.put("roops.core.objects.SinglyLinkedListContainsBug7", 1);
+						scopes_1_3_SLLContains7Bug.put("roops.core.objects.SinglyLinkedListNode", 3);
+							//NO RAC
+								StrykerOptions scopes_1_3_SLLContains7Bug_withoutRac_DFS_MD_4 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 4, RAC.DISABLED);
+							//RAC
+								StrykerOptions scopes_1_3_SLLContains7Bug_withRac_DFS_MD_0 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 0, RAC.ENABLED);
+								StrykerOptions scopes_1_3_SLLContains7Bug_withRac_DFS_MD_1 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 1, RAC.ENABLED);
+								StrykerOptions scopes_1_3_SLLContains7Bug_withRac_DFS_MD_2 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 2, RAC.ENABLED);
+								StrykerOptions scopes_1_3_SLLContains7Bug_withRac_DFS_MD_3 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 3, RAC.ENABLED);
+								StrykerOptions scopes_1_3_SLLContains7Bug_withRac_DFS_MD_4 = new StrykerOptions(SearchStrategy.DFS, scopes_1_3_SLLContains7Bug, 4, RAC.ENABLED);
 		//PARAMETERS
 		return Arrays.asList(new Object[][] {
 //				//SIMPLE CLASS DECX
@@ -143,7 +153,7 @@ public class StrykerParameterizedTest {
 //				{simpleClass, noScopes_withRac_DFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 //				{simpleClass, noScopes_withRac_BFS_MD_3, methodToFix_SimpleClass_altTwicePlusOne, true},
 				//SIMPLE CLASS MULTBYFIVE
-				{simpleClass, noScopes_withRac_DFS_MD_6, methodToFix_SimpleClass_multByfive, true},
+//				{simpleClass, noScopes_withRac_DFS_MD_6, methodToFix_SimpleClass_multByfive, true},
 				//SINGLY LINKED LIST CONTAINS
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_0, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_1, methodToFix_SinglyLinkedList_contains, false},
@@ -151,7 +161,8 @@ public class StrykerParameterizedTest {
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_3, methodToFix_SinglyLinkedList_contains, false},
 //				{singlyLinkedList, scopes_1_3_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true},
 				//SINGLY LINKED LIST (STRYKER) CONTAINS BUG7
-//				{singlyLinkedListBug7, scopes_1_3_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true}
+				//{singlyLinkedListBug7, scopes_1_3_SLLContains7Bug_withRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true}
+				{singlyLinkedListBug7, scopes_1_3_SLLContains7Bug_withoutRac_DFS_MD_4, methodToFix_SinglyLinkedList_contains, true}
 		});
 	}
 	

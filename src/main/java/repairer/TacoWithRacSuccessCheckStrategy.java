@@ -74,6 +74,7 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		try {
 			// call jmlrac before taco
 			testsResults = RacAPI.getInstance().runJUnits(s, this.builtJunitTests);
+//			testsResults = RacAPI.getInstance().runTests(s, this.collectedCounterExamples);
 			for (int tr = 0; tr < testsResults.length && racPassed; tr++) {
 				racPassed = testsResults[tr];
 			}

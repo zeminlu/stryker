@@ -22,6 +22,7 @@ import config.StrykerConfig;
 //import ar.edu.taco.engine.JUnitStage;
 import ar.edu.taco.engine.StrykerStage;
 import repairer.FixCandidate;
+import tools.TestRunner.TestResult;
 
 /**
  * This class is used to access RAC, the main responsabilities of this API are:
@@ -105,12 +106,12 @@ public class RacAPI {
 			return null;
 		}
 
-//        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-//        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
-//        	return null;
-//        }
-//	       
-//        if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
+        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
+        	return null;
+        }
+	       
+        if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
         //return new File(currentJunit).toPath();
         return new File(testPath).toPath();
@@ -143,10 +144,10 @@ public class RacAPI {
 		
 		testClassName = testClassName.replaceAll(StrykerConfig.getInstance().getFileSeparator(), ".");
 		
-	    if (!JavaCompilerAPI.getInstance().compile(testPath.toString(), new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-	    	if (RacAPI.verbose) System.err.println("test failed to compile: " + testPath);
-	    	return false;
-	    }
+//	    if (!JavaCompilerAPI.getInstance().compile(testPath.toString(), new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+//	    	if (RacAPI.verbose) System.err.println("test failed to compile: " + testPath);
+//	    	return false;
+//	    }
 		
         final Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(candidate.getProgram().getClassName(), Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
         Class<?> testClass = JavaCompilerAPI.getInstance().reloadClassFrom(testClassName, Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
@@ -332,8 +333,104 @@ public class RacAPI {
 	}
 	
 	
-	//DELETE
+	public boolean runTest(FixCandidate candidate, CounterExample ce) {
+		TestResult result = TestRunner.runTest(ce);
+		boolean testPassed = false;
+		switch(result.getResult()) {
+			case ERROR_INITIALIZATION: {
+				if (RacAPI.verbose) {
+					System.out.println("Error initializating test");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = true;
+				break;
+			}
+			case ERROR_METHOD_EXCEPTION: {
+				if (RacAPI.verbose) {
+					System.out.println("Tested method throwed an exception");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = false;
+				break;
+			}
+			case ERROR_RUNTIME: {
+				if (RacAPI.verbose) {
+					System.out.println("Exception while running test");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = true;
+				break;
+			}
+			case ERROR_SPECIFICATION: {
+				if (RacAPI.verbose) {
+					System.out.println("Specification error while running test");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = false;
+				break;
+			}
+			case ERROR_TIMEOUT: {
+				if (RacAPI.verbose) {
+					System.out.println("Method tested timed out");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = true;
+				break;
+			}
+			case VALID: {
+				if (RacAPI.verbose) {
+					System.out.println("Test passed");
+					if (result.getException() != null) result.getException().printStackTrace();
+				}
+				testPassed = true;
+				break;
+			}
+		}
+		return testPassed;
+	}
 	
 	
+	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples, boolean stopAtFirstFail) {
+		boolean[] results = new boolean[counterExamples.size()];
+		Arrays.fill(results, true);
+		if (counterExamples.isEmpty()) {
+			return results;
+		}
+		
+		candidate.getProgram().makeBackup();
+		
+		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+		
+		if (!JavaCompilerAPI.getInstance().compileWithJML4C(StrykerConfig.getInstance().getCompilingSandbox() + candidate.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
+			System.err.println("error while compiling rac version of FixCandidate!");
+			Arrays.fill(results, false);
+			candidate.getProgram().restoreBackup();
+			return results;
+		}
+		
+		int t = 0;
+		for (t = 0; t < counterExamples.size(); t++) {
+			results[t] = this.runTest(candidate, counterExamples.get(t));
+			if (!results[t] && stopAtFirstFail) {
+				break;
+			}
+		}
+
+		
+		candidate.getProgram().restoreBackup();
+		return results;
+	}
+	
+	/**
+	 * This method runs a list of counter examples for a give {@code FixCandidate}
+	 * 
+	 * 
+	 * @param candidate
+	 * @param counterExamples
+	 * @return
+	 */
+	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples) {
+		return this.runTests(candidate, counterExamples, true);
+	}
 	
 }
