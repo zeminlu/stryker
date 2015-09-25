@@ -16,10 +16,11 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
-import tools.utils.UpdateCommand;
+import tools.apis.ReloaderAPI;
+import tools.data.CounterExample;
+import tools.data.UpdateCommand;
 import config.StrykerConfig;
 import ar.edu.taco.TacoException;
-import ar.edu.taco.junit.RecoveredInformation;
 import ar.edu.taco.junit.RecoveredInformation.StaticFieldInformation;
 
 /**
@@ -36,8 +37,10 @@ public class TestBuilder {
     private Set<String> imports = new TreeSet<String>();
     
     static private int testIndex = 0;
+    
+    private String testClassName = null;
 
-    private RecoveredInformation recoveredInformation;
+    private CounterExample ce;
 
     // Keep the variables and objects that have already been created. 
     // We use the identityHashCode of each object as the Key and the created variable name as Value
@@ -45,8 +48,8 @@ public class TestBuilder {
 
     private Map<Object, Integer> instancesIndex = new HashMap<Object, Integer>();
 
-    public TestBuilder(RecoveredInformation recoveredInformation) {
-        this.recoveredInformation = recoveredInformation;
+    public TestBuilder(CounterExample ce) {
+        this.ce = ce;
     }
 
 
@@ -56,24 +59,25 @@ public class TestBuilder {
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws IOException 
+     * @throws ClassNotFoundException 
      */
-    public String createUnitTest() throws IllegalArgumentException, IllegalAccessException, InstantiationException, SecurityException, IOException {
-        if (!this.recoveredInformation.isValidInformation()) {
+    public String createUnitTest() throws IllegalArgumentException, IllegalAccessException, InstantiationException, SecurityException, IOException, ClassNotFoundException {
+        if (!this.ce.getRecoveredInformation().isValidInformation()) {
             return null;
         }
 
-        String className = TestBuilder.PACKAGE_NAME + "." + recoveredInformation.getClassToCheck().substring(recoveredInformation.getClassToCheck().lastIndexOf(".") + 1) + "Test";
-        String methodName = recoveredInformation.getMethodToCheck();
+        String className = TestBuilder.PACKAGE_NAME + "." + ce.getRecoveredInformation().getClassToCheck().substring(ce.getRecoveredInformation().getClassToCheck().lastIndexOf(".") + 1) + "Test";
+        String methodName = ce.getRecoveredInformation().getMethodToCheck();
 
         Class<?> clazz;
-        clazz = JavaCompilerAPI.getInstance().loadClass(recoveredInformation.getClassToCheck());
+        clazz = ReloaderAPI.getInstance().load(ce.getRecoveredInformation().getClassToCheck());
         if (clazz == null) return null;
         
         Method methodToCheck = null;
         for (Method aMethod : clazz.getDeclaredMethods()) {
-            if (	aMethod.getName().equals(recoveredInformation.getMethodToCheck())
+            if (	aMethod.getName().equals(ce.getRecoveredInformation().getMethodToCheck())
             		&&
-            		aMethod.getParameterTypes().length == recoveredInformation.getMethodParametersNames().size()) {
+            		aMethod.getParameterTypes().length == ce.getRecoveredInformation().getMethodParametersNames().size()) {
                 methodToCheck = aMethod;
                 break;
             }
@@ -106,8 +110,8 @@ public class TestBuilder {
         
         boolean isStatic = Modifier.isStatic(methodToCheck.getModifiers());
         Object thizInstance = null;
-        if (recoveredInformation.getSnapshot().get(THIZ_0) != null) {
-            thizInstance = recoveredInformation.getSnapshot().get(THIZ_0);
+        if (ce.getRecoveredInformation().getSnapshot().get(THIZ_0) != null) {
+            thizInstance = ce.getRecoveredInformation().getSnapshot().get(THIZ_0);
         } else if (!isStatic){
         	thizInstance = clazz.newInstance();
         }
@@ -132,8 +136,14 @@ public class TestBuilder {
 
         String outputClassName = className + "_" + methodName + "_" + getSuffix();
         
+        this.testClassName = outputClassName;
+        
         TestWritter testWritter = new TestWritter(TestBuilder.PACKAGE_NAME, imports, outputClassName, isStatic, initializations, updates, params, ignoreImports);
         return testWritter.writeTest();
+    }
+    
+    public String getTestClassName() {
+    	return this.testClassName;
     }
 
     /**
@@ -148,7 +158,7 @@ public class TestBuilder {
 
         if (!clazz.isAssignableFrom(Integer.class) && !clazz.isAssignableFrom(Long.class) && !clazz.isAssignableFrom(Float.class)){
 
-            List<StaticFieldInformation> staticFields = recoveredInformation.getStaticFieldsNameForClass(recoveredInformation.getClassToCheck());
+            List<StaticFieldInformation> staticFields = ce.getRecoveredInformation().getStaticFieldsNameForClass(ce.getRecoveredInformation().getClassToCheck());
             
             List<String> shortFieldNames = new ArrayList<String>();
             String moduleName = getModuleName(clazz);
@@ -453,24 +463,24 @@ public class TestBuilder {
     private List<String> getParametersInitializationStatements(Class<?> clazz, List<String> objectDefinitionStatements, List<String> objectInitializationStatements, Set<UpdateCommand> updates) throws InstantiationException, IllegalAccessException {
         List<String> paramsNames = new ArrayList<String>();
 
-        if (recoveredInformation.getMethodParametersNames().size() > 0) {
+        if (ce.getRecoveredInformation().getMethodParametersNames().size() > 0) {
 
             // Gets parameters types
-            Class<?>[] parameterTypes = new Class<?>[recoveredInformation.getMethodParametersNames().size()];
+            Class<?>[] parameterTypes = new Class<?>[ce.getRecoveredInformation().getMethodParametersNames().size()];
             for (Method aMethod : clazz.getDeclaredMethods()) {
-                if (aMethod.getName().equals(recoveredInformation.getMethodToCheck())) {
+                if (aMethod.getName().equals(ce.getRecoveredInformation().getMethodToCheck())) {
                     parameterTypes = aMethod.getParameterTypes();
                 }
             }
 
             for (int index = 0; index < parameterTypes.length; index++){
-                String aParameterName = recoveredInformation.getMethodParametersNames().get(index);
+                String aParameterName = ce.getRecoveredInformation().getMethodParametersNames().get(index);
 
                 Class<?> parameterType = parameterTypes[index];
 
                 Object parameterInstance;
-                if (recoveredInformation.getSnapshot().containsKey(aParameterName + "_0")) {
-                    parameterInstance = recoveredInformation.getSnapshot().get(aParameterName + "_0");
+                if (ce.getRecoveredInformation().getSnapshot().containsKey(aParameterName + "_0")) {
+                    parameterInstance = ce.getRecoveredInformation().getSnapshot().get(aParameterName + "_0");
                 } else {
                     parameterInstance = defaultValue(parameterType);
                 }
@@ -547,7 +557,7 @@ public class TestBuilder {
 
         if (!this.createdInstances.containsKey(System.identityHashCode(instance))) {
 
-            Object parameterValue = this.recoveredInformation.getSnapshot().get(parameterName + "_0");
+            Object parameterValue = this.ce.getRecoveredInformation().getSnapshot().get(parameterName + "_0");
 
             if (clazz.isPrimitive() || isAutoboxingClass(clazz)) {
                 String value;

@@ -1,4 +1,4 @@
-package tools.utils;
+package tools.data;
 
 /**
  * This class is used by {@link TestBuilder} and {@link TestWritter} to make and write update statements of the form

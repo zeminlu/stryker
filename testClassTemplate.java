@@ -76,7 +76,7 @@ CLASS START
 	}
 
 
-    	public void test(Class<?> clazz, String methodName) throws IllegalAccessException,InvocationTargetException, InstantiationException {
+    public void test(Class<?> clazz, String methodName) throws IllegalAccessException,InvocationTargetException, InstantiationException {
  	   	Object instance = INSTANCE VALUE;
         	
 		INITIALIZATIONS
@@ -87,18 +87,15 @@ CLASS START
 	
 		PARAMS INIT
         	
-        	try {
-			Method method = getMethodToRepair(methodName, clazz);
+        try {
+		    Method method = getMethodToRepair(methodName, clazz);
 			method.setAccessible(true);
-        		method.invoke(instance, params);
-        	} catch (Exception e) {
-        		throw(new java.lang.RuntimeException(e));
-        	} 
+        	method.invoke(instance, params);
+        } catch (Exception e) {
+        	throw(new java.lang.RuntimeException(e));
+        } 
 	
-    	}
-
-
-
+    }
 
 
 }

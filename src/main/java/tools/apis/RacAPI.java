@@ -1,4 +1,4 @@
-package tools;
+package tools.apis;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,11 +18,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import config.StrykerConfig;
+import tools.Compiler;
 //import ar.edu.taco.TacoMain;
 //import ar.edu.taco.engine.JUnitStage;
 import ar.edu.taco.engine.StrykerStage;
 import repairer.FixCandidate;
+import tools.TestBuilder;
+import tools.TestRunner;
 import tools.TestRunner.TestResult;
+import tools.data.CounterExample;
 
 /**
  * This class is used to access RAC, the main responsabilities of this API are:
@@ -68,52 +72,33 @@ public class RacAPI {
 			throw new IllegalArgumentException("RacAPI#buildJUnit(FixCandidate, CounterExample): trying to build a junit test with no counter example");
 		}
 		
-//    	String FILE_SEP = StrykerConfig.getInstance().getFileSeparator();
-//    	
-//    	String classToCheck = candidate.getProgram().getClassName();
-//      	String methodToCheck = candidate.getMethodToFix() + "_0" ;
-//
-//	    JUnitStage jUnitStage = new JUnitStage(ce.getRecoveredInformation());
-//	    jUnitStage.execute();
-//
-//	    String junitFile = jUnitStage.getJunitFileName();
-//
-//	    String currentJunit = null;
-//
-//	    String tempFilename = junitFile.substring(0, junitFile.lastIndexOf(FILE_SEP)+1); 
-//	    String editedTestFolderPath = tempFilename.replaceAll("generated", "output");
-//	    File editedTestFolderFile = new File(editedTestFolderPath);
-//	    editedTestFolderFile.mkdirs();
-//	    String fileClasspath = tempFilename.substring(
-//	    							0,
-//	    							tempFilename.lastIndexOf(
-//	    									"ar.edu.generated.junit".replaceAll("\\.", FILE_SEP)
-//	    							)
-//	    						);
-//	    fileClasspath = fileClasspath.replaceFirst("generated", "output");
-//	    String packageToWrite = "ar.edu.output.junit";
-//	    currentJunit = TacoMain.editTestFileToCompile(junitFile, classToCheck, packageToWrite, methodToCheck);
-		
-		TestBuilder builder = new TestBuilder(ce.getRecoveredInformation());
+		TestBuilder builder = new TestBuilder(ce);
 		String testPath = null;
 		try {
 			testPath = builder.createUnitTest();
-		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | SecurityException | IOException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException | SecurityException | IOException | ClassNotFoundException e) {
 			if (RacAPI.verbose) {
 				System.err.println("Error while generating test");
 				e.printStackTrace();
 			}
 			return null;
 		}
-
-        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
+		
+		if (!Compiler.compileClass(builder.getTestClassName(), StrykerConfig.getInstance().getTestsOutputDir(), Arrays.asList(new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getJML4CLibPath()}))) {
+			if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
         	return null;
-        }
+		}
+		
+		//ReloaderAPI.getInstance().rescan(StrykerConfig.getInstance().getTestsOutputDir());
+		ReloaderAPI.getInstance().rescan();
+
+//        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
+//        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
+//        	return null;
+//        }
 	       
         if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
-        //return new File(currentJunit).toPath();
         return new File(testPath).toPath();
 	}
 	
@@ -126,8 +111,9 @@ public class RacAPI {
 	 * @return {@code true} or {@code false} depending if the test passes or not	:	{@code boolean}
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public boolean runJUnit(FixCandidate candidate, Path testPath) throws InstantiationException, IllegalAccessException {
+	public boolean runJUnit(FixCandidate candidate, Path testPath) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		if (candidate==null) throw new IllegalArgumentException("checking if tests passes on null candidate");
 		if (testPath==null) throw new IllegalArgumentException("checking if test passes on null test");
         
@@ -149,8 +135,9 @@ public class RacAPI {
 //	    	return false;
 //	    }
 		
-        final Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(candidate.getProgram().getClassName(), Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
-        Class<?> testClass = JavaCompilerAPI.getInstance().reloadClassFrom(testClassName, Arrays.asList(new String[]{StrykerConfig.getInstance().getTestsOutputDir(), StrykerConfig.getInstance().getCompilingSandbox()}));
+        //ReloaderAPI.getInstance().rescan();
+        Class<?> testClass = ReloaderAPI.getInstance().reloadFrom(testClassName, StrykerConfig.getInstance().getTestsOutputDir());
+        final Class<?> candidateClass = ReloaderAPI.getInstance().load(candidate.getProgram().getClassName());
         
         Method[] methods = testClass.getDeclaredMethods();
         Method methodToRun = null;
@@ -286,8 +273,9 @@ public class RacAPI {
 	 * @return a boolean array representing the result of running each JUnit test	:	{@code boolean[]}
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests, boolean stopAtFirstFail) throws InstantiationException, IllegalAccessException {
+	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests, boolean stopAtFirstFail) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		boolean[] results = new boolean[junitTests.size()];
 		Arrays.fill(results, true);
 		if (junitTests.isEmpty()) {
@@ -296,7 +284,7 @@ public class RacAPI {
 		
 		candidate.getProgram().makeBackup();
 		
-		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+		String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getTestsOutputDir()};
 		
 		if (!JavaCompilerAPI.getInstance().compileWithJML4C(StrykerConfig.getInstance().getCompilingSandbox() + candidate.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
 			System.err.println("error while compiling rac version of FixCandidate!");
@@ -304,6 +292,10 @@ public class RacAPI {
 			candidate.getProgram().restoreBackup();
 			return results;
 		}
+		
+		
+		ReloaderAPI.getInstance().rescan(StrykerConfig.getInstance().getTestsOutputDir());
+		ReloaderAPI.getInstance().rescan();
 		
 		int t = 0;
 		for (t = 0; t < junitTests.size(); t++) {
@@ -327,13 +319,14 @@ public class RacAPI {
 	 * @return a boolean array representing the result of running each JUnit test	:	{@code boolean[]}
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests) throws InstantiationException, IllegalAccessException {
+	public boolean[] runJUnits(FixCandidate candidate, List<Path> junitTests) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		return this.runJUnits(candidate, junitTests, true);
 	}
 	
 	
-	public boolean runTest(FixCandidate candidate, CounterExample ce) {
+	public boolean runTest(FixCandidate candidate, CounterExample ce) throws ClassNotFoundException {
 		TestResult result = TestRunner.runTest(ce);
 		boolean testPassed = false;
 		switch(result.getResult()) {
@@ -390,7 +383,7 @@ public class RacAPI {
 	}
 	
 	
-	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples, boolean stopAtFirstFail) {
+	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples, boolean stopAtFirstFail) throws ClassNotFoundException {
 		boolean[] results = new boolean[counterExamples.size()];
 		Arrays.fill(results, true);
 		if (counterExamples.isEmpty()) {
@@ -407,6 +400,10 @@ public class RacAPI {
 			candidate.getProgram().restoreBackup();
 			return results;
 		}
+		
+		
+		//ReloaderAPI.getInstance().rescan(StrykerConfig.getInstance().getTestsOutputDir());
+		ReloaderAPI.getInstance().rescan();
 		
 		int t = 0;
 		for (t = 0; t < counterExamples.size(); t++) {
@@ -428,8 +425,9 @@ public class RacAPI {
 	 * @param candidate
 	 * @param counterExamples
 	 * @return
+	 * @throws ClassNotFoundException 
 	 */
-	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples) {
+	public boolean[] runTests(FixCandidate candidate, List<CounterExample> counterExamples) throws ClassNotFoundException {
 		return this.runTests(candidate, counterExamples, true);
 	}
 	

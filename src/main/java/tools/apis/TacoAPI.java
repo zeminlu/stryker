@@ -1,21 +1,16 @@
-package tools;
+package tools.apis;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.multijava.mjc.JCompilationUnitType;
 
 import config.StrykerConfig;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoAnalysisResult;
 import ar.edu.taco.TacoMain;
 import ar.edu.taco.TacoNotImplementedYetException;
-import ar.edu.taco.engine.SnapshotStage;
-import ar.edu.taco.engine.StrykerStage;
-import ar.edu.taco.jml.parser.JmlParser;
-import ar.edu.taco.junit.RecoveredInformation;
 import repairer.FixCandidate;
+import tools.data.CounterExample;
 
 /**
  * This class is used to access TACO, the main responsabilities of this API are:
@@ -127,17 +122,7 @@ public class TacoAPI {
 		catch (JDynAlloySemanticException e) {
 			throw e; 
 		}
-		RecoveredInformation recoveredInformation = null;
-		if (result.get_alloy_analysis_result().isSAT()) {
-			List<JCompilationUnitType> compilation_units = JmlParser.getInstance().getCompilationUnits();
-	        String classToCheck = candidate.getProgram().getClassName();
-	        String methodToCheck = candidate.getMethodToFix() + "_0" ;
-		    SnapshotStage snapshotStage = new SnapshotStage(compilation_units, result, classToCheck, methodToCheck);
-		    snapshotStage.execute();
-		    recoveredInformation = snapshotStage.getRecoveredInformation();
-		    recoveredInformation.setFileNameSuffix(StrykerStage.fileSuffix);
-		}
-	    CounterExample ce = new CounterExample(recoveredInformation, result, candidate);
+	    CounterExample ce = new CounterExample(result, candidate);
 		this.lastCounterExample = ce;
 		this.counterexamples.put(candidate, ce);
 	    return ce.counterExampleExist();

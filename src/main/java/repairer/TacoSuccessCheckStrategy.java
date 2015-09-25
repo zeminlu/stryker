@@ -6,8 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import tools.JavaCompilerAPI;
-import tools.TacoAPI;
+import tools.apis.JavaCompilerAPI;
+import tools.apis.ReloaderAPI;
+import tools.apis.TacoAPI;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoNotImplementedYetException;
 import config.StrykerConfig;
@@ -42,10 +43,14 @@ public class TacoSuccessCheckStrategy implements SuccessCheckStrategy {
 			return false;
 		}
 		
-		JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
-		JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
+		try {
+			ReloaderAPI.getInstance().reloadFrom(s.getProgram().getClassName(), s.getProgram().getAbsolutePath());
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+			return false;
+		}
 		ClassLoader classLoaderBackup = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
+		ReloaderAPI.getInstance().setReloaderAsThreadClassLoader(Thread.currentThread());
 		
 		if (!s.program.isValid()) return false;
 		boolean error = false;

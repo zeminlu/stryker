@@ -1,4 +1,4 @@
-package tools;
+package tools.apis;
 
 import org.jmlspecs.checker.JmlOptions;
 import org.jmlspecs.checker.Main;

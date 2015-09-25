@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import tools.utils.UpdateCommand;
+import tools.data.UpdateCommand;
 import config.StrykerConfig;
 
 /**

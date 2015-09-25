@@ -18,8 +18,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import tools.apis.ReloaderAPI;
+import tools.data.CounterExample;
 import ar.edu.taco.TacoException;
-import config.StrykerConfig;
 
 
 /**
@@ -85,11 +86,13 @@ public final class TestRunner {
 	 * 
 	 * @param ce
 	 * @return
+	 * @throws ClassNotFoundException 
 	 */
-	public static TestResult runTest(CounterExample ce) {
+	public static TestResult runTest(CounterExample ce) throws ClassNotFoundException {
 		if (ce == null) return TestRunner.NullCounterExample;
 		if (!ce.counterExampleExist()) return TestRunner.NoCounterExample;
-		Class<?> candidateClass = JavaCompilerAPI.getInstance().reloadClassFrom(ce.getRecoveredInformation().getClassToCheck(), StrykerConfig.getInstance().getCompilingSandbox());
+		ce.refresh();
+		Class<?> candidateClass = ReloaderAPI.getInstance().reload(ce.getFixCandidate().getProgram().getClassName());
 		if (candidateClass == null) return TestRunner.ErrorLoadingCandidateClass;
 		Object[] params = retrieveParams(candidateClass, ce);
 		Method methodToRun = retrieveMethodToRun(candidateClass, ce, params);
@@ -133,6 +136,9 @@ public final class TestRunner {
 				Object paramValue;
 				if (ce.getRecoveredInformation().getSnapshot().containsKey(param+"_0")) {
 					paramValue = ce.getRecoveredInformation().getSnapshot().get(param+"_0");
+					if (paramValue == null) {
+						paramValue = new Dummy();
+					}
 				} else {
 					paramValue = new Dummy();
 				}
@@ -142,12 +148,12 @@ public final class TestRunner {
 		}
 	}
 	
-	private static void setStaticFields(CounterExample ce) throws IllegalArgumentException, IllegalAccessException {
+	private static void setStaticFields(CounterExample ce) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		Map<String, Map<String, Object>> staticFieldsValues = ce.getRecoveredInformation().getStaticFieldsValues();
 		for (Entry<String, Map<String, Object>> staticFieldValuesPerClass : staticFieldsValues.entrySet()) {
 			String clazzName = staticFieldValuesPerClass.getKey();
 			Map<String, Object> fieldValues = staticFieldValuesPerClass.getValue();
-			Class<?> clazz = JavaCompilerAPI.getInstance().loadClass(clazzName);
+			Class<?> clazz = ReloaderAPI.getInstance().load(clazzName);
 			Field[] fields = clazz.getDeclaredFields();
 			for (Field field : fields) {
 				if (fieldValues.containsKey(field.getName())) {
@@ -165,6 +171,8 @@ public final class TestRunner {
                 try {
                 	runningThread = Thread.currentThread();
                     long timeprev = System.currentTimeMillis();
+                    System.out.println("instance CL : " + instance.getClass().getClassLoader().toString());
+                    System.out.println("method CL : " + methodToRun.getDeclaringClass().getClassLoader().toString());
                     methodToRun.invoke(instance, params);
                     long timepost = System.currentTimeMillis();
                     if (TestRunner.verbose) System.out.println("time taken: "+(timepost - timeprev));
@@ -233,7 +241,7 @@ public final class TestRunner {
         try {
             result = future.get(TestRunner.timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ex) {
-        	runningThread.interrupt();
+        	if (runningThread != null) runningThread.interrupt();
             executor.shutdownNow();
             result = new TestResult(TestResult.Result.ERROR_TIMEOUT, ex);
         } catch (InterruptedException e) {
@@ -247,6 +255,7 @@ public final class TestRunner {
         	result = new TestResult(TestResult.Result.ERROR_RUNTIME, new RuntimeException(e));
         } finally {
             future.cancel(true); // may or may not desire this	
+            executor.shutdown();
         }
         return result;
 	}

@@ -1,4 +1,4 @@
-package tools;
+package tools.apis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,10 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import javax.tools.JavaCompiler;
@@ -23,15 +19,6 @@ import ar.edu.taco.stryker.api.impl.StringsToWriteInFile;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 
-
-
-
-
-
-
-//import mujava.app.Reloader;
-import tools.Reloader;
-import mujava.util.JustCodeDigest;
 import config.StrykerConfig;
 
 /**
@@ -39,25 +26,11 @@ import config.StrykerConfig;
  * this class also offers the functionality of {@code Reloader}
  * 
  * @author Simón Emmanuel Gutiérrez Brida
- * @version 0.7
- * @see Reloader
+ * @version 1.0
  */
 public class JavaCompilerAPI {
 	
-	private Map<String, byte[]> loadedClassesHashes;
-	
 	private static JavaCompilerAPI instance;
-	
-	/**
-	 * used to load/reload classes
-	 * @see Reloader
-	 */
-	private Reloader reloader;
-	
-	/**
-	 * the classpath that will be used by {@code reloader}
-	 */
-	private List<String> reloaderClasspath;
 	
 	/**
 	 * @return an instance of this class
@@ -67,28 +40,8 @@ public class JavaCompilerAPI {
 		return instance;
 	}
 	
-	public static void resetInstance() {
-		instance = null;
-	}
+	private JavaCompilerAPI() {}
 	
-	/**
-	 * @return an instance of this class
-	 */
-	public static JavaCompilerAPI getInstance(Reloader reloader) {
-		if (instance == null) instance = new JavaCompilerAPI(reloader);
-		if (instance != null && instance.reloader != reloader) throw new IllegalArgumentException("a previous instance was constructed with another reloader");
-		return instance;
-	}
-	
-	private JavaCompilerAPI() {
-		this.loadedClassesHashes = new HashMap<String, byte[]>();
-	}
-	
-	private JavaCompilerAPI(Reloader reloader) {
-		this();
-		this.reloader = reloader;
-	}
-
 	/**
 	 * Given a path to a java file a list of folders, this method will try
 	 * to compile the given java file (and any file needed) using the list
@@ -131,7 +84,6 @@ public class JavaCompilerAPI {
 		}
 		File oldFile = new File(pathToFile);
         
-		String fileSep = StrykerConfig.getInstance().getFileSeparator();
 		String pathSep = StrykerConfig.getInstance().getPathSeparator();
 		String originalFilename = oldFile.getAbsolutePath();
 		String jmlRacFileName = newFile.getAbsolutePath();
@@ -191,12 +143,15 @@ public class JavaCompilerAPI {
         	}
         }
 
-        String currentClasspath = System.getProperty("user.dir")+pathSep+"lib/stryker/jml4c.jar"+
+        String currentClasspath = StrykerConfig.getInstance().getJML4CLibPath()+
                 pathSep+fileClasspath+
                 pathSep+filteredSystemClasspath;
 
-        String command = "java -Xmx2048m -XX:MaxPermSize=512m -jar " + System.getProperty("user.dir")+fileSep+"lib/stryker/jml4c.jar " 
-                + "-nowarn " + "-maxProblems " + "9999999 " + "-cp " + currentClasspath + " " + originalFilename;
+//        String command = "java -Xmx2048m -XX:MaxPermSize=512m -jar " + StrykerConfig.getInstance().getJML4CLibPath() + " "
+//                + "-nowarn " + "-maxProblems " + "9999999 " + "-cp " + currentClasspath + " " + originalFilename;
+        
+        String command = "java -Xmx2048m -XX:MaxPermSize=512 -cp " + currentClasspath + " org.jmlspecs.jml4.rac.Main -nowarn -maxProblems 9999999 -cp " + currentClasspath  + " " + originalFilename;
+        
         Process p;
         String errors = "";
         int exitValue = -1;
@@ -335,183 +290,6 @@ public class JavaCompilerAPI {
 	    }
 
 	    return destinationFilePath;
-	}
-	
-	/**
-	 * This method will update the classpath used by the reloader
-	 * any other method related to the reloader must be called after
-	 * calling this method at least once
-	 * 
-	 * @param classpath	:	the classpath to be used	:	{@code String[]}
-	 */
-	public void updateReloaderClassPath(String[] classpath) {
-		if (this.reloaderClasspath == null) {
-			this.reloaderClasspath = new LinkedList<String>();
-		}
-		for (String cp : classpath) {
-			if (!this.reloaderClasspath.contains(cp)) {
-				this.reloaderClasspath.add(cp);
-			}
-		}
-		if (this.reloader == null) {
-			this.reloader = new Reloader(this.reloaderClasspath, Thread.currentThread().getContextClassLoader());
-		}
-	}
-	
-	/**
-	 * Causes the reloader to reload a class
-	 * 
-	 * @param className	:	the class to reload	:	{@code String}
-	 * @return the reloaded class
-	 */
-	public Class<?> reloadClass(String className) {
-		if (this.reloader == null) {
-			throw new IllegalStateException("JavaCompilerAPI#reloadClass(String) called without a reloader built");
-		}
-		String classFileToReload = classToFile(className);
-		if (classFileToReload == null) {
-			//TODO: maybe an exception or a message log?
-			return null;
-		}
-		File javaFileToReload = new File(classFileToReload.replace(".class", ".java"));
-		Class<?> clazz = null;
-		if (this.loadedClassesHashes.containsKey(javaFileToReload.getPath())) {
-			byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
-			byte[] oldMD5Hash = this.loadedClassesHashes.get(javaFileToReload.getPath());
-			boolean javaFileWasModified = !Arrays.equals(newMD5Hash, oldMD5Hash);
-			if (!javaFileWasModified) {
-				System.out.println("======RELOAD AVOIDED=====");
-				try {
-					clazz = this.reloader.loadClassAsReloadable(className);
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else {
-				this.loadedClassesHashes.put(javaFileToReload.getPath(), newMD5Hash);
-			}
-		} else {
-			if (javaFileToReload.exists()) {
-				byte[] newMD5Hash = JustCodeDigest.digest(javaFileToReload);
-				this.loadedClassesHashes.put(javaFileToReload.getPath(), newMD5Hash);
-			}
-			try {
-				clazz = this.reloader.rloadClass(className, true);
-				this.reloader = this.reloader.getLastChild();
-				this.reloaderClasspath = this.reloader.classpath;
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}	
-		return clazz;
-	}
-	
-	public Class<?> reloadClass(String className, boolean forceReload) {
-		if (!forceReload) {
-			return this.reloadClass(className);
-		}
-		if (this.reloader == null) {
-			throw new IllegalStateException("JavaCompilerAPI#reloadClass(String) called without a reloader built");
-		}
-		Class<?> clazz = null;
-		try {
-			clazz = this.reloader.rloadClass(className, true);
-			this.reloader = this.reloader.getLastChild();
-			this.reloaderClasspath = this.reloader.classpath;
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		return clazz;
-	}
-	
-	public Class<?> reloadClassFrom(String className, String classpath) {
-		if (this.reloader == null) {
-			throw new IllegalStateException("JavaCompilerAPI#reloadClass(String) called without a reloader built");
-		}
-		Class<?> clazz = null;
-		try {
-			clazz = this.reloader.rloadClassFrom(className, classpath);
-			this.reloader = this.reloader.getLastChild();
-			this.reloaderClasspath = this.reloader.classpath;
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		return clazz;
-	}
-	
-	public Class<?> reloadClassFrom(String className, List<String> classpath) {
-		this.reloader = new Reloader(classpath, this.reloader);
-		Class<?> clazz = null;
-		try {
-			clazz = this.reloader.rloadClass(className, true);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return clazz;
-	}
-	
-	public Class<?> loadClass(String classname, ClassLoader loader) {
-		Class<?> clazz = null;
-		try {
-			clazz = loader.loadClass(classname);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return clazz;
-	}
-	
-	private String classToFile(String clazz) {
-		String classAsFile = null;
-		String classAsPath = clazz.replace(".", StrykerConfig.getInstance().getFileSeparator()) + ".class";
-		for (String cp : this.reloaderClasspath) {
-			cp = cp.endsWith(StrykerConfig.getInstance().getFileSeparator())?cp:(cp+StrykerConfig.getInstance().getFileSeparator());
-			String fullClassPath = cp + classAsPath;
-			File classFile = new File(fullClassPath);
-			if (classFile.exists()) {
-				classAsFile = fullClassPath;
-				break;
-			}
-		}
-		return classAsFile;
-	}
-	
-	/**
-	 * Causes the reloader to load a class
-	 * 
-	 * @param className	:	the class to load	:	{@code String}
-	 * @return the loaded class
-	 */
-	public Class<?> loadClass(String className) {
-		return loadClass(className, false);
-	}
-	
-	public Class<?> loadClass(String className, boolean isReloadable) {
-		if (this.reloader == null) {
-			throw new IllegalStateException("JavaCompilerAPI#loadClass(String) called without a reloader built");
-		}
-		Class<?> clazz = null;
-		try {
-			clazz = isReloadable?this.reloader.loadClassAsReloadable(className):this.reloader.loadClass(className);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return clazz;
-	}
-	
-	/**
-	 * @return the reloader
-	 */
-	public Reloader getReloader() {
-		if (this.reloader == null) {
-			throw new IllegalStateException("JavaCompilerAPI#getReloader() called without a reloader built");
-		}
-		return this.reloader;
 	}
 	
 	private String convertPathsToString(String[] paths) {

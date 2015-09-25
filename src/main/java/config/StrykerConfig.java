@@ -166,6 +166,13 @@ public class StrykerConfig {
 	}
 	
 	/**
+	 * @return the value of property {@code path.jml4clib}
+	 */
+	public String getJML4CLibPath() {
+		return formatString(this.config.getString("path.jml4clib"));
+	}
+	
+	/**
 	 * The next time {@code StrykerConfig#getCompilingSandbox()} is called a new directory will be generated
 	 */
 	public void resetCompilingSandbox() {

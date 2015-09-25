@@ -8,10 +8,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import tools.CounterExample;
-import tools.JavaCompilerAPI;
-import tools.RacAPI;
-import tools.TacoAPI;
+import tools.apis.JavaCompilerAPI;
+import tools.apis.RacAPI;
+import tools.apis.ReloaderAPI;
+import tools.apis.TacoAPI;
+import tools.data.CounterExample;
 import ar.edu.jdynalloy.JDynAlloySemanticException;
 import ar.edu.taco.TacoNotImplementedYetException;
 import config.StrykerConfig;
@@ -36,6 +37,8 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 	private List<CounterExample> collectedCounterExamples = new ArrayList<CounterExample>();
 	
 	private List<Path> builtJunitTests = new ArrayList<Path>();
+	
+	private boolean buildJunitTest = true;
 
 	/**
 	 * It checks whether a given candidate is a successful fix or not by doing the following:
@@ -73,31 +76,38 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		boolean isFix = false;
 		try {
 			// call jmlrac before taco
-			testsResults = RacAPI.getInstance().runJUnits(s, this.builtJunitTests);
-//			testsResults = RacAPI.getInstance().runTests(s, this.collectedCounterExamples);
+			if (this.buildJunitTest) {
+				testsResults = RacAPI.getInstance().runJUnits(s, this.builtJunitTests);
+			} else {
+				testsResults = RacAPI.getInstance().runTests(s, this.collectedCounterExamples);
+			}
 			for (int tr = 0; tr < testsResults.length && racPassed; tr++) {
 				racPassed = testsResults[tr];
 			}
 			if (racPassed) {
 				// if rac checks pass, call TACO to check whether the 
 				// fix candidate is indeed a fix.
-				String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox()};
+				String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getTestsOutputDir()};
 				if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
 					System.err.println("error while compiling FixCandidate!");
 					return false;
 				}
-				JavaCompilerAPI.getInstance().updateReloaderClassPath(classpathToCompile);
-				JavaCompilerAPI.getInstance().reloadClass(s.getProgram().getClassName());
 				
-				Thread.currentThread().setContextClassLoader(JavaCompilerAPI.getInstance().getReloader());
+				ReloaderAPI.getInstance().rescan();
+				
+				ReloaderAPI.getInstance().reloadFrom(s.getProgram().getClassName(), s.getProgram().getAbsolutePath());
+				ReloaderAPI.getInstance().setReloaderAsThreadClassLoader(Thread.currentThread());
+				
 				isFix = !TacoAPI.getInstance().isSAT(s);
 				if (!isFix) {
 					// if candidate is invalid, collect the input obtained from
 					// the SAT check, for future verifications
 					CounterExample lastCounterExample = TacoAPI.getInstance().getLastCounterExample();
 					if (!this.collectedCounterExamples.contains(lastCounterExample)) {
-						Path junitTest = RacAPI.getInstance().buildJUnit(s, lastCounterExample);
-						this.builtJunitTests.add(junitTest);
+						if (this.buildJunitTest) {
+							Path junitTest = RacAPI.getInstance().buildJUnit(s, lastCounterExample);
+							if (junitTest != null) this.builtJunitTests.add(junitTest);
+						}
 						collectedCounterExamples.add(TacoAPI.getInstance().getLastCounterExample());
 					}
 				} else {
@@ -110,6 +120,7 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		} catch (JDynAlloySemanticException e) {
 			error = true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			error = true;
 		}
 		s.program.moveLocation(sourceFolderBackup);
@@ -130,7 +141,6 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		try {
 			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

@@ -11,7 +11,7 @@ import com.google.common.io.Files;
 
 import config.StrykerConfig;
 import mujava.util.JustCodeDigest;
-import tools.JMLSpecsAPI;
+import tools.apis.JMLSpecsAPI;
 
 /**
  * This class represents a Java program with JML specifications
@@ -179,7 +179,8 @@ public class JMLAnnotatedClass {
 	public boolean hasMethod(String methodName) {
 		if (methodName==null) throw new IllegalArgumentException("method name is null");
 		if (methodName.isEmpty()) throw new IllegalArgumentException("empty method name");
-		String preRegExp = "(public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]]+\\s+";
+		String commentRegExp = "(/\\*([^\\n])*\\*/)?";
+		String preRegExp = "(public|protected|private|static|\\s)" + commentRegExp + "(\\s)*[\\w\\<\\>\\[\\]]+\\s+";
 		String postRegExp =" *\\([^\\)]*\\) *(\\{?|[^;])";
 		String methodDecl = preRegExp + methodName + postRegExp;
 		Pattern pattern = Pattern.compile(methodDecl);

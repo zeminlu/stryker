@@ -14,15 +14,17 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
 import config.StrykerConfig;
-
 import mujava.api.Mutation;
 import search.engines.AbstractBoundedSearchEngine;
 import search.engines.BoundedBreadthFirstSearchEngine;
 import search.engines.BoundedDepthFirstSearchEngine;
+import tools.Compiler;
+import tools.apis.ReloaderAPI;
 
 /**
  * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
@@ -188,6 +190,8 @@ public class PrivateStryker {
 			System.err.println("couldn't move compilation ambient to compilation sandbox directory");
 			return false;
 		}
+		Compiler.compileProject(subjectClass.getClassName());
+		ReloaderAPI.startInstance(sandboxDir, Arrays.asList(StrykerConfig.getInstance().getTestsOutputDir()));
 		// ------------------------------------------------
 		AbstractBoundedSearchEngine<FixCandidate,StrykerRepairSearchProblem> engine = null;
 		if (this.dfsStrategy) {
@@ -198,7 +202,16 @@ public class PrivateStryker {
 		}
 		engine.setProblem(problem);
 		engine.setMaxDepth(this.maxDepth);
+		long startingTime = System.currentTimeMillis();
+		String time = String.format("%02d:%02d:%02d:%d", (startingTime / (1000 * 60 * 60)) % 24, (startingTime / (1000 * 60)) % 60, (startingTime / 1000) % 60, startingTime % 1000);
+		System.out.println("Starting search : " + time);
 		boolean outcome = engine.performSearch();
+		long finishTime = System.currentTimeMillis();
+		time = String.format("%02d:%02d:%02d:%d", (finishTime / (1000 * 60 * 60)) % 24, (finishTime / (1000 * 60)) % 60, (finishTime / 1000) % 60, finishTime % 1000);
+		System.out.println("Search finished : " + time);
+		long usedTime = finishTime - startingTime;
+		time = String.format("%02d:%02d:%02d:%d", (usedTime / (1000 * 60 * 60)) % 24, (usedTime / (1000 * 60)) % 60, (usedTime / 1000) % 60, usedTime % 1000);
+		System.out.println("Used time : " + time);
 		if (outcome) {
 			FixCandidate solution = engine.getSolution();
 			String solutionLocation = solution.program.getAbsolutePath() + solution.program.getClassName().replace(".", StrykerConfig.getInstance().getFileSeparator()) + ".java";

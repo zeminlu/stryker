@@ -8,10 +8,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import config.StrykerConfig;
-
 import search.AbstractSearchProblem;
-import tools.MuJavaAPI;
-import tools.TacoAPI;
+import tools.apis.MuJavaAPI;
+import tools.apis.TacoAPI;
 
 /**
  * StrykerRepairSearchProblem is a class that contains all concrete elements necessary for implementing the
@@ -78,11 +77,11 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 		this.relevantClasses = new String[]{programToFix.getClassName()};
 		this.hashes = new TreeSet<String>();
 		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
-		overridingProperties.put("classToCheck",initialState().program.getClassName());//.getClassNameAsPath());
+		overridingProperties.put("classToCheck",initialState().program.getClassName());
 		overridingProperties.put("methodToCheck",this.methodToFix+"_0");
 		overridingProperties.put("jmlParser.sourcePathStr", StrykerConfig.getInstance().getCompilingSandbox());
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
-		overridingProperties.put("relevancyAnalysis", true);
+		overridingProperties.put("relevancyAnalisys", true);
 		overridingProperties.put("useJavaArithmetic", false);
 		overridingProperties.put("checkArithmeticException", false);
 	}
@@ -97,9 +96,6 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	public StrykerRepairSearchProblem(JMLAnnotatedClass programToFix, String methodToFix, String[] dependencies) {
 		this(programToFix, methodToFix);
 		this.relevantClasses = dependencies;
-//		this.relevantClasses = new String[dependencies.length + 1];
-//		this.relevantClasses[0] = programToFix.getClassName();
-//		System.arraycopy(dependencies, 0, this.relevantClasses, 1, dependencies.length);
 		Properties overridingProperties = TacoAPI.getInstance().getOverridingProperties();
 		overridingProperties.put("relevantClasses",mergedRelevantClasses());
 	}
@@ -124,11 +120,7 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 	 */
 	public List<FixCandidate> getSuccessors(FixCandidate s) {
 		if (s==null) throw new IllegalArgumentException("null candidate passed for computing successors");
-//		String candidateHash = Arrays.toString(s.getProgram().getMd5Digest());
 		List<FixCandidate> filteredSuccessors = new LinkedList<FixCandidate>();
-//		if (this.hashes.add(candidateHash)) {
-//			
-//		}
 		MuJavaAPI mjAPI = MuJavaAPI.getInstance();
 		List<FixCandidate> successors = mjAPI.generateMutants(s, methodToFix);
 		for (FixCandidate successor : successors) {
