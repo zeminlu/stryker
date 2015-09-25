@@ -87,6 +87,7 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 			if (racPassed) {
 				// if rac checks pass, call TACO to check whether the 
 				// fix candidate is indeed a fix.
+				JavaCompilerAPI.getInstance().removeAllClassFilesRecursively(StrykerConfig.getInstance().getCompilingSandbox());
 				String[] classpathToCompile = new String[]{StrykerConfig.getInstance().getCompilingSandbox(), StrykerConfig.getInstance().getTestsOutputDir()};
 				if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox() + s.getProgram().getClassNameAsPath()+".java", classpathToCompile)) {
 					System.err.println("error while compiling FixCandidate!");

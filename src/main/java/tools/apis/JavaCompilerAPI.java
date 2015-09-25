@@ -172,6 +172,22 @@ public class JavaCompilerAPI {
 		return exitValue == 0;
 	}
 	
+	public void removeAllClassFilesRecursively(String dir) {
+		File folder = new File(dir);
+		removeAllClassFilesRecursively(folder);
+	}
+	
+	private void removeAllClassFilesRecursively(File folder) {
+		for(File file: folder.listFiles()) {
+			if (file.isFile() && file.exists() && file.getName().endsWith(".class")) {
+				file.delete();
+			}
+			if (file.isDirectory()) {
+				removeAllClassFilesRecursively(file);
+			}
+		}
+	}
+	
 	/**
 	 * This is an adaptation of the method with the same name from comitaco.
 	 * <p>
