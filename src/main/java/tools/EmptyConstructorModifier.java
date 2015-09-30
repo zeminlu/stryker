@@ -12,24 +12,65 @@ import com.google.common.io.Files;
 import config.StrykerConfig;
 
 /**
- * This class takes a java source file, checks if the file declares an empty constructor and if not then it will insert one
+ * This class takes a java source file, checks if the file declares an empty constructor and
+ * if not then it will insert one
  * 
  * @author Simon Emmanuel Gutierrez Brida
  * @version 0.1u
  */
 public final class EmptyConstructorModifier {
 
-	private static enum Mode {FIND, WRITE, REMOVE};
+	/**
+	 * This enum holds values used to either
+	 * find, write, or remove an empty constructor
+	 * 
+	 * @author Simon Emmanuel Gutierrez Brida
+	 * @version 0.1
+	 */
+	private static enum Mode {
+		/**
+		 * enum value used when trying to find if a class has an empty constructor
+		 */
+		FIND,
+		
+		/**
+		 * enum value used to write an empty constructor in a class
+		 */
+		WRITE,
+		
+		/**
+		 * enum value used to remove an empty constructor in a class
+		 */
+		REMOVE};
 	
 	
+	/**
+	 * Given a source directory and a class name, this method checks if the class contains an empty constructor
+	 * 
+	 * @param sourceDir	:	the root directory where to search the class 
+	 * @param className	:	the name of the class to check
+	 * @return {@code true} iff the class represented by {@code className} inside the folder {@code sourceDir} contains an empty constructor.
+	 */
 	public static boolean hasEmptyConstructor(String sourceDir, String className) {
 		return emptyConstructorScanner(sourceDir, className, Mode.FIND);
 	}
 	
+	/**
+	 * Given a source directory and a class name, this method writes an empty constructor inside the given class
+	 * 
+	 * @param sourceDir	:	the root directory where to search the class 
+	 * @param className	:	the name of the class to check
+	 */
 	public static void addEmptyConstructor(String sourceDir, String className) {
 		emptyConstructorScanner(sourceDir, className, Mode.WRITE);
 	}
 	
+	/**
+	 * Given a source directory and a class name, this method removes an empty constructor inside the given class
+	 * 
+	 * @param sourceDir	:	the root directory where to search the class 
+	 * @param className	:	the name of the class to check
+	 */
 	public static void removeEmptyConstructor(String sourceDir, String className) {
 		emptyConstructorScanner(sourceDir, className, Mode.REMOVE);
 	}

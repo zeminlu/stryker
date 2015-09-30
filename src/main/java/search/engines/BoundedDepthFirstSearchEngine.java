@@ -1,12 +1,4 @@
 package search.engines;
-/**
- * Title:        DepthFirstEngine<p>
- * Description:  Class BoundedDepthFirstSearchEngine implements a bounded depth-first search strategy
-                 iteratively. It can be used with any instance of AbstractSearchProblem. <p>
- * @author Nazareno Aguirre
- * @version 0.1
- */
-
 
 import java.util.Stack; // necessary due to the use of lists.
 
@@ -16,6 +8,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import search.AbstractSearchProblem;
 import search.State;
 
+/**
+ * This class implements a bounded depth-first search strategy
+ * iteratively. It can be used with any instance of AbstractSearchProblem.
+ * @author Nazareno Aguirre
+ * @version 0.1
+ */
 public class BoundedDepthFirstSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> extends AbstractBoundedSearchEngine<S,Problem> {
 
 	private int visited;

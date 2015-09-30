@@ -30,36 +30,64 @@ import ar.edu.taco.junit.RecoveredInformation.StaticFieldInformation;
  * @version 0.1.8
  */
 public class TestBuilder {
+	/**
+	 * Identifier of the instance of the class under test in the TACO counter example
+	 */
 	private static final String THIZ_0 = "thiz_0";
 
+	/**
+	 * The package where all tests will be generated
+	 */
     final static private String PACKAGE_NAME = StrykerConfig.getInstance().getTestsPackage();
     
+    /**
+     * Imports needed by the new test
+     */
     private Set<String> imports = new TreeSet<String>();
     
+    /**
+     * An identifier used for each new test
+     */
     static private int testIndex = 0;
     
+    /**
+     * The class name of the new test
+     */
     private String testClassName = null;
 
+    /**
+     * The TACO counter example that will be used to generate the new test
+     */
     private CounterExample ce;
 
-    // Keep the variables and objects that have already been created. 
-    // We use the identityHashCode of each object as the Key and the created variable name as Value
+    /**
+     * Keep the variables and objects that have already been created. 
+     * We use the identityHashCode of each object as the Key and the created variable name as Value
+     */
     private Map<Integer, String> createdInstances = new HashMap<Integer, String>();
 
     private Map<Object, Integer> instancesIndex = new HashMap<Object, Integer>();
 
+    /**
+     * Constructs a new instance of this class with a given TACO counter example
+     * 
+     * @param ce	:	the TACO counter example that will be used to generate a new JUnit test
+     */
     public TestBuilder(CounterExample ce) {
         this.ce = ce;
     }
 
 
     /**
+     * Writes a new test given the TACO counter example passed in the constructor of this class 
      * 
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      * @throws InstantiationException
      * @throws IOException 
      * @throws ClassNotFoundException 
+     * 
+     * @return the path of the created JUnit or {@code null} if the test couldn't be built.
      */
     public String createUnitTest() throws IllegalArgumentException, IllegalAccessException, InstantiationException, SecurityException, IOException, ClassNotFoundException {
         if (!this.ce.getRecoveredInformation().isValidInformation()) {
@@ -142,6 +170,9 @@ public class TestBuilder {
         return testWritter.writeTest();
     }
     
+    /**
+     * @return the test fully qualified class name
+     */
     public String getTestClassName() {
     	return this.testClassName;
     }

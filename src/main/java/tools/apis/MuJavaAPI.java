@@ -37,11 +37,15 @@ public class MuJavaAPI {
 	 * Defines the location where all mutants will be written : {@code String}
 	 */
 	private String outputDirectory;
+	
 	/**
 	 * Used to detect duplicate mutants : {@code Set<byte[]>}
 	 */
 	private Set<byte[]> mutantHashes;
 	
+	/**
+	 * The instance of this class
+	 */
 	private static MuJavaAPI instance;
 	
 	/**

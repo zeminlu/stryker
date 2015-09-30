@@ -62,6 +62,10 @@ public class RepairCLI {
 		Option rac = new Option("r", "rac", false, "enables the use of RAC");
 		rac.setRequired(false);
 		
+		Option tests = new Option("t", "tests", false, "generates tests");
+		tests.setRequired(false);
+		
+		
 		OptionGroup searchStrategies = new OptionGroup();
 		searchStrategies.setRequired(false);
 		
@@ -79,6 +83,7 @@ public class RepairCLI {
 		options.addOption(classes);
 		options.addOption(scope);
 		options.addOption(rac);
+		options.addOption(tests);
 		options.addOptionGroup(searchStrategies);
 
 		CommandLineParser parser = new BasicParser();
@@ -124,6 +129,13 @@ public class RepairCLI {
 			}
 			if (cmd.hasOption("d")) {
 				repairer.setDfsStrategy();
+			}
+			if (cmd.hasOption("t")) {
+				if (!cmd.hasOption("r")) {
+					System.err.println("Can't use option -t[ests] without option -r[ac]");
+					return;
+				}
+				repairer.generateTests(true);
 			}
 			repairer.repair();
 		}

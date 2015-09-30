@@ -22,14 +22,17 @@ import com.google.common.io.Files;
 import config.StrykerConfig;
 
 /**
- * A class that offers simple method to compile java files using java compiler
- * this class also offers the functionality of {@code Reloader}
+ * A class that offers simple methods to compile java files using java compiler
+ * this class also offers compiling using JML RAC.
  * 
  * @author Simón Emmanuel Gutiérrez Brida
  * @version 1.0
  */
 public class JavaCompilerAPI {
 	
+	/**
+	 * The instance of this class to be used with the {@code #getInstance()} method
+	 */
 	private static JavaCompilerAPI instance;
 	
 	/**
@@ -43,13 +46,12 @@ public class JavaCompilerAPI {
 	private JavaCompilerAPI() {}
 	
 	/**
-	 * Given a path to a java file a list of folders, this method will try
-	 * to compile the given java file (and any file needed) using the list
-	 * of folders as classpath.
+	 * Given a path to a java file and a list of paths, this method will try
+	 * to compile the given java file (and any file needed) using the provided classpath.
 	 * 
 	 * @param pathToFile	:	the path to a java file to compile	:	{@code String}
 	 * @param classpath		:	all the paths needed to compile the java file pointed by {@code pathToFile}	:	{@code String[]}
-	 * @return
+	 * @return {@code true} iff the compilation process succeeded
 	 */
 	public boolean compile(String pathToFile, String[] classpath) {
 		File fileToCompile = new File(pathToFile);
@@ -68,6 +70,14 @@ public class JavaCompilerAPI {
 		return compileResult;
 	}
 	
+	/**
+	 * Given a path to a java file and a list of paths, this method will try
+	 * to compile with JML RAC the given java file (and any file needed) using the provided classpath.
+	 * 
+	 * @param pathToFile	:	the path to a java file to compile	:	{@code String}
+	 * @param classpath		:	all the paths needed to compile the java file pointed by {@code pathToFile}	:	{@code String[]}
+	 * @return {@code true} iff the compilation process succeeded
+	 */
 	public boolean compileWithJML4C(String pathToFile, String[] classpath) {
 		File fileToCompile = new File(pathToFile);
 		if (!fileToCompile.exists() || !fileToCompile.isFile() || !fileToCompile.getName().endsWith(".java")) {
@@ -172,6 +182,11 @@ public class JavaCompilerAPI {
 		return exitValue == 0;
 	}
 	
+	/**
+	 * This method allows to recursively delete all {@code .class} files inside a directory
+	 * 
+	 * @param dir	:	the folder where to delete all {@code .class} files
+	 */
 	public void removeAllClassFilesRecursively(String dir) {
 		File folder = new File(dir);
 		removeAllClassFilesRecursively(folder);

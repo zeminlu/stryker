@@ -94,6 +94,8 @@ public class FixCandidate implements State {
 		return this.methodToFix;
 	}
 	
+	//TODO: check equals, there's something not quite right about them
+	
 	/**
 	 * Checks whether two fix candidates are equivalent. If the parameter is not a fix candidate,
 	 * returns false.

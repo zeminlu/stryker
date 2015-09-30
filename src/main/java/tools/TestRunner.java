@@ -24,9 +24,9 @@ import ar.edu.taco.TacoException;
 
 
 /**
- * This class is used to check a fix candidate against a previously built counter example
+ * This class is used to check a fix candidate against a previously built counter example without constructing a JUnit test
  * <p>
- * Given a fix candidate compiled with {@code jml4c.jar} and a counter example represented by a {@code CounterExample} instance
+ * Given a fix candidate compiled with {@code JML RAC} and a counter example represented by a {@code CounterExample} instance
  * this will run the fix candidate using the counter example values and check if executed method ends successfully or not
  * <p>
  * @author Simon Emmanuel Gutierrez Brida
@@ -34,6 +34,12 @@ import ar.edu.taco.TacoException;
  */
 public final class TestRunner {
 	
+	/**
+	 * A class used when a method argument type is not yet discovered
+	 * 
+	 * @author Simon Emmanuel Gutierrez Brida
+	 * @version 1.0
+	 */
 	private static final class Dummy{}
 	private static final TestResult NoCounterExample = new TestResult(TestResult.Result.ERROR_INITIALIZATION, new IllegalArgumentException("Trying to run a test with no counter example"));
 	private static final TestResult NullCounterExample = new TestResult(TestResult.Result.ERROR_INITIALIZATION, new IllegalArgumentException("Trying to run a test with a null counter example"));
@@ -47,46 +53,108 @@ public final class TestRunner {
 	 * This class is used to describe the result of running the counter example
 	 * 
 	 * @author Simon Emmanuel Gutierrez Brida
-	 * @version 0.1u
+	 * @version 1.0
 	 */
 	public static final class TestResult {
-		public static enum Result {VALID, ERROR_RUNTIME, ERROR_SPECIFICATION, ERROR_INITIALIZATION, ERROR_TIMEOUT, ERROR_METHOD_EXCEPTION};
+		/**
+		 * An enum defining all possible results when running a fix candidate against a counter example
+		 * 
+		 * @author Simon Emmanuel Gutierrez Brida
+		 * @version 1.0
+		 */
+		public static enum Result {
+			/**
+			 * When a fix candidate is executed against a counter example and no specification is violated
+			 */
+			VALID,
+			
+			/**
+			 * When there was a runtime exception but doesn't fall inside any of the other categories
+			 * This type of errors can be caused by an exception in RAC or a reflection error.
+			 */
+			ERROR_RUNTIME,
+			
+			/**
+			 * When a specification was violated during runtime
+			 */
+			ERROR_SPECIFICATION,
+			
+			/**
+			 * When an exception occurred before running the counter example
+			 */
+			ERROR_INITIALIZATION,
+			
+			/**
+			 * When the fix candidate took more than the alloted time while running the counter example
+			 */
+			ERROR_TIMEOUT,
+			
+			/**
+			 * An exception occurred while running the fix candidate method under examination
+			 */
+			ERROR_METHOD_EXCEPTION
+		};
 		
+		/**
+		 * The type of the result
+		 */
 		private Result result;
+		/**
+		 * The associated exception if exists
+		 */
 		private Exception ex;
 		
+		/**
+		 * Constructs a new instance of this class
+		 * 
+		 * @param result	:	the type of the result
+		 * @param ex		:	the associated exception (or {@code null} if no exception occurred)
+		 */
 		public TestResult(Result result, Exception ex) {
 			this.result = result;
 			this.ex = ex;
 		}
 		
+		/**
+		 * @return The type of the result
+		 */
 		public Result getResult() {
 			return this.result;
 		}
 		
+		/**
+		 * @return The associated exception if exists
+		 */
 		public Exception getException() {
 			return this.ex;
 		}
 		
 	}
 	
+	/**
+	 * Sets the verbosity of this class
+	 * 
+	 * @param verbose	:	whether to output information {@code true} or not {@code false}
+	 */
 	public static void setVerbose(boolean verbose) {
 		TestRunner.verbose = verbose;
 	}
 	
+	/**
+	 * Defines the timeout used when running the fix candidate against a counter example
+	 * 
+	 * @param timeout	:	the timeout to use in milliseconds.
+	 */
 	public static void setTimeout(int timeout) {
 		TestRunner.timeout = timeout;
 	}
 	
 	/**
-	 * Runs a the method to repair in the fix candidate using the provided counter example
-	 * @param params2 
-	 * @param methodToRun2 
-	 * @param instance2 
+	 * Runs the method to repair in the fix candidate using the provided counter example
 	 * 
-	 * @param ce
-	 * @return
-	 * @throws ClassNotFoundException 
+	 * @param ce	:	the counter example to use (it includes information need to find which fix candidate to run)
+	 * @return	a {@code TestResult} object containing information about the fix candidate run.
+	 * @throws ClassNotFoundException
 	 */
 	public static TestResult runTest(CounterExample ce) throws ClassNotFoundException {
 		if (ce == null) return TestRunner.NullCounterExample;
@@ -171,8 +239,6 @@ public final class TestRunner {
                 try {
                 	runningThread = Thread.currentThread();
                     long timeprev = System.currentTimeMillis();
-                    System.out.println("instance CL : " + instance.getClass().getClassLoader().toString());
-                    System.out.println("method CL : " + methodToRun.getDeclaringClass().getClassLoader().toString());
                     methodToRun.invoke(instance, params);
                     long timepost = System.currentTimeMillis();
                     if (TestRunner.verbose) System.out.println("time taken: "+(timepost - timeprev));

@@ -15,17 +15,25 @@ import tools.apis.TacoAPI;
 /**
  * StrykerRepairSearchProblem is a class that contains all concrete elements necessary for implementing the
  * program repair process associated with Stryker, as a search problem. This includes:
- * - the construction of an initial fix candidate to start the search for a fix.
- * - a routine that, given a fix candidate, computes its successors for the search (mutations obtainable from
- * a given fix candidate).
- * - a routine that, given a fix candidate, decides whether it constitutes an actual fix or not.
+ * <p>
+ * <li>The construction of an initial fix candidate to start the search for a fix.</li>
+ * 
+ * <li>A routine that, given a fix candidate, computes its successors for the search (mutations obtainable from a given fix candidate).</li>
+ * 
+ * <li>a routine that, given a fix candidate, decides whether it constitutes an actual fix or not.</li>
+ * <p>
+ * <p>
  * Actual search strategy is decoupled from this class, so that it can be easily set and replaced. They are 
- * defined as implementations of search.engines.AbstractSearchEngine.
+ * defined as implementations of {@code search.engines.AbstractSearchEngine}.
  * @author Nazareno Matías Aguirre
  * @version 0.1.6
+ * @see search.engines.AbstractSearchEngine
  */
 public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCandidate> {
 	
+	/**
+	 * A set of MD5 digest of each fix candidate, this allows to discard duplicate candidates.
+	 */
 	private Set<String> hashes;
 	
 	/**
@@ -176,6 +184,14 @@ public class StrykerRepairSearchProblem implements AbstractSearchProblem<FixCand
 			}
 		}
 		return mrc;
+	}
+
+	public void generateTests() {
+		if (this.checkStrategy instanceof TacoWithRacSuccessCheckStrategy) {
+			((TacoWithRacSuccessCheckStrategy)this.checkStrategy).generateTests();
+		} else {
+			throw new IllegalStateException("StrykerRepairSearchProblem#generateTests : Problem is not using TacoWithRacSUccessCheckStrategy");
+		}
 	}
 
 

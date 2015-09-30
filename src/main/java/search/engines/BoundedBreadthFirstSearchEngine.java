@@ -10,10 +10,8 @@ import search.AbstractSearchProblem;
 import search.State;
 
 /**
- * Title:        BoundedBreadthFirstSearchEngine<p>
- * Description:  Class BoundedBreadthFirstSearchEngine implements a Bounded Breadth-first search 
-                 strategy which can be used with any instance of 
-		         AbstractSearchProblem.<p>
+ * This class implements a Bounded Breadth-first search 
+ * strategy which can be used with any instance of AbstractSearchProblem.
  * @author Nazareno Aguirre
  * @version 0.3
  */

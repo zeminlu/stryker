@@ -76,6 +76,14 @@ public class JMLAnnotatedClass {
 		}
 	}
 
+	/**
+	 * Allows to redefine the location of this class
+	 * 
+	 * @param sourceFolder	:	the new source dir
+	 * <hr>
+	 * <p>
+	 * <b>Note: this methods does not move the file, you should have moved the file before calling this method</b>
+	 */
 	public void moveLocation(String sourceFolder) {
 		if (!isReadable(sourceFolder, this.className)) throw new IllegalArgumentException("creating program with non existent file");
 		this.sourceFolder = toPath(sourceFolder, "");

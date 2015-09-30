@@ -18,26 +18,104 @@ import config.StrykerConfig;
  * @version 0.1.5
  */
 public class TestWritter {
+	/**
+	 * The section name where the package should be written
+	 */
 	private static final String PACKAGE = "PACKAGE";
+	
+	/**
+	 * The section name where the imports should be written
+	 */
 	private static final String IMPORTS = "IMPORTS";
+	
+	/**
+	 * The section name where the class profile should be written
+	 */
 	private static final String CLASS = "CLASS START";
+	
+	/**
+	 * The section name where the instance should be written
+	 */
 	private static final String INSTANCE_VALUE = "INSTANCE VALUE";
+	
+	/**
+	 * The section name where the initializations should be written
+	 */
 	private static final String INITIALIZATIONS = "INITIALIZATIONS";
+	
+	/**
+	 * The section name where the field updates should be written
+	 */
 	private static final String UPDATES = "FIELD UPDATES";
+	
+	/**
+	 * The section name where the parameters initializations should be written
+	 */
 	private static final String PARAMS = "PARAMS INIT";
 	
+	/**
+	 * Where the template file is located
+	 */
 	private static final String TEMPLATE_PATH = StrykerConfig.getInstance().getTestTemplatePath();
+	
+	/**
+	 * The path to the output directory
+	 */
 	private static final String TEST_OUTPUT_DIR = StrykerConfig.getInstance().getTestsOutputDir();
 	
+	/**
+	 * The new test package
+	 */
 	private String pkg;
+	
+	/**
+	 * The set of imports needed by the new test
+	 */
 	private Set<String> importList;
+	
+	/**
+	 * The class name of the new test
+	 */
 	private String className;
+	
+	/**
+	 * Whether the method to check is static or not
+	 */
 	private boolean isStatic;
+	
+	/**
+	 * The list of initializations
+	 */
 	private List<String> initializationsList;
+	
+	/**
+	 * The list of updates used during initialization of the test
+	 */
 	private Set<UpdateCommand> updatesList;
+	
+	/**
+	 * The param list
+	 * TODO: improve this comment
+	 */
 	private List<String> paramsList;
+	
+	/**
+	 * Which imports to ignore (e.g.: java.lang.Object)
+	 */
 	private Set<String> importsToIgnore;
 	
+	/**
+	 * The constructor of this class, for each new test a new instance of this class should be built.
+	 * 
+	 * @param pkg						:	The new test package
+	 * @param importList				:	The set of imports needed by the new test
+	 * @param className					:	The class name of the new test
+	 * @param isStatic					:	Whether the method to check is static or not
+	 * @param initializationsList		:	The list of initializations
+	 * @param updatesList				:	The list of updates used during initialization of the test
+	 * @param paramsList				:	The param list
+	 * @param importsToIgnore			:	Which imports to ignore (e.g.: java.lang.Object)
+	 */
 	public TestWritter(String pkg, Set<String> importList, String className, boolean isStatic, List<String> initializationsList, Set<UpdateCommand> updatesList, List<String> paramsList, Set<String> importsToIgnore) {
 		this.pkg = pkg;
 		this.importList = importList;
@@ -49,6 +127,12 @@ public class TestWritter {
 		this.importsToIgnore = importsToIgnore;
 	}
 	
+	/**
+	 * This writes a new JUnit test using all the information passed when calling the constructor
+	 * 
+	 * @return the path of the generated JUnit test
+	 * @throws IOException
+	 */
 	public String writeTest() throws IOException {
 		File origFile = new File(TestWritter.TEMPLATE_PATH);
 		File destFile = new File(TestWritter.TEST_OUTPUT_DIR, this.className.replaceAll("\\.", StrykerConfig.getInstance().getFileSeparator()) + ".java");

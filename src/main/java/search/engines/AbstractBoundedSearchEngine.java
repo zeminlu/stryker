@@ -1,20 +1,21 @@
 package search.engines;
-/**
- * Title:        AbstractSearchEngine
- * Description:  class AbstractSearchEngine: abstract class which defines the basic 
- * elements that are required for a search engine. Different search strategies 
- * should extend this class.  
- * @author Nazareno Aguirre & Gaston Scilingo
- * @version 0.3
- */
 
 import search.AbstractSearchProblem;
 import search.State;
-// necessary for the use of lists
 
+/**
+ * Abstract class which defines the basic 
+ * elements that are required for a search engine. Different search strategies 
+ * should extend this class.  
+ * @author Nazareno Aguirre
+ * @author Gaston Scilingo
+ * @version 0.3
+ */
 abstract public class AbstractBoundedSearchEngine<S extends State, Problem extends AbstractSearchProblem<S>> extends AbstractSearchEngine<S, Problem>{
 	
-    // a reference to the problem to apply search to
+    /**
+    * The problem to apply search to
+    */
     protected Problem problem;
     
 	/** 
@@ -63,6 +64,9 @@ abstract public class AbstractBoundedSearchEngine<S extends State, Problem exten
         problem = p;
     }
 	
+    /**
+     * @return the solution (if found) obtained by the search algorithm
+     */
     abstract public S getSolution();
     
 	/**

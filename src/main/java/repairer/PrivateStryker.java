@@ -27,10 +27,18 @@ import tools.Compiler;
 import tools.apis.ReloaderAPI;
 
 /**
- * PrivateStryker is a command line application that calls Stryker on a given class and method, and performs the
- * intra statement mutation-based repair, without any pruning.
+ * PrivateStryker is the main API to use Stryker. At the moment this class only allows to check if a fix can be found.
+ * <p>
+ * Main points of the current implementation are:
+ * <p>
+ * <li>Stryker works using a search algorithm</li>
+ * <li>Uses TACO to check if a java class satisfies its JML specification within a given scope</li>
+ * <li>Uses RAC to, given a new fix candidate, test that previously generated TACO counterexamples can be successfully executed, this allows to reduce TACO calls</li>
+ * <li>When using RAC, Stryker can generate JUnit tests</li>
+ * <li>Different strategies can be implemented and used to repair a java class</li>
+ * <p>
  * @author Nazareno Matías Aguirre
- * @version 0.4.2
+ * @version 0.5
  */
 public class PrivateStryker {
 	
@@ -67,7 +75,16 @@ public class PrivateStryker {
 	 */
 	private boolean racEnabled;
 	
+	/**
+	 * TODO: complete this comment, can type scope be declared partially?
+	 */
 	private String typeScope = null;
+
+	/**
+	 * Defines whether or not to generate tests when using RAC, when this is set to {@code true} TACO counterexamples
+	 * will be converted into JUnit tests, when set to {@code false} the counterexamples will be used via reflection.
+	 */
+	private boolean generateTests = false;
 
 	
 	/**
@@ -175,6 +192,7 @@ public class PrivateStryker {
 		if (!subjectClass.isValid()) throw new IllegalStateException("program does not compile");
 		StrykerRepairSearchProblem problem = new StrykerRepairSearchProblem(subjectClass, subjectMethod, this.relevantClasses);
 		if (racEnabled) problem.setRacStrategy();
+		if (generateTests) problem.generateTests();
 		if (this.typeScope!=null) {
 			// if a scope is provided, we pass it to the problem (to be used in success method).
 			problem.setScope(this.typeScope);
@@ -275,7 +293,6 @@ public class PrivateStryker {
 				
 			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -341,6 +358,10 @@ public class PrivateStryker {
 	 */
 	public void enableRac() {
 		this.racEnabled = true;
+	}
+	
+	public void generateTests(boolean b) {
+		this.generateTests = b;
 	}
 	
 }

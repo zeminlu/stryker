@@ -88,14 +88,8 @@ public class RacAPI {
 			if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
         	return null;
 		}
-		
-		//ReloaderAPI.getInstance().rescan(StrykerConfig.getInstance().getTestsOutputDir());
+	
 		ReloaderAPI.getInstance().rescan();
-
-//        if (!JavaCompilerAPI.getInstance().compile(testPath, new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-//        	if (RacAPI.verbose) System.err.println("Error while compiling " + testPath);
-//        	return null;
-//        }
 	       
         if (RacAPI.verbose) System.out.println("junit counterexample compilation succeded");
 
@@ -130,12 +124,7 @@ public class RacAPI {
 		
 		testClassName = testClassName.replaceAll(StrykerConfig.getInstance().getFileSeparator(), ".");
 		
-//	    if (!JavaCompilerAPI.getInstance().compile(testPath.toString(), new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-//	    	if (RacAPI.verbose) System.err.println("test failed to compile: " + testPath);
-//	    	return false;
-//	    }
-		
-        //ReloaderAPI.getInstance().rescan();
+
         Class<?> testClass = ReloaderAPI.getInstance().reloadFrom(testClassName, StrykerConfig.getInstance().getTestsOutputDir());
         final Class<?> candidateClass = ReloaderAPI.getInstance().load(candidate.getProgram().getClassName());
         
@@ -157,25 +146,6 @@ public class RacAPI {
                 Boolean result = false;
                 try {
                     runningThread = Thread.currentThread();
-                    //DELETE+++
-//                    if (!JavaCompilerAPI.getInstance().compile(StrykerConfig.getInstance().getCompilingSandbox()+"delete/ReflectionTestSimpleClass.java", new String[]{StrykerConfig.getInstance().getCompilingSandbox()})) {
-//                    	System.out.println("la super kakona");
-//                    }
-//                    Class<?> reflectionTestSimpleClassClass = JavaCompilerAPI.getInstance().reloadClassFrom("delete.ReflectionTestSimpleClass", StrykerConfig.getInstance().getCompilingSandbox());
-//                    Object reflectionTestSimpleClassInstance = reflectionTestSimpleClassClass.newInstance();
-//                    Method[] methodsRTSC = reflectionTestSimpleClassClass.getDeclaredMethods();
-//                    Method testMethod = null;
-//                    for (Method m : methodsRTSC) {
-//                    	if (m.getName().compareTo("test") == 0) {
-//                    		testMethod = m;
-//                    		break;
-//                    	}
-//                    }
-//                    if (testMethod != null) {
-//                    	testMethod.setAccessible(true);
-//                    	testMethod.invoke(reflectionTestSimpleClassInstance, new Object[]{candidateClass});
-//                    }
-                    //DELETE---
                     long timeprev = System.currentTimeMillis();
                     methodToRunInCallable.invoke(oToRun, inputToInvoke);
                     long timepost = System.currentTimeMillis();

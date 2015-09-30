@@ -20,11 +20,14 @@ import config.StrykerConfig;
 /**
  * This class is a particular implementation of SuccessCheckStrategy. It checks whether a given candidate
  * is a successful fix or not by doing the following:
- * - it first checks whether the candidate correctly executes (i.e., does not violate its contract)
+ * <p>
+ * <li>it first checks whether the candidate correctly executes (i.e., does not violate its contract)
  *  on a number of collected counterexamples. If at least one fails, it considers the candidate an invalid
- *  fix.
- * - if the candidate "passes" all collected inputs, then it checks using TACO whether the fix candidate
- * is indeed a valid fix.  
+ *  fix.</li>
+ * <li>if the candidate "passes" all collected inputs, then it checks using TACO whether the fix candidate
+ * is indeed a valid fix.</li>
+ * <li>This class allows to either generate JUnit tests for each counterexample or to use the counterexamples
+ * without generating any new classes.</li>
  * @author Nazareno Aguirre
  *
  */
@@ -36,9 +39,16 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 	 */
 	private List<CounterExample> collectedCounterExamples = new ArrayList<CounterExample>();
 	
+	/**
+	 * Stores a list of paths representing the JUnit test classes built from previously
+	 * obtained TACO counterexamples.
+	 */
 	private List<Path> builtJunitTests = new ArrayList<Path>();
 	
-	private boolean buildJunitTest = true;
+	/**
+	 * Whether or not to generate JUnit tests for TACO counterexamples.
+	 */
+	private boolean buildJunitTest = false;
 
 	/**
 	 * It checks whether a given candidate is a successful fix or not by doing the following:
@@ -49,11 +59,6 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 	 * is indeed a valid fix.  
 	 */
 	public boolean isSuccessful(FixCandidate s) {
-		//TODO: make the following changes :
-		//1 - 	given that the jmlrac version of the candidate is only needed to run the junit tests
-		//		put the necessary code to do that in RacAPI#runJunits
-		//2 -	compile the candidate just before running TacoAPI#isSat
-		//		(maybe move the compile code inside that method?)
 		if (s==null) throw new IllegalArgumentException("null fix candidate");
 		if (s.program==null) throw new IllegalArgumentException("null program in fix candidate");
 		
@@ -147,6 +152,15 @@ public class TacoWithRacSuccessCheckStrategy implements SuccessCheckStrategy {
 		}
 		return true;
 	}
+
+	/**
+	 * Enable JUnit test generation
+	 */
+	public void generateTests() {
+		this.buildJunitTest = true;
+	}
+	
+	
 
 	
 }
