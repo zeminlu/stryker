@@ -128,7 +128,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodInBfs_2() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.utils.SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 0);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -160,7 +160,7 @@ public class BasicProgramRepairerWithRacTest {
 	@Test
 	public void programRepairWithSimpleIncorrectMethodDepthOneInBfs() {
 		// extension .java is assumed for programs
-		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.utils.SimpleClass");		
+		JMLAnnotatedClass subject = new JMLAnnotatedClass("src/test/resources/java/", "utils.SimpleClass");		
 		PrivateStryker repairer = new PrivateStryker(subject, "decX", 1);
 		repairer.setBfsStrategy();
 		repairer.enableRac();
@@ -286,11 +286,11 @@ public class BasicProgramRepairerWithRacTest {
 	 */
 	@Test
 	public void programRepairWithSimpleIncorrectMethodWithDepthOne_usingDependencies_singlylinkedlist() {
-		String sourceFolder = "src/test/resources/";
-		String[] dependencies = new String[]{"SinglyLinkedList", "SinglyLinkedListNode"};
-		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "SinglyLinkedList");
+		String sourceFolder = "src/test/resources/java/";
+		String[] dependencies = new String[]{"roops.core.SinglyLinkedList", "roops.core.SinglyLinkedListNode"};
+		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "roops.core.SinglyLinkedList");
 		PrivateStryker repairer = new PrivateStryker(subject, "getNode", dependencies, 1);
-		repairer.setScope("SinglyLinkedList:3,SinglyLinkedListNode:3");
+		repairer.setScope("roops.core.SinglyLinkedList:3,roops.core.SinglyLinkedListNode:3");
 		repairer.enableRac();
 		boolean isRepaired = repairer.repair();
 		assertTrue("method can be repaired", isRepaired);

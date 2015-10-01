@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import com.google.common.primitives.Primitives;
 
 import tools.apis.ReloaderAPI;
 import tools.data.CounterExample;
@@ -343,10 +344,14 @@ public final class TestRunner {
 				if (actualType.getCanonicalName().compareTo(Dummy.class.getCanonicalName())==0) {
 					continue;
 				}
-				if (!formalType.isAssignableFrom(actualType)) {
+				if (!compatibleTypes(formalType, actualType)) {
 					correctParamTypes = false;
 					break;
 				}
+//				if (!formalType.isAssignableFrom(actualType)) {
+//					correctParamTypes = false;
+//					break;
+//				}
 			}
 			if (correctParamTypes) {
 				return method;
@@ -355,6 +360,25 @@ public final class TestRunner {
 		return null;
 	}
 	
+	/**
+	 * Method that allows to check if two classes are compatible
+	 * 
+	 * @param p	:	the class to check compatibility with
+	 * @param v	:	the class to check compatibility
+	 * @return {@code true} if {@code v} can be assigned to {@code p}
+	 */
+	private static boolean compatibleTypes(Class<?> p, Class<?> v) {
+		if (p.isAssignableFrom(v)) {
+			return true;
+		}
+		if (p.isPrimitive() && Primitives.isWrapperType(v)) {
+			return p.isAssignableFrom(Primitives.unwrap(v));
+		}
+		if (Primitives.isWrapperType(p) && v.isPrimitive()) {
+			return Primitives.unwrap(p).isAssignableFrom(v);
+		}
+		return false;
+	}
 	
 	private static Object defaultValue(Class<?> clazz) throws InstantiationException, IllegalAccessException {
         Object value;

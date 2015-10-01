@@ -13,7 +13,7 @@ import repairer.FixCandidate;
 import tools.data.CounterExample;
 
 /**
- * This class is used to access TACO, the main responsabilities of this API are:
+ * This class is used to access TACO, the main responsibilities of this API are:
  * 
  * <li> Given a java source file run SAT and return the result </li>
  * <li> Obtain the counter example built by SAT solver for a previous run that gave UNSAT </li>

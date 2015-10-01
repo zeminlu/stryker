@@ -244,7 +244,7 @@ public class BasicProgramRepairerTest {
 		String sourceFolder = "src/test/resources/java/";
 		String[] dependencies = new String[]{"examples.stryker.multikeymap.MultiKey", "examples.stryker.multikeymap.HashEntry"};
 		JMLAnnotatedClass subject = new JMLAnnotatedClass(sourceFolder, "examples.stryker.multikeymap.MultiKeyMap");
-		PrivateStryker repairer = new PrivateStryker(subject, "equalKey", dependencies, 0);
+		PrivateStryker repairer = new PrivateStryker(subject, "equalKey", dependencies, 1);
 		boolean isRepaired = repairer.repair();
 		assertFalse("method cannot be repaired with this depth", isRepaired);
 	}
