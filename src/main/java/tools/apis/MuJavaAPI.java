@@ -1,6 +1,7 @@
 package tools.apis;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.Random;
 import java.util.Set;
 
 import config.StrykerConfig;
-
 import openjava.ptree.ParseTreeException;
 import repairer.FixCandidate;
 import repairer.JMLAnnotatedClass;
@@ -22,6 +22,7 @@ import mujava.app.MutantInfo;
 import mujava.app.MutationRequest;
 import mujava.app.Mutator;
 import mujava.op.PRVO;
+import mujava.op.basic.COR;
 import mujava.util.JustCodeDigest;
 
 /**
@@ -87,7 +88,21 @@ public class MuJavaAPI {
 	 */
 	private MuJavaAPI(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
-		Configuration.add(PRVO.ENABLE_SUPER, Boolean.FALSE);
+		List<String> bannedMethods = Arrays.asList(new String[]{"extractMin", "getClass", "toString", "toLowerCase", "intern", "toCharArray", "getBytes", "toUpperCase", "trim", "toLowerCase", "clone", "hash32", "serialPersistentFields", "hash", "hashCode"});
+		List<String> bannedFields = Arrays.asList(new String[]{"serialVersionUID", "hash32", "HASHING_SEED", "CASE_INSENSITIVE_ORDER", "serialPersistentFields"});
+		Configuration.add(PRVO.PROHIBITED_METHODS, bannedMethods);
+        Configuration.add(PRVO.PROHIBITED_FIELDS, bannedFields);
+		Configuration.add(COR.ALLOW_BIT_AND, false);
+        Configuration.add(COR.ALLOW_BIT_OR, false);
+        Configuration.add(COR.ALLOW_LOGICAL_AND, false);
+        Configuration.add(COR.ALLOW_LOGICAL_OR, false);
+        Configuration.add(COR.ALLOW_XOR, false);
+        Configuration.add(PRVO.ENABLE_SUPER, Boolean.FALSE);
+        //Configuration.add(PRVO.ENABLE_THIS, Boolean.FALSE);
+        Configuration.add(PRVO.ENABLE_LITERAL_EMPTY_STRING, Boolean.FALSE);
+        Configuration.add(PRVO.ENABLE_ONE_BY_TWO_MUTANTS, Boolean.FALSE);
+        Configuration.add(PRVO.ENABLE_PRIMITIVE_WRAPPING, Boolean.FALSE);
+        Configuration.add(PRVO.ENABLE_PRIMITIVE_TO_OBJECT_ASSIGNMENTS, Boolean.FALSE);
 	}
 	
 	
