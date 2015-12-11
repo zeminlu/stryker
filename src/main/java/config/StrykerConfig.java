@@ -138,20 +138,6 @@ public class StrykerConfig {
 	}
 	
 	/**
-	 * @return the value of property {@code path.junitPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
-	 */
-	public String getJunitPath() {
-		return formatString(this.config.getString("path.junitPath"));
-	}
-	
-	/**
-	 * @return the value of property {@code path.hamcrestPath} replacing the only argument with {@link StrykerConfig#getFileSeparator()}
-	 */
-	public String getHamcrestPath() {
-		return formatString(this.config.getString("path.hamcrestPath"));
-	}
-	
-	/**
 	 * @return the value of property {@code tests.output}
 	 */
 	public String getTestsOutputDir() {
