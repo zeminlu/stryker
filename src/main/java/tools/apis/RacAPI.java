@@ -125,8 +125,9 @@ public class RacAPI {
 		testClassName = testClassName.replaceAll(StrykerConfig.getInstance().getFileSeparator(), ".");
 		
 
-        Class<?> testClass = ReloaderAPI.getInstance().reloadFrom(testClassName, StrykerConfig.getInstance().getTestsOutputDir());
-        final Class<?> candidateClass = ReloaderAPI.getInstance().load(candidate.getProgram().getClassName());
+        //Class<?> testClass = ReloaderAPI.getInstance().reloadFrom(testClassName, StrykerConfig.getInstance().getTestsOutputDir());
+        final Class<?> candidateClass = ReloaderAPI.getInstance().reload(candidate.getProgram().getClassName());//ReloaderAPI.getInstance().load(candidate.getProgram().getClassName());
+        Class<?> testClass = ReloaderAPI.getInstance().load(testClassName);
         
         Method[] methods = testClass.getDeclaredMethods();
         Method methodToRun = null;
